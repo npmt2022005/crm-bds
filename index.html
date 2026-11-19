@@ -844,34 +844,6 @@ body.detail-mode #viewbar{display:none}
 .tpl:hover .tpl-dl{color:var(--fg2)}
 .cell.s-lock .code{color:var(--fg2)}
 .viewnote .saved{margin-left:auto}
-
-/* ===== tab Điều kiện bàn giao ===== */
-.hg-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
-.hg-head .std-tag{font-size:12.5px;height:18px}
-.hspec{border:1px solid var(--bd);border-radius:var(--r-sm);overflow:hidden;background:#fff}
-.hspec .r{display:grid;grid-template-columns:104px 1fr;gap:10px;padding:6px 9px;border-bottom:1px solid var(--bdl);font-size:13.5px;line-height:1.45}
-.hspec .r:last-child{border-bottom:0}
-.hspec .r>span{color:var(--fg3)}
-.hspec .r>b{font-weight:400;color:var(--fg)}
-.hstep{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--bd);border-left:2px solid var(--bd);border-radius:var(--r-sm);background:#fff;width:100%;text-align:left}
-.hstep+.hstep{margin-top:5px}
-.hstep:hover{background:#FAFAFA}
-.hstep.on{border-left-color:#00824D;background:#F6FCF8}
-.hstep .box{width:15px;height:15px;border:1px solid var(--bd2);border-radius:3px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;color:#fff;background:#fff}
-.hstep.on .box{background:#00824D;border-color:#00824D}
-.hstep .tx{display:flex;flex-direction:column;min-width:0;line-height:1.35}
-.hstep .tx b{font-size:13.5px;font-weight:500;color:var(--fg)}
-.hstep .tx span{font-size:12.5px;color:var(--fg3)}
-.gift{border:1px solid var(--bd);border-radius:var(--r-sm);background:#fff;padding:7px 9px;width:100%;text-align:left;display:flex;flex-direction:column;gap:1px}
-.gift+.gift{margin-top:5px}
-.gift:hover{background:#FAFAFA;border-color:var(--bd2)}
-.gift.on{border-color:var(--accb);background:var(--accs)}
-.gift .g-h{display:flex;align-items:center;gap:6px;min-width:0}
-.gift .g-h b{font-size:13.5px;font-weight:500;color:var(--fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.gift .g-h .price{margin-left:auto;font-family:'DM Mono',monospace;font-size:12.5px;color:var(--fg2);white-space:nowrap}
-.gift .g-d{font-size:12.5px;color:var(--fg3);line-height:1.4}
-.gift .g-d .over{color:#D14E00}
-.gsum{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
 </style>
 
 <script>
@@ -893,13 +865,6 @@ body.detail-mode #viewbar{display:none}
 
   /* ================= domain ================= */
   const VAT = 0.0845, MF = 0.02, TODAY = "19/11/2026";
-  /* ---- Ký quỹ thay cho "đặt cọc" ----
-     Đặt cọc (BLDS Điều 328) là tiền giao thẳng cho bên nhận cọc, vi phạm thì mất cọc/phạt cọc.
-     Ký quỹ là tiền gửi vào tài khoản phong toả tại ngân hàng, vẫn là tài sản bảo đảm của khách,
-     được trừ dần vào tiến độ thanh toán và hoàn lại nếu giao dịch không thành.
-     Luật KDBĐS 2023 giới hạn tiền bảo đảm thu trước của nhà ở hình thành trong tương lai
-     không quá 5% giá bán → dùng 5% để mọi căn đều đúng trần, thay cho mức cứng 300 triệu. */
-  const KQ = 0.05;
   const ST = {
     AVAILABLE:       { l: "Chưa bán",           c: "s-av",   t: "t-av",   hex: "#00824D" },
     SOLD:            { l: "Đã bán",             c: "s-sold", t: "t-sold", hex: "#E5484D" },
@@ -913,14 +878,14 @@ body.detail-mode #viewbar{display:none}
      hợp lệ của bước hiện tại (Status reason transitions), không sửa tay. */
   const REASON_L = {
     FREE: "Còn trống", HIDDEN: "Chưa công bố", HOLD: "Giữ chỗ",
-    DEPOSIT: "Ký quỹ", CONTRACT: "Ký HĐMB", TRANSFER: "Chuyển nhượng",
+    DEPOSIT: "Đặt cọc", CONTRACT: "Ký HĐMB", TRANSFER: "Chuyển nhượng",
     OPEN: "Mở bán", CANCEL: "Huỷ giao dịch"
   };
   const TRANS = {
     UNRELEASED: [{ k: "OPEN", l: "Mở bán", to: "AVAILABLE", reason: "FREE" }],
     AVAILABLE: [
       { k: "HOLD", l: "Giữ chỗ", to: "IN_TRANSACTION", reason: "HOLD", need: 1 },
-      { k: "DEPOSIT", l: "Ký quỹ", to: "IN_TRANSACTION", reason: "DEPOSIT", need: 1 }
+      { k: "DEPOSIT", l: "Đặt cọc", to: "IN_TRANSACTION", reason: "DEPOSIT", need: 1 }
     ],
     IN_TRANSACTION: [
       { k: "CONTRACT", l: "Ký HĐMB", to: "SOLD", reason: "CONTRACT", need: 1 },
@@ -962,7 +927,7 @@ body.detail-mode #viewbar{display:none}
   const PROJECTS = [
     {
       id: "orchard", name: "The Orchard – Sycamore", short: "The Orchard",
-      addr: "An Phú, TP. Thủ Đức, TP.HCM", handover: "29/08/2027", hstd: "FINISHED",
+      addr: "An Phú, TP. Thủ Đức, TP.HCM", handover: "29/08/2027",
       cols: [
         { n: 1, type: "2PN", area: 105.0 },
         { n: 2, type: "3PN", area: 180.0 },
@@ -977,7 +942,7 @@ body.detail-mode #viewbar{display:none}
     },
     {
       id: "global", name: "The Global City – Block G", short: "The Global City",
-      addr: "An Phú, TP. Thủ Đức, TP.HCM", handover: "30/06/2028", hstd: "BASIC",
+      addr: "An Phú, TP. Thủ Đức, TP.HCM", handover: "30/06/2028",
       cols: [
         { n: 1, type: "Studio", area: 42.0 },
         { n: 2, type: "1PN", area: 58.5 },
@@ -1394,8 +1359,7 @@ body.detail-mode #viewbar{display:none}
             dir: DIRS[c.n - 1], view: VIEWS[c.n - 1],
             status,
             buyer: who || "", phone: pe ? pe[1] : "", cccd: pe ? pe[2] : "",
-            handover: p.handover,
-            hstd: p.hstd || "FINISHED", gift: "", gstat: "todo", hsteps: {}
+            deposit: 300000000, handover: p.handover
           });
         })
       );
@@ -1415,8 +1379,8 @@ body.detail-mode #viewbar{display:none}
   ];
 
   const SCHED = [
-    { k: "Đợt 1", w: "Ký quỹ 5% (phong toả ngân hàng)", p: 0.05, date: "15/01/2026" },
-    { k: "Đợt 2", w: "Ký HĐMB · 30 ngày sau ký quỹ", p: 0.20, date: "28/01/2026" },
+    { k: "Đợt 1", w: "Ký thoả thuận đặt cọc", p: 0.10, date: "15/01/2026" },
+    { k: "Đợt 2", w: "30 ngày sau khi cọc", p: 0.15, date: "28/01/2026" },
     { k: "Đợt 3", w: "Theo tiến độ xây dựng", p: 0.15, date: "31/03/2026" },
     { k: "Đợt 4", w: "Cất nóc", p: 0.15, date: "30/06/2026" },
     { k: "Đợt 5", w: "Bàn giao nhà", p: 0.40, date: "29/08/2027" },
@@ -1425,108 +1389,12 @@ body.detail-mode #viewbar{display:none}
 
   const DOCS = [
     { t: "Hợp đồng mua bán (HĐMB)", d: "Tự điền căn, khách hàng, tiến độ thanh toán" },
-    { t: "Thoả thuận ký quỹ (TTKQ)", d: "Ký quỹ 5% giá bán · phong toả tại ngân hàng" },
+    { t: "Thoả thuận đặt cọc (TTĐC)", d: "Giá trị cọc 300.000.000 ₫ · mẫu 2026" },
     { t: "Phụ lục hoàn thiện nội thất", d: "Danh mục bàn giao căn hộ" },
     { t: "Biên bản bàn giao căn hộ", d: "Checklist bàn giao & chỉ số đồng hồ" },
-    { t: "Thanh lý hợp đồng", d: "Mẫu thanh lý & hoàn ký quỹ" },
+    { t: "Thanh lý hợp đồng", d: "Mẫu thanh lý & hoàn cọc" },
     { t: "Công văn xác nhận chuyển nhượng", d: "Gửi chủ đầu tư & phòng công chứng" }
   ];
-
-  /* ================= điều kiện bàn giao =================
-     Thị trường VN phân 3 chuẩn: "bàn giao thô" (shell & core),
-     "hoàn thiện cơ bản" và "bàn giao hoàn thiện" (fully fitted).
-     CĐT chốt 1 chuẩn cho dự án; từng căn có thể thoả thuận riêng
-     bằng phụ lục HĐMB nên trạng thái được lưu theo từng căn. */
-  const HSTD = {
-    FINISHED: {
-      l: "Bàn giao hoàn thiện", short: "Hoàn thiện", tag: "t-av",
-      d: "CĐT làm hết phần cứng: sàn, trần, tường, cửa, thiết bị vệ sinh, điều hoà, tủ bếp và thiết bị bếp. Khách nhận nhà chỉ cần mua nội thất rời."
-    },
-    BASIC: {
-      l: "Hoàn thiện cơ bản", short: "Cơ bản", tag: "t-tx",
-      d: "Hoàn thiện thô + ốp lát và thiết bị vệ sinh mức tiêu chuẩn. Điều hoà, tủ bếp, nội thất để khách tự làm theo ý."
-    },
-    RAW: {
-      l: "Bàn giao thô", short: "Thô", tag: "t-lock",
-      d: "Chỉ kết cấu bê tông, xây trát, điện nước chờ. Chưa ốp lát, chưa trần, chưa thiết bị — khách tự hoàn thiện từ A–Z."
-    }
-  };
-  const HSTD_KEYS = ["FINISHED", "BASIC", "RAW"];
-  const HSTD_SPEC = {
-    FINISHED: [
-      ["Sàn", "Đá granite khu khách – bếp, gỗ công nghiệp phòng ngủ"],
-      ["Trần", "Thạch cao toàn bộ, đèn downlight âm trần"],
-      ["Tường", "Bả matit + sơn nước 2 lớp"],
-      ["Cửa", "Cửa chính, cửa phòng nhôm kính, khoá tay gạt"],
-      ["Thiết bị vệ sinh", "Trọn bộ: lavabo, sen, bồn cầu, gương, phụ kiện"],
-      ["Điều hoà", "Dàn lạnh lắp sẵn phòng khách và các phòng ngủ"],
-      ["Bếp", "Tủ bếp trên/dưới, mặt đá, bếp từ, máy hút mùi"],
-      ["Điện – nước", "Hoàn thiện, đồng hồ riêng, aptomat từng tầng"],
-      ["Nội thất rời", "Không bao gồm: sofa, bàn ăn, giường, rèm, tranh"]
-    ],
-    BASIC: [
-      ["Sàn", "Gạch ceramic 60×60 khu khách – bếp, gạch phòng ngủ"],
-      ["Trần", "Thạch cao khu khách, sơn trần phòng ngủ"],
-      ["Tường", "Bả matit + sơn nước"],
-      ["Cửa", "Cửa nhôm kính, khoá cơ"],
-      ["Thiết bị vệ sinh", "Bộ cơ bản: lavabo, sen, bồn cầu"],
-      ["Điều hoà", "Chờ ống + ổ cắm, không gồm dàn lạnh"],
-      ["Bếp", "Chờ điện – nước, chưa có tủ bếp"],
-      ["Điện – nước", "Hoàn thiện, đồng hồ riêng"],
-      ["Nội thất rời", "Không bao gồm"]
-    ],
-    RAW: [
-      ["Kết cấu", "Bê tông cốt thép, tường xây trát bả"],
-      ["Sàn", "Bê tông, chưa ốp lát"],
-      ["Trần", "Chưa làm trần"],
-      ["Tường", "Trát bả, chưa sơn"],
-      ["Cửa", "Chưa lắp, chỉ chừa ô cửa"],
-      ["Thiết bị vệ sinh", "Chưa lắp, chỉ chờ đường ống"],
-      ["Điều hoà", "Chưa có, chỉ chờ ống"],
-      ["Điện – nước", "Đi âm trong tường, chờ đồng hồ"],
-      ["Nội thất rời", "Không bao gồm"]
-    ]
-  };
-  /* chi phí khách phải tự bỏ thêm để ở được (đ/m², ước tính 2026) */
-  const HSTD_COST = { FINISHED: 0, BASIC: 3500000, RAW: 6000000 };
-  /* checklist bàn giao — dùng chung cho mọi chuẩn */
-  const HSTEPS = [
-    { k: "bienban", l: "Biên bản bàn giao có chữ ký", d: "Lập 2 bản, ghi rõ tình trạng căn hộ và ngày nhận" },
-    { k: "snag", l: "Checklist lỗi (snagging) & hẹn xử lý", d: "Chụp ảnh từng lỗi, ghi hạn khắc phục ngay trong biên bản" },
-    { k: "meter", l: "Chỉ số đồng hồ điện – nước", d: "Ghi số đầu kỳ, bàn giao thẻ/kênh thanh toán" },
-    { k: "doc", l: "Sổ bảo hành & hướng dẫn sử dụng", d: "Bảo hành kết cấu 5 năm, thiết bị theo hãng" },
-    { k: "key", l: "Chìa khoá, thẻ từ, remote", d: "Kiểm tra đủ bộ, đổi mật khẩu khoá thông minh" },
-    { k: "gift", l: "Quà tặng & lễ bàn giao", d: "Chuẩn bị theo ngân sách và phân khúc căn" }
-  ];
-  /* quà tặng bàn giao: hạch toán vào chi phí bán hàng / chăm sóc khách hàng */
-  const GIFTS = [
-    { k: "key", l: "Bộ chìa khoá kỷ niệm + thiệp", price: 1500000, d: "Hộp chìa khoá khắc số căn, thiệp chúc mừng có chữ ký CĐT", for: ["FINISHED", "BASIC", "RAW"] },
-    { k: "welcome", l: "Giỏ quà chào nhà mới", price: 3000000, d: "Hoa, nến thơm, cà phê, bánh, khăn — đóng giỏ đồng bộ", for: ["FINISHED", "BASIC", "RAW"] },
-    { k: "green", l: "Cây xanh & tiểu cảnh phong thuỷ", price: 2500000, d: "Cây lọc khí, chậu gốm, đèn trang trí theo hướng nhà", for: ["FINISHED", "BASIC"] },
-    { k: "clean", l: "Gói vệ sinh tổng thể + 1 tháng phí quản lý", price: 5000000, d: "Dọn sau thi công, lau kính, khử mùi trước ngày nhận", for: ["FINISHED", "BASIC", "RAW"] },
-    { k: "stay", l: "2 đêm nghỉ dưỡng trải nghiệm", price: 6000000, d: "Voucher nghỉ dưỡng cùng thương hiệu, dùng trong 12 tháng", for: ["FINISHED"] },
-    { k: "design", l: "Gói đo đạc + thiết kế 3D nội thất", price: 8000000, d: "Kiến trúc sư đo đạc, dựng 3D và báo giá thi công", for: ["RAW", "BASIC"] },
-    { k: "smart", l: "Smart home: khoá vân tay, camera, ổ cắm", price: 15000000, d: "Lắp đặt và cấu hình, đồng bộ app điện thoại", for: ["FINISHED"] },
-    { k: "interior", l: "Voucher thiết kế & thi công nội thất", price: 20000000, d: "Giảm trừ khi ký hợp đồng nội thất với đối tác CĐT", for: ["RAW"] }
-  ];
-  const GST = { todo: "Chưa đặt", ordered: "Đã đặt", given: "Đã tặng" };
-  const GST_NEXT = { todo: "ordered", ordered: "given", given: "todo" };
-  function daysTo(dmy) {
-    const a = String(dmy || "").split("/").map(Number);
-    const b = TODAY.split("/").map(Number);
-    if (a.length !== 3 || a.some((x) => !x)) return null;
-    return Math.round((Date.UTC(a[2], a[1] - 1, a[0]) - Date.UTC(b[2], b[1] - 1, b[0])) / 86400000);
-  }
-  /* ngân sách quà gợi ý: 0,1% giá trị căn, tối thiểu 1,5 triệu */
-  function giftPlan(u) {
-    const budget = Math.max(1500000, Math.round((pricing(u).total * 0.001) / 100000) * 100000);
-    const std = u.hstd || "FINISHED";
-    const pri = GIFTS.filter((g) => (g.for || [])[0] === std);
-    const ok = GIFTS.filter((g) => (g.for || []).indexOf(std) > 0);
-    const rest = GIFTS.filter((g) => (g.for || []).indexOf(std) < 0);
-    const list = pri.concat(ok).concat(rest);
-    return { budget, suggest: list.slice(0, 2).map((g) => g.k), list };
-  }
 
   const LS = "twenty-re-crm-v3";
 
@@ -1536,21 +1404,12 @@ body.detail-mode #viewbar{display:none}
     const mf = Math.round(base * MF);
     return { base, vat, mf, total: base + vat + mf };
   }
-  /* số tiền ký quỹ = 5% giá bán (trước VAT), làm tròn 100.000 ₫ */
-  function kqOf(u) { return Math.round((pricing(u).base * KQ) / 100000) * 100000; }
   function builtArea(u) { return Math.round(u.area * 1.08 * 10) / 10; }
   function schedule(u) {
     const total = pricing(u).total;
-    /* Đợt 1 là tiền ký quỹ (5% giá bán), các đợt sau chia theo tỷ lệ trên phần còn lại
-       để tổng luôn bằng đúng giá trị căn hộ. */
-    const kq = Math.min(kqOf(u), total);
-    const wsum = SCHED.slice(1).reduce((a, s) => a + s.p, 0) || 1;
     let acc = 0;
     const rows = SCHED.map((s, i) => {
-      let amt;
-      if (i === 0) amt = kq;
-      else if (i === SCHED.length - 1) amt = total - acc;
-      else amt = Math.round(((total - kq) * s.p) / wsum);
+      const amt = i === SCHED.length - 1 ? total - acc : Math.round(total * s.p);
       acc += amt;
       return { ...s, amt };
     });
@@ -1630,7 +1489,7 @@ body.detail-mode #viewbar{display:none}
     try {
       localStorage.setItem(LS, JSON.stringify({
         v: 2,
-        units: UNITS.map((u) => ({ uid: u.uid, status: u.status, buyer: u.buyer, phone: u.phone, cccd: u.cccd, reason: u.reason, log: u.log || [], hstd: u.hstd, gift: u.gift || "", gstat: u.gstat || "todo", hsteps: u.hsteps || {} })),
+        units: UNITS.map((u) => ({ uid: u.uid, status: u.status, buyer: u.buyer, phone: u.phone, cccd: u.cccd, reason: u.reason, log: u.log || [] })),
         cust: CUST,
         extra: EXTRA
       }));
@@ -1650,10 +1509,6 @@ body.detail-mode #viewbar{display:none}
         u.buyer = r.buyer || ""; u.phone = r.phone || ""; u.cccd = r.cccd || "";
         if (r.reason && REASON_L[r.reason]) u.reason = r.reason;
         if (Array.isArray(r.log)) u.log = r.log.filter((x) => x && ST[x.from] && ST[x.to] && x.at).map((x) => ({ at: +x.at, from: x.from, to: x.to, reason: x.reason || "FREE", by: x.by || ME }));
-        if (r.hstd && HSTD[r.hstd]) u.hstd = r.hstd;
-        if (r.gift && GIFTS.some((g) => g.k === r.gift)) u.gift = r.gift;
-        if (r.gstat && GST[r.gstat]) u.gstat = r.gstat;
-        if (r.hsteps && typeof r.hsteps === "object") u.hsteps = r.hsteps;
       });
       if (!Array.isArray(d)) {
         if (d.cust) Object.keys(d.cust).forEach((n) => { CUST[n] = Object.assign(defaultCust(n), d.cust[n]); });
@@ -1886,7 +1741,6 @@ body.detail-mode #viewbar{display:none}
     { n: 1, l: "Tổng quan", req: true },
     { n: 2, l: "Khách hàng", req: true },
     { n: 3, l: "Báo giá", req: false },
-    { n: 8, l: "Bàn giao", req: true },
     { n: 4, l: "HĐMB & mẫu", req: true },
     { n: 5, l: "Hoa hồng", req: false },
     { n: 6, l: "Chuyển nhượng", req: false },
@@ -1918,9 +1772,8 @@ body.detail-mode #viewbar{display:none}
       field("Floor", '<input class="inp mono" value="' + esc(u.tower) + "-" + pad2(u.floor) + '" readonly />') +
       field("Project", '<input class="inp" value="' + esc(projOf(u).name) + '" readonly />', true) +
       field("Block", '<input class="inp mono" value="' + esc(u.tower) + '" readonly />', true) +
-      field("Ký quỹ (5% giá bán)", '<input class="inp mono" value="' + fmt(kqOf(u)) + '" readonly />', true) +
+      field("Deposit amount", '<input class="inp mono" value="' + fmt(u.deposit) + '" readonly />', true) +
       field("Handover date", '<input class="inp" value="' + u.handover + '" readonly />', true) +
-      field("Handover condition", '<input class="inp" value="' + (HSTD[u.hstd] || HSTD.FINISHED).l + '" readonly />', true) +
       "</div>";
     return (
       '<div class="sec"><div class="sec-h"><span>Trạng thái</span></div>' +
@@ -2124,85 +1977,6 @@ body.detail-mode #viewbar{display:none}
     );
   }
 
-  /* ================= tab: điều kiện bàn giao ================= */
-  function unitTabHandover(u) {
-    const p = pricing(u);
-    const std = HSTD[u.hstd] || HSTD.FINISHED;
-    const spec = HSTD_SPEC[u.hstd] || HSTD_SPEC.FINISHED;
-    const plan = giftPlan(u);
-    const gift = u.gift ? GIFTS.find((g) => g.k === u.gift) : null;
-    const steps = u.hsteps || {};
-    const doneN = HSTEPS.filter((s) => steps[s.k]).length;
-    const d = daysTo(u.handover);
-    const costPerM2 = HSTD_COST[u.hstd] || 0;
-    const costTotal = costPerM2 * builtArea(u);
-    const pct = Math.round((doneN / HSTEPS.length) * 100);
-
-    const stdSeg = HSTD_KEYS.map((k) =>
-      '<button class="' + (u.hstd === k ? "on" : "") + '" data-act="hstd" data-uid="' + u.uid + '" data-v="' + k + '">' + HSTD[k].short + "</button>"
-    ).join("");
-
-    const specRows = spec.map((r) => '<div class="r"><span>' + r[0] + "</span><b>" + r[1] + "</b></div>").join("");
-
-    const items = HSTEPS.map((s) => {
-      const on = !!steps[s.k];
-      return '<button class="hstep ' + (on ? "on" : "") + '" data-act="hstep" data-uid="' + u.uid + '" data-k="' + s.k + '">' +
-        '<span class="box">' + (on ? '<svg class="ic sm"><use href="#i-check"/></svg>' : "") + "</span>" +
-        '<span class="tx"><b>' + s.l + "</b><span>" + s.d + "</span></span></button>";
-    }).join("");
-
-    const giftRows = plan.list.map((g) => {
-      const on = u.gift === g.k;
-      const rec = plan.suggest.indexOf(g.k) > -1;
-      const over = g.price > plan.budget;
-      return '<button class="gift ' + (on ? "on" : "") + '" data-act="gift" data-uid="' + u.uid + '" data-k="' + g.k + '">' +
-        '<span class="g-h"><b>' + g.l + "</b>" +
-        (rec ? '<span class="tag t-acc" style="font-size:11px">Gợi ý</span>' : "") +
-        '<span class="price">' + fmt(g.price) + "</span></span>" +
-        '<span class="g-d">' + g.d + (over ? ' · <span class="over">vượt ngân sách gợi ý</span>' : "") + "</span></button>";
-    }).join("");
-
-    const giftBox = gift
-      ? '<div class="gsum"><span class="tag t-acc">Đã chọn</span><b style="font-weight:500;font-size:14px">' + gift.l + "</b>" +
-        '<span class="note mono">' + fmt(gift.price) + "</span><span class=\"flex1\"></span>" +
-        '<button class="btn" data-act="gstat" data-uid="' + u.uid + '"><svg class="ic sm"><use href="#i-check"/></svg>' + GST[u.gstat || "todo"] + "</button></div>" +
-        '<div class="note" style="margin-top:5px">Bấm nút để chuyển trạng thái: Chưa đặt → Đã đặt → Đã tặng.</div>'
-      : '<div class="warn">Chưa chọn quà. Chọn một gói bên trên — hệ thống gợi ý theo chuẩn bàn giao và ngân sách 0,1% giá trị căn.</div>';
-
-    return (
-      '<div class="sec"><div class="sec-h"><span>Chuẩn bàn giao của căn</span>' +
-      '<span class="note mono">' + esc(projOf(u).short) + " · " + u.handover + "</span></div>" +
-      '<div class="hg-head"><span class="tag ' + std.tag + ' std-tag">' + std.l + "</span>" +
-      (d === null ? "" : '<span class="note mono">' + (d > 0 ? "còn " + d + " ngày" : d === 0 ? "hôm nay" : "đã qua " + -d + " ngày") + "</span>") +
-      '<span class="flex1"></span><div class="seg">' + stdSeg + "</div></div>" +
-      '<div class="note" style="margin-bottom:8px">' + std.d + "</div>" +
-      '<div class="hspec">' + specRows + "</div>" +
-      '<div class="note" style="margin-top:6px">Chuẩn bàn giao được ghi trong HĐMB và phụ lục hoàn thiện nội thất; mọi thay đổi phải lập phụ lục có chữ ký hai bên.</div></div>' +
-
-      '<div class="sec"><div class="sec-h"><span>Chi phí hoàn thiện phải tự lo</span><span class="note">ước tính 2026</span></div>' +
-      '<div class="stat2">' +
-      '<div class="stat"><span>Diện tích xây dựng</span><b>' + fmtA(builtArea(u)) + " m²</b></div>" +
-      '<div class="stat"><span>Suất đầu tư</span><b>' + (costPerM2 ? (costPerM2 / 1e6).toFixed(1).replace(".", ",") + " tr/m²" : "0") + "</b></div>" +
-      "</div>" +
-      '<div class="kv" style="margin-top:6px"><span>Tổng chi phí hoàn thiện (ước tính)</span><b>' + fmt(costTotal) + "</b></div>" +
-      '<div class="kv"><span>Giá trị căn theo HĐMB</span><b>' + fmt(p.total) + "</b></div>" +
-      (costTotal
-        ? '<div class="note" style="margin-top:5px">Nhận căn thô, khách cần chuẩn bị thêm khoảng ' + fmt(costTotal) + " cho thiết kế – thi công – thiết bị trước khi ở. Nên tư vấn con số này ngay từ lúc báo giá để khách không bị động dòng tiền.</div>"
-        : '<div class="note" style="margin-top:5px">Căn hoàn thiện: không phát sinh chi phí hoàn thiện, khách chỉ cần sắm nội thất rời.</div>') +
-      "</div>" +
-
-      '<div class="sec"><div class="sec-h"><span>Mốc bàn giao &amp; checklist</span><span class="note mono">' + doneN + " / " + HSTEPS.length + "</span></div>" +
-      '<div class="kv"><span>Ngày bàn giao dự kiến</span><b>' + u.handover + "</b></div>" +
-      '<div class="bar"><i style="width:' + pct + '%"></i></div>' +
-      '<div class="barline"><span>Đã chuẩn bị ' + doneN + " bước</span><b>" + pct + "%</b></div>" +
-      '<div style="margin-top:6px">' + items + "</div></div>" +
-
-      '<div class="sec"><div class="sec-h"><span>Quà tặng ngày bàn giao</span><span class="note mono">ngân sách ' + fmt(plan.budget) + "</span></div>" +
-      '<div class="note" style="margin-bottom:6px">Ngân sách gợi ý = 0,1% giá trị căn, chốt trước ngày bàn giao 2 tuần để kịp in ấn và giao nhận.</div>' +
-      giftRows + giftBox + "</div>"
-    );
-  }
-
   function unitTab(u, n) {
     if (n === 2) return unitTab2(u);
     if (n === 3) return unitTab3(u);
@@ -2210,7 +1984,6 @@ body.detail-mode #viewbar{display:none}
     if (n === 5) return unitTab5(u);
     if (n === 6) return unitTabTransfer(u);
     if (n === 7) return unitTab6(u);
-    if (n === 8) return unitTabHandover(u);
     return unitTab1(u);
   }
 
@@ -2289,8 +2062,7 @@ body.detail-mode #viewbar{display:none}
       kv("Hướng", u.dir) +
       kv("View", u.view) +
       kv("Đơn giá", fmt(u.ppm) + "/m²", "mono") +
-      kv("Ký quỹ 5%", fmt(kqOf(u)) + ' <span class="note">phong toả NH</span>', "mono") +
-      kv("Bàn giao", u.handover + ' · <span class="tag ' + (HSTD[u.hstd] || HSTD.FINISHED).tag + '">' + (HSTD[u.hstd] || HSTD.FINISHED).short + "</span>") +
+      kv("Bàn giao", u.handover) +
       "</div>" +
       '<div class="sec"><div class="sec-h"><span>Khách hàng</span></div>' + cust + "</div>" +
       '<div class="sec"><div class="sec-h"><span>Thanh toán</span><span class="note mono">' + r.nPaid + " / " + SCHED.length + "</span></div>" +
@@ -2638,7 +2410,6 @@ body.detail-mode #viewbar{display:none}
       const s0 = UNITS_INIT.find((x) => x.uid === u.uid) || {};
       u.status = s0.status || "AVAILABLE";
       u.buyer = s0.buyer || ""; u.phone = s0.phone || ""; u.cccd = s0.cccd || "";
-      u.hstd = projOf(u).hstd || "FINISHED"; u.gift = ""; u.gstat = "todo"; u.hsteps = {};
     });
     Object.keys(CUST).forEach((k) => delete CUST[k]);
     EXTRA.length = 0;
@@ -2719,42 +2490,6 @@ body.detail-mode #viewbar{display:none}
     if (a === "ctype") { setCtype(el.dataset.name, el.dataset.t); return; }
     if (a === "cfilter") { S.ct = el.dataset.t; renderContent(); return; }
     if (a === "cust-name") { openCustByName(el.dataset.name); return; }
-    if (a === "hstd") {
-      const u = byUid(el.dataset.uid);
-      if (u && HSTD[el.dataset.v]) {
-        u.hstd = el.dataset.v;
-        const g = GIFTS.find((x) => x.k === u.gift);
-        if (g && (g.for || []).indexOf(u.hstd) < 0) u.gift = "";
-        persist(); renderContent();
-        toast("Điều kiện bàn giao: " + HSTD[u.hstd].l);
-      }
-      return;
-    }
-    if (a === "hstep") {
-      const u = byUid(el.dataset.uid);
-      if (u) {
-        u.hsteps = u.hsteps || {};
-        if (u.hsteps[el.dataset.k]) delete u.hsteps[el.dataset.k];
-        else u.hsteps[el.dataset.k] = true;
-        persist(); renderContent();
-      }
-      return;
-    }
-    if (a === "gift") {
-      const u = byUid(el.dataset.uid);
-      if (u) {
-        u.gift = el.dataset.k; u.gstat = "todo";
-        persist(); renderContent();
-        const g = GIFTS.find((x) => x.k === u.gift);
-        toast("Đã chọn quà: " + (g ? g.l : u.gift));
-      }
-      return;
-    }
-    if (a === "gstat") {
-      const u = byUid(el.dataset.uid);
-      if (u) { u.gstat = GST_NEXT[u.gstat || "todo"]; persist(); renderContent(); toast("Quà tặng: " + GST[u.gstat]); }
-      return;
-    }
     if (a === "reset") { resetData(); return; }
     if (a === "toast") { toast(el.dataset.msg || "OK"); return; }
   });
@@ -2775,7 +2510,7 @@ body.detail-mode #viewbar{display:none}
 
   /* ================= tooltip tom tat can ho ================= */
   const UTIP_HINT = {
-    AVAILABLE: "Còn trống · có thể giữ chỗ hoặc ký quỹ",
+    AVAILABLE: "Còn trống · có thể giữ chỗ hoặc đặt cọc",
     IN_TRANSACTION: "Đang giao dịch · theo dõi tiến độ thanh toán",
     SOLD: "Đã bán · xem hợp đồng, lịch thanh toán, chuyển nhượng",
     UNRELEASED: "Chưa mở bán · chưa đưa ra thị trường"
