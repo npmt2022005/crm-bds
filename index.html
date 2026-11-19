@@ -216,15 +216,15 @@ svg.ic.sm{width:14px;height:14px}
 .fl span{font-size:10px;color:var(--fg4)}
 
 .cell{
-  position:relative;height:56px;border:1px solid var(--bd);border-radius:var(--r-sm);
-  background:#fff;padding:6px 7px;display:flex;flex-direction:column;justify-content:space-between;
+  position:relative;height:40px;border:1px solid var(--bd);border-radius:var(--r-sm);
+  background:#fff;padding:0 8px;display:flex;flex-direction:row;align-items:center;
   text-align:left;transition:box-shadow .1s ease,filter .1s ease,opacity .12s ease;
 }
-.cell:hover{box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
-.cell .row1{display:flex;align-items:center;gap:5px}
+.cell:hover{box-shadow:inset 0 0 0 1px rgba(0,0,0,.08),0 3px 10px rgba(17,17,17,.07);z-index:2}
+.cell .row1{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
 .cell .code{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;letter-spacing:.01em;color:var(--fg)}
 .cell .price{margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;color:var(--fg3);white-space:nowrap}
-.cell .row2{display:flex;align-items:center;gap:4px;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell .row2{display:none}
 .cell .row2 svg.ic{width:11px;height:11px;opacity:.7}
 .cell .tdot{width:5px;height:5px;border-radius:50%;flex:0 0 auto}
 
@@ -243,6 +243,30 @@ svg.ic.sm{width:14px;height:14px}
 .cell.dim:hover{opacity:.75}
 .cell:focus-visible{outline:2px solid rgba(70,89,214,.55);outline-offset:1px}
 .cell.sel{box-shadow:inset 0 0 0 2px var(--acc)}
+
+/* tooltip tom tat can ho (chi hien khi tro vao) */
+.utip{
+  position:fixed;left:0;top:0;z-index:95;width:250px;padding:9px 10px 8px;
+  background:#fff;border:1px solid var(--bd);border-radius:var(--r-md);
+  box-shadow:0 8px 24px rgba(17,17,17,.14),0 1px 2px rgba(17,17,17,.06);
+  opacity:0;transform:translateY(3px);pointer-events:none;
+  transition:opacity .1s ease,transform .12s ease;visibility:hidden;
+}
+.utip.on{opacity:1;transform:none;visibility:visible}
+.utip-h{display:flex;align-items:center;gap:6px;margin-bottom:7px;padding-bottom:6px;border-bottom:1px solid var(--bdl)}
+.utip-h b{font-family:'DM Mono',monospace;font-size:12.5px;font-weight:500;letter-spacing:.02em;color:var(--fg)}
+.utip-h .tag{margin-left:auto}
+.utip-r{display:flex;align-items:baseline;gap:8px;font-size:11.5px;line-height:1.65}
+.utip-r span{flex:0 0 74px;color:var(--fg4);font-size:11px}
+.utip-r b{font-weight:500;color:var(--fg2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.utip-r b.mono{font-family:'DM Mono',monospace;color:var(--fg);font-weight:500}
+.utip-g{margin-top:7px;padding-top:6px;border-top:1px dashed var(--bdl);font-size:11px;color:var(--fg3);line-height:1.5}
+.utip-c{margin-top:5px;font-size:10.5px;color:var(--acc);letter-spacing:.01em}
+
+/* bo loc: nhom trong popover */
+.pkpop-g{font-size:10px;color:var(--fg4);text-transform:uppercase;letter-spacing:.05em;padding:7px 7px 3px}
+.pkpop-g:first-child{padding-top:4px}
+.pkpop-i .pdot{width:6px;height:6px;border-radius:50%;flex:0 0 auto}
 
 .viewnote{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;padding-top:10px;border-top:1px solid var(--bdl);color:var(--fg3);font-size:11.5px;flex-wrap:wrap}
 .viewnote .mono{color:var(--fg2)}
@@ -532,7 +556,13 @@ body.detail-mode #viewbar{display:none}
   .plan-topbar{gap:12px 18px}
   .pbar{padding:8px 12px}
   .pbar .note{display:none}
-  .pkpop{max-width:calc(100vw - 24px)}
+  .pbar{gap:6px}
+  .pbar .pk .cnt{display:none}
+  .pkpop{
+    position:fixed;left:12px;right:12px;bottom:12px;top:auto;
+    width:auto;min-width:0;max-width:none;max-height:56vh;z-index:60;
+    box-shadow:0 12px 32px rgba(17,17,17,.18);
+  }
   .d-head{padding:8px 12px 0}
   .d-body{padding:12px 12px 0}
   .d-title h1{font-size:17px}
@@ -540,8 +570,8 @@ body.detail-mode #viewbar{display:none}
   .fgrid{grid-template-columns:1fr}
   .toolbar{padding:9px 12px}
   .stat2{grid-template-columns:1fr}
-  .cell{height:52px}
-  .cell .price{display:none}
+  .cell{height:38px}
+  .utip{width:min(250px,calc(100vw - 24px))}
 }
 @media (prefers-reduced-motion:reduce){
   *{transition:none!important;animation:none!important}
@@ -653,6 +683,7 @@ body.detail-mode #viewbar{display:none}
   <main class="content" id="content"></main>
 </div>
 
+<div class="utip" id="utip"></div>
 <div class="toast" id="toast"></div>
 
 <style>
@@ -1221,15 +1252,19 @@ body.detail-mode #viewbar{display:none}
     $$("[data-count]").forEach((el) => (el.textContent = c[el.dataset.count] || 0));
   }
 
+  function pickMenu(menu, label, value, count, items, head) {
+    return '<div class="pkwrap">' +
+      '<button class="pk' + (S.menu === menu ? " on" : "") + '" data-act="menu" data-menu="' + menu + '" aria-haspopup="true" aria-expanded="' + (S.menu === menu) + '">' +
+      '<span class="lb">' + label + '</span><b>' + esc(value) + '</b><span class="cnt">' + count + "</span>" +
+      '<svg class="ic chev"><use href="#i-chevron-down"/></svg></button>' +
+      (S.menu === menu ? '<div class="pkpop">' + (head ? '<div class="pkpop-h">' + head + "</div>" : "") + items + "</div>" : "") +
+      "</div>";
+  }
+
   function renderViewbar() {
     const vb = $("#viewbar");
     if (S.view === "project") {
       const us = shownUnits();
-      const c = countByStatus(us);
-      let chips = '<button class="chip ' + (S.f === "all" ? "on" : "") + '" data-act="filter" data-f="all">Tất cả <span class="cnt">' + us.length + "</span></button>";
-      ST_KEYS.forEach((k) => {
-        chips += '<button class="chip ' + (S.f === k ? "on" : "") + '" data-act="filter" data-f="' + k + '"><span class="dot" style="background:' + ST[k].hex + '"></span>' + ST[k].l + ' <span class="cnt">' + (c[k] || 0) + "</span></button>";
-      });
       const fl = curTower().floors;
       const from = S.sort === "desc" ? fl[0] : fl[fl.length - 1];
       const to = S.sort === "desc" ? fl[fl.length - 1] : fl[0];
@@ -1237,7 +1272,6 @@ body.detail-mode #viewbar{display:none}
         '<span class="vb-icon"><svg class="ic"><use href="#i-layers"/></svg></span>' +
         '<span class="vb-title">Stacking plan</span>' +
         '<span class="vb-count">· ' + esc(curProj().short) + " · " + esc(curTower().name) + " · " + us.length + " căn</span>" +
-        '<span class="vb-sep"></span>' + chips +
         '<span class="vb-spacer"></span>' +
         '<div class="vb-actions">' +
         '<button class="btn" data-act="sort"><svg class="ic sm"><use href="#i-sort"/></svg>Tầng ' + from + " → " + to + "</button>" +
@@ -1245,17 +1279,10 @@ body.detail-mode #viewbar{display:none}
         "</div>";
     } else {
       const all = customers();
-      const cnt = { all: all.length, owner: 0, tx: 0, prospect: 0 };
-      all.forEach((c) => cnt[c.tag]++);
-      let chips = '<button class="chip ' + (S.f === "all" ? "on" : "") + '" data-act="filter" data-f="all">Tất cả <span class="cnt">' + cnt.all + "</span></button>";
-      ["owner", "tx", "prospect"].forEach((k) => {
-        chips += '<button class="chip ' + (S.f === k ? "on" : "") + '" data-act="filter" data-f="' + k + '">' + TAG[k].l + ' <span class="cnt">' + cnt[k] + "</span></button>";
-      });
       vb.innerHTML =
         '<span class="vb-icon"><svg class="ic"><use href="#i-users"/></svg></span>' +
         '<span class="vb-title">Khách hàng</span>' +
         '<span class="vb-count" id="vbcount">· ' + all.length + ' người</span>' +
-        '<span class="vb-sep"></span>' + chips +
         '<span class="vb-spacer"></span>' +
         '<div class="vb-actions">' +
         '<span class="qwrap"><svg class="ic"><use href="#i-search"/></svg>' +
@@ -1283,18 +1310,17 @@ body.detail-mode #viewbar{display:none}
       '<span>' + esc(x.name) + '</span><span class="cnt">' + towerUnits(p.id, x.id).length + " căn</span></button>"
     ).join("");
 
-    const selBtn = (menu, label, value, count, items, head) =>
-      '<div class="pkwrap">' +
-      '<button class="pk' + (S.menu === menu ? " on" : "") + '" data-act="menu" data-menu="' + menu + '" aria-haspopup="true">' +
-      '<span class="lb">' + label + '</span><b>' + esc(value) + '</b><span class="cnt">' + count + "</span>" +
-      '<svg class="ic chev"><use href="#i-chevron-down"/></svg></button>' +
-      (S.menu === menu ? '<div class="pkpop"><div class="pkpop-h">' + head + "</div>" + items + "</div>" : "") +
-      "</div>";
+    const selBtn = pickMenu;
+    const fltItems =
+      '<button class="pkpop-i ' + (S.f === "all" ? "on" : "") + '" data-act="filter" data-f="all"><span>Tất cả trạng thái</span><span class="cnt">' + us.length + "</span></button>" +
+      ST_KEYS.map((k) => '<button class="pkpop-i ' + (S.f === k ? "on" : "") + '" data-act="filter" data-f="' + k + '">' +
+        '<i class="pdot" style="background:' + ST[k].hex + '"></i><span>' + ST[k].l + '</span><span class="cnt">' + (c[k] || 0) + "</span></button>").join("");
 
     const pickers =
       '<div class="pbar">' +
       selBtn("pid", "Dự án", p.short, UNITS.filter((u) => u.proj === p.id).length + " căn", projItems, "Chọn dự án (" + PROJECTS.length + ")") +
       selBtn("tid", "Toà", t.name.replace(/^Toà\s+/, ""), us.length + " căn", towerItems, "Chọn toà (" + p.towers.length + ")") +
+      selBtn("flt", "Lọc", S.f === "all" ? "Tất cả" : ST[S.f].l, (S.f === "all" ? us.length : c[S.f] || 0) + " căn", fltItems, "Trạng thái căn") +
       '<span class="flex1"></span>' +
       '<span class="note mono">' + t.floors.length + " tầng · " + p.cols.length + " căn/tầng · " + esc(p.addr) + "</span>" +
       "</div>";
@@ -1322,11 +1348,10 @@ body.detail-mode #viewbar{display:none}
         if (!u) return '<div class="cell" style="border-style:dashed"></div>';
         const st = ST[u.status];
         const dim = S.f !== "all" && S.f !== u.status ? " dim" : "";
-        const lock = u.status === "UNRELEASED" ? '<svg class="ic"><use href="#i-lock"/></svg>' : "";
+        const lock = u.status === "UNRELEASED" ? '<svg class="ic"><use href="#i-lock"/></svg>' : '<span class="tdot"></span>';
         return (
-          '<button class="cell ' + st.c + dim + '" data-act="unit" data-uid="' + u.uid + '" title="' + esc("Căn " + u.code + " · " + u.type + " · " + fmtA(u.area) + " m² · " + st.l) + '">' +
-          '<span class="row1"><span class="code">' + u.code + '</span><span class="tdot"></span><span class="price">' + shortVnd(pricing(u).total) + "</span></span>" +
-          '<span class="row2">' + lock + u.type + " · " + fmtA(u.area) + " m²</span>" +
+          '<button class="cell ' + st.c + dim + '" data-act="unit" data-uid="' + u.uid + '" aria-label="' + esc("Căn " + u.code + " · " + st.l) + '">' +
+          '<span class="row1"><span class="code">' + u.code + '</span>' + lock + "</span>" +
           "</button>"
         );
       }).join("");
@@ -1368,9 +1393,19 @@ body.detail-mode #viewbar{display:none}
       ["ind", "Cá nhân", all.filter((c) => c.type === "ind").length],
       ["org", "Doanh nghiệp", all.filter((c) => c.type === "org").length]
     ];
+    const stCnt = { all: all.length, owner: 0, tx: 0, prospect: 0 };
+    all.forEach((c) => stCnt[c.tag]++);
+    const fltLabels = [];
+    if (S.f !== "all") fltLabels.push(TAG[S.f].l);
+    if (S.ct !== "all") fltLabels.push(S.ct === "org" ? "Doanh nghiệp" : "Cá nhân");
+    const fltItems =
+      '<div class="pkpop-g">Trạng thái khách hàng</div>' +
+      '<button class="pkpop-i ' + (S.f === "all" ? "on" : "") + '" data-act="filter" data-f="all"><span>Tất cả</span><span class="cnt">' + stCnt.all + "</span></button>" +
+      ["owner", "tx", "prospect"].map((k) => '<button class="pkpop-i ' + (S.f === k ? "on" : "") + '" data-act="filter" data-f="' + k + '"><span>' + TAG[k].l + '</span><span class="cnt">' + stCnt[k] + "</span></button>").join("") +
+      '<div class="pkpop-g">Loại hồ sơ</div>' +
+      ct.map((x) => '<button class="pkpop-i ' + (S.ct === x[0] ? "on" : "") + '" data-act="cfilter" data-t="' + x[0] + '"><span>' + x[1] + '</span><span class="cnt">' + x[2] + "</span></button>").join("");
     const toolbar =
-      '<div class="toolbar"><span class="vt">Loại hồ sơ</span>' +
-      ct.map((x) => '<button class="chip' + (S.ct === x[0] ? " on" : "") + '" data-act="cfilter" data-t="' + x[0] + '">' + x[1] + ' <span class="mono">' + x[2] + "</span></button>").join("") +
+      '<div class="toolbar">' + pickMenu("flt", "Bộ lọc", fltLabels.length ? fltLabels.join(" · ") : "Tất cả", list.length, fltItems, "") +
       '<span class="flex1"></span>' +
       '<button class="btn pri" data-act="add-cust"><svg class="ic sm"><use href="#i-plus"/></svg>Thêm khách hàng</button></div>';
 
@@ -2038,12 +2073,13 @@ body.detail-mode #viewbar{display:none}
   /* ================= events ================= */
   document.addEventListener("click", (e) => {
     const el = e.target.closest("[data-act]");
+    hideTip();
     if (!el) {
       if (S.menu) { S.menu = ""; renderContent(); }
       return;
     }
     const a = el.dataset.act;
-    if (S.menu && a !== "menu" && a !== "pid" && a !== "tid") S.menu = "";
+    if (S.menu && a !== "menu" && a !== "pid" && a !== "tid" && a !== "filter" && a !== "cfilter") S.menu = "";
     if (a === "menu") {
       S.menu = S.menu === el.dataset.menu ? "" : el.dataset.menu;
       renderContent();
@@ -2058,12 +2094,7 @@ body.detail-mode #viewbar{display:none}
       return;
     }
     if (a === "tid") { S.tid = el.dataset.tid; S.route = null; S.menu = ""; render(); return; }
-    if (a === "filter") {
-      const f = el.dataset.f;
-      S.f = S.view === "project" && S.f === f ? "all" : f;
-      render();
-      return;
-    }
+    if (a === "filter") { S.f = el.dataset.f; render(); return; }
     if (a === "filter-toggle") {
       if (S.view === "project") { S.f = S.f === "AVAILABLE" ? "all" : "AVAILABLE"; render(); }
       else goSearch();
@@ -2095,6 +2126,65 @@ body.detail-mode #viewbar{display:none}
     if (S.menu) { S.menu = ""; renderContent(); return; }
     if (S.route) { e.preventDefault(); back(); }
   });
+
+  /* ================= tooltip tom tat can ho ================= */
+  const UTIP_HINT = {
+    AVAILABLE: "Còn trống · có thể giữ chỗ hoặc đặt cọc",
+    IN_TRANSACTION: "Đang giao dịch · theo dõi tiến độ thanh toán",
+    SOLD: "Đã bán · xem hợp đồng và lịch thanh toán",
+    RESOLD: "Đã chuyển nhượng · xem lịch sử chuyển nhượng",
+    UNRELEASED: "Chưa mở bán · chưa đưa ra thị trường"
+  };
+
+  function unitTipHtml(u) {
+    const st = ST[u.status];
+    const pr = pricing(u);
+    const t = towerOf(u);
+    const trs = TRANSFER[u.uid] || [];
+    let rows =
+      '<div class="utip-r"><span>Vị trí</span><b>' + esc(t.name) + " · Tầng " + u.floor + "</b></div>" +
+      '<div class="utip-r"><span>Loại căn</span><b>' + esc(u.type) + " · " + fmtA(u.area) + " m²</b></div>" +
+      '<div class="utip-r"><span>Giá bán</span><b class="mono">' + shortVnd(pr.total) + "</b></div>";
+    if (u.buyer) rows += '<div class="utip-r"><span>Khách hàng</span><b>' + esc(u.buyer) + "</b></div>";
+    if (trs.length) rows += '<div class="utip-r"><span>Chuyển nhượng</span><b>' + trs.length + " lần</b></div>";
+    return '<div class="utip-h"><b>Căn ' + u.code + '</b><span class="tag ' + st.c + '">' + st.l + "</span></div>" +
+      rows +
+      '<div class="utip-g">' + UTIP_HINT[u.status] + "</div>" +
+      '<div class="utip-c">Bấm để mở hồ sơ nghiệp vụ →</div>';
+  }
+
+  let tipCell = null;
+
+  function hideTip() {
+    const t = $("#utip");
+    if (t) t.classList.remove("on");
+    tipCell = null;
+  }
+
+  function showTip(cell) {
+    const t = $("#utip"), u = byUid(cell.dataset.uid);
+    if (!t || !u) return;
+    t.innerHTML = unitTipHtml(u);
+    t.classList.add("on");
+    const r = cell.getBoundingClientRect(), tr = t.getBoundingClientRect();
+    let x = r.left + r.width / 2 - tr.width / 2;
+    x = Math.max(8, Math.min(x, window.innerWidth - tr.width - 8));
+    let y = r.top - tr.height - 8;
+    if (y < 8) y = Math.min(r.bottom + 8, window.innerHeight - tr.height - 8);
+    t.style.left = Math.round(x) + "px";
+    t.style.top = Math.round(y) + "px";
+    tipCell = cell;
+  }
+
+  document.addEventListener("mouseover", (e) => {
+    const cell = e.target && e.target.closest ? e.target.closest(".cell[data-uid]") : null;
+    if (cell) {
+      if (cell !== tipCell) showTip(cell);
+      return;
+    }
+    if (tipCell) hideTip();
+  });
+  document.addEventListener("scroll", hideTip, true);
 
   /* ================= kéo ngang các dải một dòng ================= */
   function bindHScroll() {
