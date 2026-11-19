@@ -1,0 +1,2161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Orchard – Stacking plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   Tokens — lấy từ twenty-ui (ThemeLight): background, border,
+   font color, radius, accent, tag bg/text, spacing 4px.
+   ============================================================ */
+:root{
+  --bg:#FFFFFF;
+  --bg2:#FCFCFC;
+  --bg3:#F1F1F1;
+  --bg4:#EBEBEB;
+
+  --bd:#EBEBEB;
+  --bd2:#D6D6D6;
+  --bdl:#F1F1F1;
+
+  --fg:#2B2B2B;
+  --fg2:#666666;
+  --fg3:#999999;
+  --fg4:#B3B3B3;
+
+  --acc:#4659D6;
+  --accs:#EEF2FD;
+  --accb:#DCE4FA;
+
+  --r-xs:2px;
+  --r-sm:4px;
+  --r-md:8px;
+
+  --topbar:40px;
+  --sbw:224px;
+
+  --sh-btn:0 1px 1px rgba(0,0,0,.04);
+  --sh-panel:-12px 0 32px rgba(0,0,0,.08), -1px 0 0 rgba(0,0,0,.07);
+  --ease:cubic-bezier(.16,1,.3,1);
+
+  /* trạng thái căn hộ */
+  --s-av-bg:#EEF2FD;  --s-av-fg:#415AC0;  --s-av-bd:#DCE4FA;
+  --s-sold-bg:#E9F6EC;--s-sold-fg:#2E7D4F;--s-sold-bd:#D2EBD9;
+  --s-tx-bg:#FCEFDB;  --s-tx-fg:#B0560E;  --s-tx-bd:#F3DCBC;
+  --s-lock-bg:#FAFAFA;--s-lock-fg:#8A8A8A;--s-lock-bd:#E6E6E6;
+  --s-tr-bg:#F5EEFC;  --s-tr-fg:#7848AF;  --s-tr-bd:#E7DAF8;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Inter',-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+  font-size:13px;line-height:1.4;color:var(--fg);background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  display:flex;overflow:hidden;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit}
+svg.ic{width:16px;height:16px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+svg.ic.sm{width:14px;height:14px}
+.mono{font-family:'DM Mono','SFMono-Regular',Consolas,monospace;font-variant-ligatures:none}
+::selection{background:#D8DFFA}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:#DEDEDE;border-radius:8px;border:2px solid #fff}
+::-webkit-scrollbar-thumb:hover{background:#C9C9C9}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+.sb{
+  width:var(--sbw);flex:0 0 var(--sbw);
+  background:var(--bg2);border-right:1px solid var(--bd);
+  display:flex;flex-direction:column;min-height:0;
+}
+.sb-head{padding:8px 8px 6px;display:flex;flex-direction:column;gap:6px}
+.ws{display:flex;align-items:center;gap:7px;height:26px;padding:0 4px;border-radius:var(--r-sm);width:100%}
+.ws:hover{background:var(--bg3)}
+.ws-logo{
+  width:18px;height:18px;border-radius:var(--r-sm);background:#2B2B2B;color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;letter-spacing:-.02em;
+}
+.ws-name{font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ws svg.ic{margin-left:auto;color:var(--fg3)}
+.sb-search{
+  display:flex;align-items:center;gap:6px;height:26px;padding:0 6px;
+  border:1px solid var(--bd);border-radius:var(--r-sm);background:#fff;
+  color:var(--fg3);font-size:12.5px;width:100%;text-align:left;
+}
+.sb-search:hover{border-color:var(--bd2)}
+.sb-search kbd{
+  margin-left:auto;font-family:inherit;font-size:10.5px;color:var(--fg4);
+  border:1px solid var(--bdl);border-radius:3px;padding:0 3px;background:var(--bg2);
+}
+
+.sb-nav{padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow-y:auto;flex:1;min-height:0}
+.nav-label{
+  font-size:11px;color:var(--fg3);padding:10px 6px 4px;letter-spacing:.02em;
+}
+.nav-item{
+  display:flex;align-items:center;gap:7px;height:26px;padding:0 6px;border-radius:var(--r-sm);
+  color:var(--fg2);font-size:12.5px;width:100%;text-align:left;white-space:nowrap;
+}
+.nav-item svg.ic{color:var(--fg3)}
+.nav-item:hover{background:var(--bg3);color:var(--fg)}
+.nav-item.on{background:var(--bg4);color:var(--fg);font-weight:500}
+.nav-item.on svg.ic{color:var(--fg)}
+.nav-count{margin-left:auto;font-size:11px;color:var(--fg3);font-family:'DM Mono',monospace}
+.nav-item.on .nav-count{color:var(--fg2)}
+.sb-ctx{padding:2px 6px 2px 22px;display:flex;flex-direction:column;gap:3px}
+.sb-ctx span{font-size:12px;color:var(--fg3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-ctx b{font-weight:500;color:var(--fg2)}
+.sb-foot{border-top:1px solid var(--bd);padding:8px;display:flex;align-items:center;gap:7px}
+.ava{
+  width:20px;height:20px;border-radius:50%;background:var(--bg4);color:var(--fg2);
+  display:inline-flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:600;flex:0 0 auto;
+}
+.sb-user{min-width:0;display:flex;flex-direction:column}
+.sb-user b{font-size:12px;font-weight:500}
+.sb-user span{font-size:11px;color:var(--fg3)}
+.sb-foot .iconbtn{margin-left:auto}
+
+/* ============================================================
+   MAIN
+   ============================================================ */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;min-height:0}
+.topbar{
+  height:var(--topbar);flex:0 0 var(--topbar);display:flex;align-items:center;gap:8px;
+  padding:0 6px 0 12px;border-bottom:1px solid var(--bd);
+}
+.crumb{display:flex;align-items:center;gap:5px;font-size:12.5px;color:var(--fg3);min-width:0}
+.crumb svg.ic{width:12px;height:12px;color:var(--fg4)}
+.crumb b{color:var(--fg);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-actions{margin-left:auto;display:flex;align-items:center;gap:2px}
+.iconbtn{
+  width:26px;height:26px;border-radius:var(--r-sm);display:inline-flex;align-items:center;justify-content:center;
+  color:var(--fg2);
+}
+.iconbtn:hover{background:var(--bg3);color:var(--fg)}
+.top-ava{margin-left:4px}
+
+.viewbar{
+  height:40px;flex:0 0 40px;display:flex;align-items:center;gap:6px;
+  padding:0 8px 0 12px;border-bottom:1px solid var(--bd);
+  overflow-x:auto;overflow-y:hidden;scrollbar-width:none;
+}
+.viewbar::-webkit-scrollbar{display:none}
+.vb-icon{color:var(--fg2);display:flex}
+.vb-title{font-size:13px;font-weight:500;white-space:nowrap}
+.vb-count{font-size:12px;color:var(--fg3);white-space:nowrap}
+.vb-sep{width:1px;height:16px;background:var(--bd);margin:0 4px;flex:0 0 auto}
+.vb-spacer{flex:1;min-width:8px}
+.vb-actions{display:flex;align-items:center;gap:4px;flex:0 0 auto}
+
+.chip{
+  display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 7px;border-radius:var(--r-sm);
+  border:1px solid transparent;font-size:12px;color:var(--fg2);white-space:nowrap;background:var(--bg3);
+}
+.chip:hover{background:var(--bg4)}
+.chip.on{background:var(--accs);border-color:var(--accb);color:#3346C4;font-weight:500}
+.chip .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.55}
+.chip.on .dot{opacity:1}
+
+.btn{
+  height:26px;display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:0 8px;
+  border:1px solid var(--bd);border-radius:var(--r-sm);background:#fff;color:var(--fg);
+  font-size:12.5px;font-weight:500;white-space:nowrap;box-shadow:var(--sh-btn);
+  transition:background .1s ease,border-color .1s ease;
+}
+.btn:hover{background:#F7F7F7;border-color:var(--bd2)}
+.btn:active{background:var(--bg3)}
+.btn svg.ic{color:var(--fg2)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:none}
+.btn.pri:hover{background:#3B4CC4;border-color:#3B4CC4}
+.btn.pri svg.ic{color:#fff}
+.btn.ghost{border-color:transparent;background:transparent;box-shadow:none}
+.btn.ghost:hover{background:var(--bg3)}
+.btn.icon{width:26px;padding:0}
+.btn.danger{color:#B42318;border-color:#F2D3D0}
+.btn.danger:hover{background:#FEF3F2}
+.btn:focus-visible,.chip:focus-visible,.iconbtn:focus-visible,.nav-item:focus-visible{
+  outline:2px solid rgba(70,89,214,.5);outline-offset:1px;
+}
+
+.content{flex:1;min-height:0;overflow:auto;background:var(--bg)}
+
+/* ============================================================
+   STACKING PLAN
+   ============================================================ */
+.view{padding:14px 16px 28px}
+.plan-topbar{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--bdl)}
+.prop{display:flex;flex-direction:column;gap:1px}
+.prop span{font-size:11px;color:var(--fg3)}
+.prop b{font-size:12.5px;font-weight:500;white-space:nowrap}
+
+.legend{margin-left:auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.lg{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--fg2);white-space:nowrap}
+.lg i{width:8px;height:8px;border-radius:2px;display:block}
+.lg b{font-family:'DM Mono',monospace;font-weight:500;color:var(--fg3);font-size:11px}
+
+.plan-scroll{overflow-x:auto;overflow-y:hidden;padding-bottom:6px}
+.plan{min-width:720px;max-width:1180px}
+.prow,.phead{display:grid;grid-template-columns:56px repeat(5,minmax(0,1fr));gap:6px;align-items:stretch}
+.phead{margin-bottom:6px;align-items:end}
+.ph-floor{font-size:11px;color:var(--fg4);letter-spacing:.04em;text-transform:uppercase;padding-left:2px}
+.ph-col{display:flex;flex-direction:column;gap:1px;padding-left:1px}
+.ph-col b{font-size:11.5px;font-weight:500;color:var(--fg2)}
+.ph-col span{font-size:10.5px;color:var(--fg4)}
+.prow{margin-bottom:6px}
+.fl{display:flex;flex-direction:column;justify-content:center;gap:1px;padding-left:2px}
+.fl b{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--fg2)}
+.fl span{font-size:10px;color:var(--fg4)}
+
+.cell{
+  position:relative;height:56px;border:1px solid var(--bd);border-radius:var(--r-sm);
+  background:#fff;padding:6px 7px;display:flex;flex-direction:column;justify-content:space-between;
+  text-align:left;transition:box-shadow .1s ease,filter .1s ease,opacity .12s ease;
+}
+.cell:hover{box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.cell .row1{display:flex;align-items:center;gap:5px}
+.cell .code{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;letter-spacing:.01em;color:var(--fg)}
+.cell .price{margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;color:var(--fg3);white-space:nowrap}
+.cell .row2{display:flex;align-items:center;gap:4px;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cell .row2 svg.ic{width:11px;height:11px;opacity:.7}
+.cell .tdot{width:5px;height:5px;border-radius:50%;flex:0 0 auto}
+
+.cell.s-av{background:var(--s-av-bg);border-color:var(--s-av-bd);color:var(--s-av-fg)}
+.cell.s-sold{background:var(--s-sold-bg);border-color:var(--s-sold-bd);color:var(--s-sold-fg)}
+.cell.s-tx{background:var(--s-tx-bg);border-color:var(--s-tx-bd);color:var(--s-tx-fg)}
+.cell.s-lock{background:var(--s-lock-bg);border-style:dashed;border-color:var(--s-lock-bd);color:var(--s-lock-fg)}
+.cell.s-tr{background:var(--s-tr-bg);border-color:var(--s-tr-bd);color:var(--s-tr-fg)}
+.cell.s-av .tdot{background:var(--s-av-fg)}
+.cell.s-sold .tdot{background:var(--s-sold-fg)}
+.cell.s-tx .tdot{background:var(--s-tx-fg)}
+.cell.s-lock .tdot{background:var(--s-lock-fg)}
+.cell.s-tr .tdot{background:var(--s-tr-fg)}
+.cell.s-tx .code,.cell.s-av .code,.cell.s-sold .code,.cell.s-tr .code{color:var(--fg)}
+.cell.dim{opacity:.3}
+.cell.dim:hover{opacity:.75}
+.cell:focus-visible{outline:2px solid rgba(70,89,214,.55);outline-offset:1px}
+.cell.sel{box-shadow:inset 0 0 0 2px var(--acc)}
+
+.viewnote{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;padding-top:10px;border-top:1px solid var(--bdl);color:var(--fg3);font-size:11.5px;flex-wrap:wrap}
+.viewnote .mono{color:var(--fg2)}
+
+/* ============================================================
+   TABLE (khách hàng)
+   ============================================================ */
+.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+.tbl thead th{
+  position:sticky;top:0;z-index:1;background:#fff;height:30px;padding:0 8px;text-align:left;
+  font-size:11px;font-weight:500;color:var(--fg3);letter-spacing:.03em;text-transform:uppercase;
+  border-bottom:1px solid var(--bd);white-space:nowrap;
+}
+.tbl thead th:first-child{padding-left:16px}
+.tbl thead th:last-child{padding-right:16px}
+.tbl tbody td{height:38px;padding:0 8px;border-bottom:1px solid var(--bdl);vertical-align:middle;white-space:nowrap}
+.tbl tbody td:first-child{padding-left:16px}
+.tbl tbody td:last-child{padding-right:16px}
+.tbl tbody tr{cursor:pointer}
+.tbl tbody tr:hover td{background:#FAFAFA}
+.tbl tbody tr.sel td{background:var(--accs)}
+.cust{display:flex;align-items:center;gap:8px;min-width:0}
+.cust .nm{min-width:0;display:flex;flex-direction:column;gap:0;line-height:1.25}
+.cust .nm b{font-weight:500;font-size:13px;color:var(--fg);overflow:hidden;text-overflow:ellipsis}
+.cust .nm span{font-size:11px;color:var(--fg3)}
+.ava.lg{width:24px;height:24px;font-size:10px}
+
+.tag{
+  display:inline-flex;align-items:center;gap:4px;height:19px;padding:0 6px;border-radius:var(--r-sm);
+  font-size:11px;font-weight:500;background:var(--bg3);color:var(--fg2);white-space:nowrap;
+}
+.tag.t-sold{background:var(--s-sold-bg);color:var(--s-sold-fg)}
+.tag.t-tx{background:var(--s-tx-bg);color:var(--s-tx-fg)}
+.tag.t-av{background:var(--s-av-bg);color:var(--s-av-fg)}
+.tag.t-lock{background:var(--bg3);color:var(--fg2)}
+.tag.t-tr{background:var(--s-tr-bg);color:var(--s-tr-fg)}
+.tag.t-acc{background:var(--accs);color:#3346C4}
+.unit-chip{
+  display:inline-flex;align-items:center;gap:4px;height:19px;padding:0 5px;border-radius:3px;
+  border:1px solid var(--bd);background:#fff;font-family:'DM Mono',monospace;font-size:11px;color:var(--fg2);
+}
+.empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  padding:56px 16px;color:var(--fg3);font-size:12.5px;text-align:center;
+}
+.empty b{font-size:13px;font-weight:500;color:var(--fg2)}
+
+/* ============================================================
+   TABS (dùng trong trang chi tiết căn hộ)
+   ============================================================ */
+.tab{
+  height:29px;padding:0 8px;font-size:12.5px;color:var(--fg2);border-bottom:2px solid transparent;
+  white-space:nowrap;flex:0 0 auto;
+}
+.tab:hover{color:var(--fg)}
+.tab.on{color:var(--fg);border-color:var(--fg);font-weight:500}
+.tab .req{color:#D93B3B;margin-left:2px}
+
+.sec{padding:12px 0;border-bottom:1px solid var(--bdl)}
+.sec:last-child{border-bottom:0}
+.sec-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.sec-h span{font-size:11px;font-weight:500;color:var(--fg3);text-transform:uppercase;letter-spacing:.03em}
+
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px}
+.fgrid.one{grid-template-columns:1fr}
+.field{display:flex;flex-direction:column;gap:3px;min-width:0}
+.field label{font-size:11px;color:var(--fg3);display:flex;align-items:center;gap:2px}
+.field .req{color:#D93B3B}
+.field .v{font-size:12.5px;color:var(--fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.inp,.sel{
+  height:26px;width:100%;border:1px solid var(--bd);border-radius:var(--r-sm);background:#fff;
+  padding:0 7px;font-size:12.5px;color:var(--fg);
+}
+.inp:hover,.sel:hover{border-color:var(--bd2)}
+.inp:focus,.sel:focus{outline:none;border-color:#AEB9EE;box-shadow:0 0 0 3px rgba(70,89,214,.12)}
+.inp.mono{font-family:'DM Mono',monospace}
+.inp[readonly]{background:var(--bg2);color:var(--fg2)}
+
+.opt{
+  display:flex;align-items:center;gap:7px;width:100%;height:28px;padding:0 7px;margin-bottom:4px;
+  border:1px solid var(--bd);border-radius:var(--r-sm);background:#fff;font-size:12.5px;text-align:left;
+}
+.opt:hover{border-color:var(--bd2);background:#FCFCFC}
+.opt.on{border-color:var(--fg);box-shadow:inset 0 0 0 1px var(--fg)}
+.opt i{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+.opt span{margin-left:auto;font-size:11px;color:var(--fg3)}
+.opt.on span{color:var(--fg2)}
+
+.kv{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:4px 0;font-size:12.5px;color:var(--fg2)}
+.kv b{font-family:'DM Mono',monospace;font-weight:400;color:var(--fg);white-space:nowrap}
+.kv.total{border-top:1px solid var(--bd);margin-top:6px;padding-top:8px;color:var(--fg);font-weight:500}
+.kv.total b{font-weight:500;color:var(--acc);font-size:13px}
+
+.itable{width:100%;border-collapse:separate;border-spacing:0;font-size:12px}
+.itable th{
+  height:26px;padding:0 7px;text-align:left;font-size:10.5px;font-weight:500;color:var(--fg3);
+  text-transform:uppercase;letter-spacing:.03em;background:var(--bg2);border-bottom:1px solid var(--bd);white-space:nowrap;
+}
+.itable td{height:30px;padding:0 7px;border-bottom:1px solid var(--bdl);white-space:nowrap}
+.itable tr:last-child td{border-bottom:0}
+.itable .num{text-align:right;font-family:'DM Mono',monospace;color:var(--fg)}
+.itable tbody tr:hover td{background:#FCFCFC}
+.mtable{border:1px solid var(--bd);border-radius:var(--r-sm);overflow:hidden}
+
+.tpl{display:flex;align-items:center;gap:9px;width:100%;padding:8px 6px;border-radius:var(--r-sm);text-align:left;border-bottom:1px solid var(--bdl)}
+.tpl:last-child{border-bottom:0}
+.tpl:hover{background:#FAFAFA}
+.tpl .tpl-ic{
+  width:26px;height:26px;border-radius:var(--r-sm);background:var(--bg3);color:var(--fg2);
+  display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+}
+.tpl .tpl-tx{min-width:0;display:flex;flex-direction:column;gap:0;line-height:1.3}
+.tpl .tpl-tx b{font-size:12.5px;font-weight:500;color:var(--fg)}
+.tpl .tpl-tx span{font-size:11px;color:var(--fg3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tpl .tpl-dl{margin-left:auto;flex:0 0 auto}
+
+.stat2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{border:1px solid var(--bd);border-radius:var(--r-sm);padding:8px 9px;background:#fff}
+.stat span{display:block;font-size:10.5px;color:var(--fg3);margin-bottom:2px}
+.stat b{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--fg)}
+.stat b.g{color:#2E7D4F}
+
+.bar{height:5px;border-radius:99px;background:var(--bg3);overflow:hidden;margin:6px 0 4px}
+.bar i{display:block;height:100%;background:var(--acc);border-radius:99px}
+.barline{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-size:11.5px;color:var(--fg3)}
+.barline b{font-family:'DM Mono',monospace;font-weight:400;color:var(--fg2);font-size:11.5px}
+
+.tl{display:flex;flex-direction:column;gap:0;margin-top:2px}
+.tl-row{display:grid;grid-template-columns:16px 1fr;gap:8px;padding:0 0 10px;position:relative}
+.tl-row:last-child{padding-bottom:0}
+.tl-dot{
+  width:16px;height:16px;border-radius:50%;background:var(--bg3);color:var(--fg2);
+  display:flex;align-items:center;justify-content:center;margin-top:1px;position:relative;z-index:1;
+}
+.tl-dot svg.ic{width:9px;height:9px;stroke-width:2.4}
+.tl-row:not(:last-child):before{
+  content:'';position:absolute;left:7.5px;top:17px;bottom:0;width:1px;background:var(--bdl);
+}
+.tl-tx{display:flex;flex-direction:column;gap:1px;line-height:1.35;min-width:0}
+.tl-tx b{font-size:12px;font-weight:500}
+.tl-tx span{font-size:11px;color:var(--fg3)}
+
+/* toast */
+.toast{
+  position:fixed;left:50%;bottom:16px;transform:translate(-50%,10px);background:#2B2B2B;color:#fff;
+  font-size:12.5px;padding:7px 11px;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.18);
+  opacity:0;pointer-events:none;transition:opacity .14s ease,transform .14s ease;z-index:60;max-width:88vw;
+  display:flex;align-items:center;gap:7px;
+}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.toast svg.ic{width:13px;height:13px;color:#6CE0A0}
+
+/* ============================================================
+   PICKER BAR · 2 dropdown (Dự án / Toà) — không vỡ khi có nhiều
+   ============================================================ */
+.pbar{
+  display:flex;align-items:center;gap:6px;flex-wrap:nowrap;
+  padding:8px 16px;border-bottom:1px solid var(--bdl);background:#fff;
+}
+.pkwrap{position:relative;display:inline-flex;flex:0 0 auto}
+.pk{
+  height:28px;display:inline-flex;align-items:center;gap:6px;padding:0 7px 0 8px;
+  border:1px solid var(--bd);border-radius:var(--r-sm);background:#fff;
+  font-size:13px;color:var(--fg);box-shadow:var(--sh-btn);white-space:nowrap;
+}
+.pk .lb{font-size:11px;color:var(--fg3);font-weight:400}
+.pk b{font-weight:500}
+.pk .cnt{font-family:'DM Mono',monospace;font-size:10.5px;font-weight:400;color:var(--fg3)}
+.pk .chev{width:12px;height:12px;color:var(--fg3);margin-left:1px}
+.pk:hover{background:#F7F7F7;border-color:var(--bd2)}
+.pk.on{border-color:#AEB9EE;box-shadow:0 0 0 3px rgba(70,89,214,.12)}
+.pkpop{
+  position:absolute;top:calc(100% + 5px);left:0;z-index:40;
+  min-width:250px;max-width:min(380px,84vw);max-height:min(360px,62vh);overflow:auto;
+  padding:3px;background:#fff;border:1px solid var(--bd);border-radius:var(--r-sm);box-shadow:var(--sh-panel);
+}
+.pkpop-h{font-size:10.5px;color:var(--fg4);text-transform:uppercase;letter-spacing:.04em;padding:5px 7px 3px}
+.pkpop-i{
+  display:flex;align-items:center;gap:8px;width:100%;height:30px;padding:0 7px;
+  border-radius:var(--r-xs);font-size:13px;color:var(--fg);text-align:left;
+}
+.pkpop-i:hover{background:var(--bg2)}
+.pkpop-i.on{background:var(--accs);color:#3346C4;font-weight:500}
+.pkpop-i .cnt{margin-left:auto;font-family:'DM Mono',monospace;font-size:10.5px;font-weight:400;color:var(--fg3)}
+.pkpop-i.on .cnt{color:#3346C4;opacity:.75}
+.pbar .flex1{flex:1;min-width:8px}
+.pbar .note{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+
+/* ============================================================
+   CUSTOMER PROFILE FORM (15 trường cá nhân / 17 trường DN)
+   ============================================================ */
+.field.full{grid-column:1 / -1}
+select.inp{
+  -webkit-appearance:none;appearance:none;padding-right:20px;cursor:pointer;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
+  background-repeat:no-repeat;background-position:right 6px center;
+}
+.field.err label{color:#B4272E}
+.field.err .inp,.field.err select,.field.err textarea{border-color:#D93B3B;box-shadow:0 0 0 3px rgba(217,59,59,.1)}
+.sub-h{
+  font-size:11px;font-weight:500;color:var(--fg3);text-transform:uppercase;letter-spacing:.03em;
+  margin:14px 0 6px;
+}
+.sub-h:first-child{margin-top:0}
+.seg{display:inline-flex;gap:2px;padding:2px;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r-sm)}
+.seg button{height:23px;padding:0 9px;border-radius:var(--r-xs);font-size:12.5px;color:var(--fg2)}
+.seg button:hover{color:var(--fg)}
+.seg button.on{background:#fff;color:var(--fg);font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.fhint{font-size:11.5px;color:var(--fg4);margin-top:9px}
+.toolbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:10px 16px 10px;border-bottom:1px solid var(--bdl)}
+.toolbar .flex1{flex:1;min-width:8px}
+.toolbar .vt{font-size:12px;color:var(--fg3);margin-right:2px}
+.tag.t-org{background:#F4EEFB;color:#6A3FA0}
+.tag.t-ind{background:var(--bg3);color:var(--fg2)}
+
+/* ============================================================
+   DETAIL PAGE (thay cho drawer cũ)
+   ============================================================ */
+body.detail-mode #viewbar{display:none}
+.detail{padding-bottom:26px}
+.d-head{
+  padding:10px 16px 0;border-bottom:1px solid var(--bd);background:#fff;
+  position:sticky;top:0;z-index:5;
+}
+.d-top{display:flex;align-items:center;gap:6px;height:26px;font-size:12px;color:var(--fg3)}
+.d-top .iconbtn{width:24px;height:24px;margin-left:-4px;flex:0 0 auto}
+.d-top svg.sep{width:12px;height:12px;color:var(--fg4);flex:0 0 auto}
+.d-top b{color:var(--fg);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.d-top .flex1{flex:1;min-width:8px}
+.d-title{display:flex;align-items:center;gap:9px;margin:4px 0 10px;flex-wrap:wrap}
+.d-title h1{font-size:19px;font-weight:600;letter-spacing:-.015em}
+.d-title h1.mono{font-family:'DM Mono',monospace;font-weight:500;letter-spacing:0;font-size:18px}
+.d-title .d-sub{font-size:12px;color:var(--fg3)}
+.d-title .ava.lg{width:26px;height:26px;font-size:10px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.kpi{
+  display:flex;flex-direction:column;gap:3px;padding:8px 10px;min-width:0;
+  border:1px solid var(--bd);border-radius:var(--r-sm);background:var(--bg2);
+}
+.kpi span{font-size:11px;color:var(--fg3)}
+.kpi b{font-family:'DM Mono',monospace;font-size:13.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi b.g{color:#2E7D4F}
+.d-tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin:0 -2px}
+.d-tabs::-webkit-scrollbar{display:none}
+.d-tabs .tab{height:32px;padding:0 10px;font-size:12.5px}
+.d-body{display:grid;grid-template-columns:minmax(0,1fr) 316px;gap:16px;padding:14px 16px 0;align-items:start}
+.d-main{min-width:0}
+.d-side{min-width:0;display:flex;flex-direction:column;gap:10px}
+.d-side .sec{margin:0;padding:10px 11px;border:1px solid var(--bd);border-radius:var(--r-sm);background:#fff}
+.d-side .sec .sec-h{margin-bottom:6px}
+.d-side .kv span{font-size:11.5px}
+.d-side .kv b{font-size:12px}
+.d-side .opt{margin-bottom:3px}
+.cust2{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.cust2 .nm{display:flex;flex-direction:column;min-width:0}
+.cust2 .nm b{font-size:12.5px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cust2 .nm span{font-size:11.5px;color:var(--fg3)}
+.cr-lnk{color:var(--acc);font-weight:500;text-align:left}
+.cr-lnk:hover{text-decoration:underline}
+.btn.wide{width:100%}
+.lbl{font-size:11px;color:var(--fg3);display:block;margin-bottom:3px}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:1180px){
+  .legend{margin-left:0;width:100%}
+}
+@media (max-width:1000px){
+  :root{--sbw:52px}
+  .sb-head{padding:8px 6px 4px;align-items:center}
+  .ws{justify-content:center;padding:0}
+  .ws-name,.ws svg,.sb-search span,.sb-search kbd,.nav-label,.sb-ctx,.sb-user,.nav-count{display:none}
+  .sb-search{justify-content:center;padding:0}
+  .nav-item{justify-content:center;padding:0}
+  .sb-foot{justify-content:center;padding:8px 4px}
+  .sb-foot .iconbtn{display:none}
+}
+@media (max-width:1080px){
+  .d-body{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .d-side{flex-direction:row;flex-wrap:wrap}
+  .d-side .sec{flex:1 1 260px}
+}
+@media (max-width:760px){
+  .view{padding:12px 12px 24px}
+  .plan-topbar{gap:12px 18px}
+  .pbar{padding:8px 12px}
+  .pbar .note{display:none}
+  .pkpop{max-width:calc(100vw - 24px)}
+  .d-head{padding:8px 12px 0}
+  .d-body{padding:12px 12px 0}
+  .d-title h1{font-size:17px}
+  .kpis{grid-template-columns:1fr 1fr;gap:6px}
+  .fgrid{grid-template-columns:1fr}
+  .toolbar{padding:9px 12px}
+  .stat2{grid-template-columns:1fr}
+  .cell{height:52px}
+  .cell .price{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+<!-- ===== icon sprite (lucide, stroke 1.6) ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+<symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+<symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="i-building" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></symbol>
+<symbol id="i-layers" viewBox="0 0 24 24"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m6.08 9.5-3.5 1.6a1 1 0 0 0 0 1.81l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9a1 1 0 0 0 0-1.83l-3.5-1.59"/><path d="m6.08 14.5-3.5 1.6a1 1 0 0 0 0 1.81l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9a1 1 0 0 0 0-1.83l-3.5-1.59"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3"/><path d="M14 2v4M8 10v4M16 18v4"/></symbol>
+<symbol id="i-sort" viewBox="0 0 24 24"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8M16 13H8M16 17H8"/></symbol>
+<symbol id="i-percent" viewBox="0 0 24 24"><path d="M19 5 5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></symbol>
+<symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></symbol>
+<symbol id="i-id" viewBox="0 0 24 24"><path d="M16 10h2M16 14h2M6.17 15a3 3 0 0 1 5.66 0"/><circle cx="9" cy="11" r="2"/><rect x="2" y="5" width="20" height="14" rx="2"/></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></symbol>
+<symbol id="i-wallet" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol>
+<symbol id="i-map" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
+<symbol id="i-settings" viewBox="0 0 24 24"><path d="M20 7h-9M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></symbol>
+<symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+<symbol id="i-external" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+<symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></symbol>
+<symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+</defs></svg>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<aside class="sb">
+  <div class="sb-head">
+    <button class="ws" data-act="toast" data-msg="Chuyển không gian làm việc">
+      <span class="ws-logo">ML</span>
+      <span class="ws-name">Meraki Land</span>
+      <svg class="ic"><use href="#i-chevron-down"/></svg>
+    </button>
+    <button class="sb-search" data-act="search-cust">
+      <svg class="ic sm"><use href="#i-search"/></svg>
+      <span>Tìm khách hàng</span>
+      <kbd>⌘K</kbd>
+    </button>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="nav-label">Làm việc</div>
+    <button class="nav-item on" data-act="nav" data-view="project">
+      <svg class="ic"><use href="#i-layers"/></svg>
+      <span>Dự án</span>
+      <span class="nav-count" id="cnt-units">30</span>
+    </button>
+    <button class="nav-item" data-act="nav" data-view="customer">
+      <svg class="ic"><use href="#i-users"/></svg>
+      <span>Khách hàng</span>
+      <span class="nav-count" id="cnt-cust">8</span>
+    </button>
+
+  </nav>
+
+  <div class="sb-foot">
+    <span class="ava">AD</span>
+    <div class="sb-user"><b>Alex Dương</b><span>Sale Manager</span></div>
+    <button class="iconbtn" data-act="toast" data-msg="Cài đặt không gian làm việc" title="Cài đặt">
+      <svg class="ic sm"><use href="#i-settings"/></svg>
+    </button>
+  </div>
+</aside>
+
+<!-- ============================================================
+     MAIN
+     ============================================================ -->
+<div class="main">
+  <header class="topbar">
+    <div class="crumb" id="crumb"></div>
+    <div class="top-actions">
+      <button class="iconbtn" data-act="search-cust" title="Tìm khách hàng (⌘K)">
+        <svg class="ic"><use href="#i-search"/></svg>
+      </button>
+      <button class="iconbtn" data-act="filter-toggle" title="Bộ lọc">
+        <svg class="ic"><use href="#i-sliders"/></svg>
+      </button>
+      <button class="iconbtn" data-act="reset" title="Khôi phục dữ liệu mẫu">
+        <svg class="ic"><use href="#i-refresh"/></svg>
+      </button>
+      <button class="iconbtn" data-act="toast" data-msg="Trợ giúp: chọn căn để mở hồ sơ nghiệp vụ" title="Trợ giúp">
+        <svg class="ic"><use href="#i-help"/></svg>
+      </button>
+      <span class="ava top-ava">AD</span>
+    </div>
+  </header>
+
+  <div class="viewbar" id="viewbar"></div>
+  <main class="content" id="content"></main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<style>
+/* bổ sung cho shell (giữ toàn bộ token ở khối style chính) */
+/* kéo ngang: chuột kéo được, bánh xe cũng cuộn */
+.viewbar.canscroll,.d-tabs.canscroll,.plan-scroll.canscroll{cursor:grab}
+.viewbar.dragging,.d-tabs.dragging,.plan-scroll.dragging{cursor:grabbing;user-select:none}
+.viewbar,.d-tabs,.plan-scroll{scroll-behavior:auto}
+/* bảng rộng: kéo ngang được thay vì bị cắt */
+.mtable{overflow:auto}
+/* thẻ lịch sử chuyển nhượng */
+.trs{display:flex;flex-direction:column;gap:8px}
+.tr{border:1px solid var(--bd);border-radius:var(--r-sm);background:#fff;padding:8px 10px}
+.tr-h{display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap}
+.tr-h b{font-weight:500;font-size:12.5px;color:var(--fg)}
+.tr-h .mono{color:var(--fg3)}
+.kv.w b{font-family:inherit;white-space:normal;text-align:right;word-break:break-word}
+.q{
+  height:26px;width:230px;max-width:38vw;border:1px solid var(--bd);border-radius:var(--r-sm);
+  background:#fff;padding:0 8px 0 26px;font-size:12.5px;color:var(--fg);box-shadow:var(--sh-btn);
+}
+.q::placeholder{color:var(--fg4)}
+.q:focus{outline:none;border-color:#AEB9EE;box-shadow:0 0 0 3px rgba(70,89,214,.12)}
+.qwrap{position:relative;display:flex;align-items:center;flex:0 0 auto}
+.qwrap svg.ic{position:absolute;left:7px;width:13px;height:13px;color:var(--fg3);pointer-events:none}
+.chip .cnt{font-family:'DM Mono',monospace;font-size:10.5px;color:var(--fg3)}
+.chip.on .cnt{color:#3346C4;opacity:.8}
+.saved{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--fg3)}
+.saved svg.ic{width:11px;height:11px;color:#2E7D4F}
+.cunits{display:flex;flex-direction:column;border:1px solid var(--bd);border-radius:var(--r-sm);overflow:hidden}
+.cunit{display:flex;align-items:center;gap:8px;padding:7px 8px;border-bottom:1px solid var(--bdl);background:#fff;text-align:left;width:100%}
+.cunit:last-child{border-bottom:0}
+.cunit:hover{background:#FAFAFA}
+.cunit .cu-tx{display:flex;flex-direction:column;gap:0;line-height:1.3;min-width:0;flex:1}
+.cunit .cu-tx b{font-family:'DM Mono',monospace;font-size:12px;font-weight:500}
+.cunit .cu-tx span{font-size:11px;color:var(--fg3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cunit .tag{margin-left:auto}
+.cunit svg.ic{margin-left:6px;color:var(--fg4)}
+.note{font-size:11.5px;color:var(--fg3);line-height:1.5}
+.warn{border:1px solid #F3DCBC;background:#FEF9F1;color:#8A4A0B;border-radius:var(--r-sm);padding:7px 8px;font-size:11.5px;line-height:1.5}
+.hr{height:1px;background:var(--bdl);margin:10px 0}
+.ta{
+  width:100%;min-height:62px;border:1px solid var(--bd);border-radius:var(--r-sm);background:#fff;
+  padding:6px 7px;font-size:12.5px;color:var(--fg);font-family:inherit;line-height:1.5;resize:vertical;
+}
+.ta:hover{border-color:var(--bd2)}
+.ta:focus{outline:none;border-color:#AEB9EE;box-shadow:0 0 0 3px rgba(70,89,214,.12)}
+.itable.tall td{height:34px}
+.tpl .tpl-dl{margin-left:auto;color:var(--fg4);flex:0 0 auto}
+.tpl:hover .tpl-dl{color:var(--fg2)}
+.cell.s-lock .code{color:var(--fg2)}
+.viewnote .saved{margin-left:auto}
+</style>
+
+<script>
+"use strict";
+(function () {
+  /* ================= helpers ================= */
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const esc = (v) => String(v == null ? "" : v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const fmt = (n) => Math.round(n || 0).toLocaleString("vi-VN") + " ₫";
+  const shortVnd = (n) => (n / 1e9).toFixed(1).replace(".", ",") + " tỷ";
+  const pad2 = (n) => String(n).padStart(2, "0");
+  const initials = (name) => {
+    const p = String(name || "").trim().split(/\s+/);
+    return ((p[0] || "?")[0] + (p.length > 1 ? p[p.length - 1][0] : "")).toUpperCase();
+  };
+  const slug = (s) =>
+    String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/gi, "d").toLowerCase().replace(/[^a-z0-9]+/g, ".").replace(/^\.|\.$/g, "");
+
+  /* ================= domain ================= */
+  const VAT = 0.0845, MF = 0.02, TODAY = "19/11/2026";
+  const ST = {
+    AVAILABLE:       { l: "Chưa bán",           c: "s-av",   t: "t-av",   hex: "#415AC0" },
+    IN_TRANSACTION:  { l: "Đang xử lý GD",      c: "s-tx",   t: "t-tx",   hex: "#B0560E" },
+    SOLD:            { l: "Đã bán (HĐMB)",      c: "s-sold", t: "t-sold", hex: "#2E7D4F" },
+    UNRELEASED:      { l: "Chưa mở bán",        c: "s-lock", t: "t-lock", hex: "#8A8A8A" },
+    RESOLD:          { l: "Đã chuyển nhượng",   c: "s-tr",   t: "t-tr",   hex: "#7848AF" }
+  };
+  const ST_KEYS = ["AVAILABLE", "IN_TRANSACTION", "SOLD", "RESOLD", "UNRELEASED"];
+
+  /* 2 dự án × 2 toà × 6 tầng × 5 căn = 120 căn */
+  const PROJECTS = [
+    {
+      id: "orchard", name: "The Orchard – Sycamore", short: "The Orchard",
+      addr: "An Phú, TP. Thủ Đức, TP.HCM", handover: "29/08/2027",
+      cols: [
+        { n: 1, type: "2PN", area: 105.0 },
+        { n: 2, type: "3PN", area: 180.0 },
+        { n: 3, type: "1PN", area: 58.5 },
+        { n: 4, type: "2PN", area: 105.0 },
+        { n: 5, type: "2PN", area: 110.0 }
+      ],
+      towers: [
+        { id: "SD", name: "Toà SD", ppm: 145000000, floors: [20, 19, 18, 17, 16, 15] },
+        { id: "SA", name: "Toà SA", ppm: 152000000, floors: [24, 23, 22, 21, 20, 19] }
+      ]
+    },
+    {
+      id: "global", name: "The Global City – Block G", short: "The Global City",
+      addr: "An Phú, TP. Thủ Đức, TP.HCM", handover: "30/06/2028",
+      cols: [
+        { n: 1, type: "Studio", area: 42.0 },
+        { n: 2, type: "1PN", area: 58.5 },
+        { n: 3, type: "2PN", area: 96.0 },
+        { n: 4, type: "2PN", area: 105.0 },
+        { n: 5, type: "3PN", area: 165.0 }
+      ],
+      towers: [
+        { id: "G1", name: "Toà G1", ppm: 168000000, floors: [12, 11, 10, 9, 8, 7] },
+        { id: "G2", name: "Toà G2", ppm: 172000000, floors: [15, 14, 13, 12, 11, 10] }
+      ]
+    }
+  ];
+  const DIRS = ["Đông Nam", "Tây Bắc", "Đông", "Nam", "Tây Nam"];
+  const VIEWS = ["Công viên nội khu", "Sông Sài Gòn", "Trục đường chính", "Thành phố", "Hồ bơi"];
+
+  const PEOPLE = [
+    ["Nguyễn Văn An", "0912.333.444", "079088005678"],
+    ["Phạm Minh Khoa", "0938.222.111", "079088002345"],
+    ["Võ Ngọc Hân", "0977.654.321", "079088003456"],
+    ["Đặng Quốc Bảo", "0909.111.222", "079088004567"],
+    ["Bùi Thanh Mai", "0918.777.555", "079088006789"],
+    ["Lê Văn Thành", "0908.123.888", "079088001234"],
+    ["Trần Thị Thu Trang", "0903.888.999", "079088007890"],
+    ["Đỗ Văn Khánh", "0982.444.666", "079088008901"],
+    ["Lê Minh Châu", "0907.222.333", "079188002233"],
+    ["Hoàng Anh Tuấn", "0934.555.111", "079188007788"],
+    ["Nguyễn Thanh Tùng", "0977.111.222", "079088009012"],
+    ["Phan Thị Kim Ngân", "0913.666.888", "079288004455"]
+  ];
+  const PERSON = {};
+  PEOPLE.forEach((p) => { PERSON[p[0]] = p; });
+  /* ================= hồ sơ khách hàng =================
+     15 trường · khách hàng cá nhân
+     17 trường · khách hàng doanh nghiệp
+     ==================================================== */
+  const F_IND = [
+    { k: "fullname", l: "Họ và tên", req: 1, up: 1 },
+    { k: "gender", l: "Giới tính", t: "select", o: ["Nam", "Nữ", "Khác"] },
+    { k: "dob", l: "Ngày/tháng/năm sinh", req: 1, ph: "dd/mm/yyyy" },
+    { k: "idno", l: "CCCD / Passport", req: 1, mono: 1 },
+    { k: "iddate", l: "Ngày cấp", ph: "dd/mm/yyyy" },
+    { k: "idplace", l: "Nơi cấp" },
+    { k: "nation", l: "Quốc tịch", req: 1 },
+    { k: "addr_perm", l: "Địa chỉ thường trú", full: 1 },
+    { k: "addr_contact", l: "Địa chỉ liên hệ", full: 1 },
+    { k: "email", l: "Email", req: 1, t: "email" },
+    { k: "phone", l: "Số điện thoại", req: 1, mono: 1 },
+    { k: "ben_name", l: "Tên người thụ hưởng", req: 1 },
+    { k: "ben_acc", l: "Số tài khoản ngân hàng", req: 1, mono: 1 },
+    { k: "bank", l: "Ngân hàng", req: 1 },
+    { k: "bank_branch", l: "Chi nhánh" }
+  ];
+  const F_ORG = [
+    { k: "coname", l: "Tên công ty", req: 1, up: 1, full: 1 },
+    { k: "nation", l: "Quốc tịch", req: 1 },
+    { k: "taxno", l: "Giấy ĐKKD số (MST)", req: 1, mono: 1 },
+    { k: "taxdate", l: "Ngày cấp ĐKKD", ph: "dd/mm/yyyy" },
+    { k: "taxplace", l: "Nơi cấp ĐKKD", full: 1 },
+    { k: "leg_name", l: "Họ tên người đại diện", req: 1, up: 1 },
+    { k: "leg_dob", l: "Ngày sinh người đại diện", ph: "dd/mm/yyyy" },
+    { k: "leg_id", l: "CCCD người đại diện", req: 1, mono: 1 },
+    { k: "leg_iddate", l: "Ngày cấp CCCD người đại diện", ph: "dd/mm/yyyy" },
+    { k: "leg_idplace", l: "Nơi cấp CCCD người đại diện" },
+    { k: "email", l: "Email công ty", req: 1, t: "email" },
+    { k: "phone", l: "SĐT công ty", req: 1, mono: 1 },
+    { k: "hq", l: "Địa chỉ trụ sở chính", req: 1, full: 1 },
+    { k: "vp", l: "Địa chỉ liên hệ", full: 1 },
+    { k: "ben_name", l: "Đơn vị thụ hưởng", req: 1 },
+    { k: "ben_acc", l: "Số tài khoản ngân hàng", req: 1, mono: 1 },
+    { k: "bank", l: "Ngân hàng & chi nhánh", req: 1 }
+  ];
+  const G_IND = [
+    { t: "Thông tin cá nhân", a: 0, b: 7 },
+    { t: "Địa chỉ", a: 7, b: 9 },
+    { t: "Liên hệ & tài khoản thụ hưởng", a: 9, b: 15 }
+  ];
+  const G_ORG = [
+    { t: "Thông tin doanh nghiệp", a: 0, b: 5 },
+    { t: "Người đại diện theo pháp luật", a: 5, b: 10 },
+    { t: "Liên hệ & tài khoản thụ hưởng", a: 10, b: 17 }
+  ];
+  const BANKS = ["Vietcombank", "BIDV", "Techcombank", "VietinBank", "ACB", "MB Bank"];
+  const CUST = {};   /* tên gốc -> hồ sơ đầy đủ */
+  const EXTRA = [];  /* khách hàng tạo mới trong phiên */
+  const isOrgName = (n) => /CÔNG TY|TNHH|CỔ PHẦN|DOANH NGHIỆP|TẬP ĐOÀN/.test(String(n).toUpperCase());
+  const hnum = (s) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 90000; return h; };
+
+  function defaultCust(name) {
+    const up = String(name).toUpperCase();
+    const h = hnum(up);
+    const org = isOrgName(up);
+    const bank = BANKS[h % BANKS.length];
+    const base = {
+      type: org ? "org" : "ind",
+      nation: "Việt Nam",
+      email: "lienhe." + slug(name) + "@gmail.com",
+      phone: "09" + String(10000000 + (h % 8999999)),
+      bank: bank,
+      ben_name: up,
+      ben_acc: "0071 0000 " + String(1000 + (h % 9000)) + " " + String(10 + (h % 89)),
+      note: ""
+    };
+    if (org) {
+      return Object.assign(base, {
+        coname: up,
+        taxno: "03" + String(10000000 + (h % 8999999)),
+        taxdate: "12/04/2019",
+        taxplace: "Sở Kế hoạch & Đầu tư TP.HCM",
+        leg_name: "LÊ VĂN THÀNH",
+        leg_dob: "12/03/1985",
+        leg_id: "079088001234",
+        leg_iddate: "15/06/2021",
+        leg_idplace: "Cục Cảnh sát QLHC về TTXH",
+        hq: "Tầng 12, Toà nhà Bitexco, 2 Hải Triều, Quận 1, TP.HCM",
+        vp: "Tầng 5, 88 Nguyễn Du, Quận 1, TP.HCM",
+        bank_branch: "Sở Giao dịch"
+      });
+    }
+    return Object.assign(base, {
+      fullname: up,
+      gender: h % 2 ? "Nữ" : "Nam",
+      dob: pad2(1 + (h % 28)) + "/" + pad2(1 + (h % 12)) + "/" + (1978 + (h % 22)),
+      idno: "0790" + String(88001234 + ((h * 7) % 1000)),
+      iddate: "15/06/2021",
+      idplace: "Cục Cảnh sát QLHC về TTXH",
+      addr_perm: "Khu đô thị An Phú, TP. Thủ Đức, TP.HCM",
+      addr_contact: "Khu đô thị An Phú, TP. Thủ Đức, TP.HCM",
+      bank_branch: "Sở Giao dịch"
+    });
+  }
+  function blankCust(type) {
+    const o = { type: type, note: "" };
+    (type === "org" ? F_ORG : F_IND).forEach((f) => { o[f.k] = ""; });
+    o.nation = "Việt Nam";
+    return o;
+  }
+  function custOf(name, c) {
+    if (!CUST[name]) {
+      const r = defaultCust(name);
+      if (c) {
+        if (c.phone) r.phone = c.phone;
+        if (c.email) r.email = c.email;
+        if (c.cccd && r.type === "ind") r.idno = c.cccd;
+        if (c.addr) { r.addr_perm = c.addr; r.addr_contact = c.addr; r.hq = c.addr; }
+        if (c.note) r.note = c.note;
+      }
+      CUST[name] = r;
+    }
+    return CUST[name];
+  }
+  function cfField(f, v) {
+    const lab = "<label>" + f.l + (f.req ? '<span class="req">*</span>' : "") + "</label>";
+    let inp;
+    if (f.t === "select") {
+      inp = '<select class="inp" data-f="' + f.k + '">' + f.o.map((x) => "<option" + (x === v ? " selected" : "") + ">" + x + "</option>").join("") + "</select>";
+    } else {
+      inp = '<input class="inp' + (f.mono ? " mono" : "") + '" data-f="' + f.k + '" type="' + (f.t || "text") + '"' + (f.ph ? ' placeholder="' + f.ph + '"' : "") + ' value="' + esc(v || "") + '" />';
+    }
+    return '<div class="field' + (f.full ? " full" : "") + '">' + lab + inp + "</div>";
+  }
+  function syncCust() {
+    UNITS.filter((u) => u.buyer).forEach((u) => {
+      const r = CUST[u.buyer];
+      if (!r) return;
+      const legal = r.type === "org" ? r.taxno : r.idno;
+      if (r.phone) u.phone = r.phone;
+      if (legal) u.cccd = legal;
+    });
+    const push = (o) => {
+      const r = CUST[o.name];
+      if (!r) return;
+      const legal = r.type === "org" ? r.taxno : r.idno;
+      if (r.phone) o.phone = r.phone;
+      if (legal) o.cccd = legal;
+      if (r.email) o.email = r.email;
+      const ad = r.addr_contact || r.hq || r.addr_perm;
+      if (ad) o.addr = ad;
+    };
+    PROSPECTS.forEach(push);
+    EXTRA.forEach(push);
+  }
+
+
+  /* trạng thái mẫu theo từng toà */
+  const SEED_ST = {
+    "orchard:SD": { SOLD: ["2002", "1902", "1602", "1502"], TX: ["1702", "1802"], RESOLD: ["1904", "1604"], LOCK: ["2005", "1505"] },
+    "orchard:SA": { SOLD: ["2402", "2302", "2202"], TX: ["2102", "2004"], RESOLD: ["2404"], LOCK: ["2405", "2305", "2205"] },
+    "global:G1":  { SOLD: ["1201", "1101", "1001", "0902", "0802", "0703"], TX: ["1202"], RESOLD: ["1204"], LOCK: ["1205", "1105"] },
+    "global:G2":  { SOLD: ["1502", "1402", "1302", "1201"], TX: ["1102"], RESOLD: ["1504"], LOCK: ["1505", "1405"] }
+  };
+  const SEED_BUY = {
+    "orchard:SD:1702": "Lê Văn Thành",
+    "orchard:SD:1802": "Nguyễn Văn An",
+    "orchard:SD:2002": "Phạm Minh Khoa",
+    "orchard:SD:1902": "Võ Ngọc Hân",
+    "orchard:SD:1602": "Đặng Quốc Bảo",
+    "orchard:SD:1502": "Bùi Thanh Mai",
+    "orchard:SD:1904": "Trần Thị Thu Trang",
+    "orchard:SD:1604": "Trần Thị Thu Trang",
+    "orchard:SA:2402": "Đỗ Văn Khánh",
+    "orchard:SA:2302": "Trần Thị Thu Trang",
+    "orchard:SA:2404": "Lê Minh Châu",
+    "global:G1:1201": "Hoàng Anh Tuấn",
+    "global:G1:0902": "Phan Thị Kim Ngân",
+    "global:G2:1502": "Nguyễn Thanh Tùng",
+    "global:G2:1201": "Bùi Thanh Mai"
+  };
+
+  /* lịch sử chuyển nhượng thứ cấp (giá thị trường, không phải giá CĐT) */
+  const TRANSFER = {
+    "orchard:SD:1904": [
+      { id: "CN-2024-0117", date: "08/03/2024", from: "Nguyễn Thanh Tùng", to: "Lê Minh Châu", ppm: 149000000, notary: "CC-00412/2024" },
+      { id: "CN-2026-0031", date: "12/06/2026", from: "Lê Minh Châu", to: "Trần Thị Thu Trang", ppm: 158000000, notary: "CC-01842/2026" }
+    ],
+    "orchard:SD:1604": [
+      { id: "CN-2025-0088", date: "19/09/2025", from: "Đỗ Văn Khánh", to: "Trần Thị Thu Trang", ppm: 152000000, notary: "CC-01207/2025" }
+    ],
+    "orchard:SA:2404": [
+      { id: "CN-2026-0044", date: "27/04/2026", from: "Hoàng Anh Tuấn", to: "Lê Minh Châu", ppm: 160500000, notary: "CC-01499/2026" }
+    ],
+    "global:G1:1204": [
+      { id: "CN-2026-0058", date: "06/08/2026", from: "Phan Thị Kim Ngân", to: "Đỗ Văn Khánh", ppm: 178000000, notary: "CC-02071/2026" }
+    ],
+    "global:G2:1504": [
+      { id: "CN-2026-0061", date: "21/09/2026", from: "Nguyễn Thanh Tùng", to: "Trần Thị Thu Trang", ppm: 181000000, notary: "CC-02118/2026" }
+    ]
+  };
+
+  const UNITS = [];
+  let pi = 0;
+  PROJECTS.forEach((p) =>
+    p.towers.forEach((t) => {
+      const seed = SEED_ST[p.id + ":" + t.id] || {};
+      const has = (arr, code) => (arr || []).indexOf(code) > -1;
+      t.floors.forEach((f) =>
+        p.cols.forEach((c) => {
+          const code = pad2(f) + pad2(c.n);
+          const uid = p.id + ":" + t.id + ":" + code;
+          let status = "AVAILABLE";
+          if (has(seed.SOLD, code)) status = "SOLD";
+          else if (has(seed.TX, code)) status = "IN_TRANSACTION";
+          else if (has(seed.RESOLD, code)) status = "RESOLD";
+          else if (has(seed.LOCK, code)) status = "UNRELEASED";
+          let who = SEED_BUY[uid];
+          if (!who && (status === "SOLD" || status === "RESOLD")) who = PEOPLE[pi++ % PEOPLE.length][0];
+          const pe = who ? PERSON[who] : null;
+          UNITS.push({
+            uid, proj: p.id, tower: t.id, code,
+            floor: f, col: c.n, label: "Căn " + pad2(c.n),
+            type: c.type, area: c.area, ppm: t.ppm,
+            dir: DIRS[c.n - 1], view: VIEWS[c.n - 1],
+            status,
+            buyer: who || "", phone: pe ? pe[1] : "", cccd: pe ? pe[2] : "",
+            deposit: 300000000, handover: p.handover
+          });
+        })
+      );
+    })
+  );
+  const byUid = (uid) => UNITS.find((u) => u.uid === uid);
+  const projOf = (u) => PROJECTS.find((p) => p.id === u.proj);
+  const towerOf = (u) => projOf(u).towers.find((t) => t.id === u.tower);
+  const UNITS_INIT = UNITS.map((u) => ({ uid: u.uid, status: u.status, buyer: u.buyer, phone: u.phone, cccd: u.cccd }));
+
+  const PROSPECTS = [
+    { name: "Nguyễn Thị Mai Hương", phone: "0906.555.777", cccd: "079188009012", email: "maihuong.nt@gmail.com", addr: "12 Nguyễn Văn Hưởng, Thảo Điền, TP.HCM", src: "Facebook Ads", note: "Quan tâm 2PN tầng 18–20, ngân sách 12–15 tỷ.", created: "02/11/2026" },
+    { name: "Lý Gia Hân", phone: "0932.888.999", cccd: "079288003344", email: "giahan.ly@outlook.com", addr: "45 Xuân Thuỷ, Cầu Giấy, Hà Nội", src: "Giới thiệu", note: "Đầu tư cho thuê, ưu tiên view sông.", created: "08/11/2026" }
+  ];
+
+  const SCHED = [
+    { k: "Đợt 1", w: "Ký thoả thuận đặt cọc", p: 0.10, date: "15/01/2026" },
+    { k: "Đợt 2", w: "30 ngày sau khi cọc", p: 0.15, date: "28/01/2026" },
+    { k: "Đợt 3", w: "Theo tiến độ xây dựng", p: 0.15, date: "31/03/2026" },
+    { k: "Đợt 4", w: "Cất nóc", p: 0.15, date: "30/06/2026" },
+    { k: "Đợt 5", w: "Bàn giao nhà", p: 0.40, date: "29/08/2027" },
+    { k: "Đợt 6", w: "Nhận sổ hồng", p: 0.05, date: "30/11/2027" }
+  ];
+
+  const DOCS = [
+    { t: "Hợp đồng mua bán (HĐMB)", d: "Tự điền căn, khách hàng, tiến độ thanh toán" },
+    { t: "Thoả thuận đặt cọc (TTĐC)", d: "Giá trị cọc 300.000.000 ₫ · mẫu 2026" },
+    { t: "Phụ lục hoàn thiện nội thất", d: "Danh mục bàn giao căn hộ" },
+    { t: "Biên bản bàn giao căn hộ", d: "Checklist bàn giao & chỉ số đồng hồ" },
+    { t: "Thanh lý hợp đồng", d: "Mẫu thanh lý & hoàn cọc" },
+    { t: "Công văn xác nhận chuyển nhượng", d: "Gửi chủ đầu tư & phòng công chứng" }
+  ];
+
+  const LS = "twenty-re-crm-v2";
+
+  function pricing(u) {
+    const base = Math.round(u.area * (u.ppm || 145000000));
+    const vat = Math.round(base * VAT);
+    const mf = Math.round(base * MF);
+    return { base, vat, mf, total: base + vat + mf };
+  }
+  function schedule(u) {
+    const total = pricing(u).total;
+    let acc = 0;
+    const rows = SCHED.map((s, i) => {
+      const amt = i === SCHED.length - 1 ? total - acc : Math.round(total * s.p);
+      acc += amt;
+      return { ...s, amt };
+    });
+    const paid = u.status === "SOLD" || u.status === "RESOLD" ? 6 : u.status === "IN_TRANSACTION" ? 2 : 0;
+    return rows.map((r, i) => ({ ...r, st: i < paid ? "paid" : i === paid && u.status === "IN_TRANSACTION" ? "due" : "wait" }));
+  }
+  function commission(u) {
+    const p = pricing(u);
+    const rate = p.total >= 20e9 ? 0.021 : p.total >= 15e9 ? 0.020 : p.total >= 10e9 ? 0.019 : 0.018;
+    const f1 = Math.round(p.base * rate);
+    const bonus = u.status === "SOLD" || u.status === "RESOLD" ? 50000000 : 0;
+    const paid = u.status === "SOLD" || u.status === "RESOLD";
+    return {
+      rate, f1, bonus,
+      total: f1 + bonus,
+      steps: [
+        { k: "Ký HĐMB", p: 0.3, amt: Math.round(f1 * 0.3), st: paid ? "paid" : u.status === "IN_TRANSACTION" ? "due" : "wait" },
+        { k: "Công chứng", p: 0.5, amt: Math.round(f1 * 0.5), st: paid ? "paid" : "wait" },
+        { k: "Bàn giao nhà", p: 0.2, amt: f1 - Math.round(f1 * 0.3) - Math.round(f1 * 0.5), st: paid ? "paid" : "wait" }
+      ]
+    };
+  }
+  function report(u) {
+    const sch = schedule(u), total = pricing(u).total;
+    const paid = sch.filter((r) => r.st === "paid").reduce((a, r) => a + r.amt, 0);
+    return { paid, total, pct: Math.round((paid / total) * 100), nPaid: sch.filter((r) => r.st === "paid").length };
+  }
+  function countByStatus(list) {
+    const m = {};
+    (list || UNITS).forEach((u) => (m[u.status] = (m[u.status] || 0) + 1));
+    return m;
+  }
+  function customers() {
+    const map = new Map();
+    UNITS.filter((u) => u.buyer).forEach((u) => {
+      if (!map.has(u.buyer)) map.set(u.buyer, { name: u.buyer, phone: u.phone, cccd: u.cccd, units: [] });
+      map.get(u.buyer).units.push(u);
+    });
+    PROSPECTS.forEach((p) => { if (!map.has(p.name)) map.set(p.name, { ...p, units: [] }); });
+    EXTRA.forEach((p) => { if (!map.has(p.name)) map.set(p.name, { ...p, units: [] }); });
+    return Array.from(map.values()).map((c, i) => {
+      const rec = custOf(c.name, c);
+      const org = rec.type === "org";
+      const owner = c.units.some((u) => u.status === "SOLD" || u.status === "RESOLD");
+      const tag = c.units.length === 0 ? "prospect" : owner ? "owner" : "tx";
+      const legal = org ? rec.taxno : rec.idno;
+      return {
+        id: "C" + String(i + 1).padStart(4, "0"),
+        key: c.name,
+        name: c.name,
+        disp: (org ? rec.coname : rec.fullname) || c.name,
+        type: rec.type,
+        typeL: org ? "Doanh nghiệp" : "Cá nhân",
+        legal: legal || (org ? rec.taxno : c.cccd) || "",
+        rec: rec,
+        phone: rec.phone || c.phone,
+        cccd: legal || c.cccd,
+        email: rec.email || c.email || slug(c.name) + "@gmail.com",
+        addr: rec.addr_contact || rec.hq || rec.addr_perm || c.addr || "Khu đô thị An Phú, TP. Thủ Đức, TP.HCM",
+        src: c.src || "Website", sale: "Alex Dương",
+        created: c.created || TODAY,
+        note: rec.note || c.note || "",
+        units: c.units, tag
+      };
+    });
+  }
+  const TAG = {
+    owner: { l: "Chủ sở hữu", c: "t-sold" },
+    tx: { l: "Đang giao dịch", c: "t-tx" },
+    prospect: { l: "Tiềm năng", c: "t-av" }
+  };
+
+  /* ================= persistence ================= */
+  function persist() {
+    try {
+      localStorage.setItem(LS, JSON.stringify({
+        v: 2,
+        units: UNITS.map((u) => ({ uid: u.uid, status: u.status, buyer: u.buyer, phone: u.phone, cccd: u.cccd })),
+        cust: CUST,
+        extra: EXTRA
+      }));
+    } catch (e) {}
+  }
+  function restore() {
+    try {
+      const raw = localStorage.getItem(LS);
+      if (!raw) return;
+      const d = JSON.parse(raw);
+      const units = Array.isArray(d) ? d : d.units || [];
+      units.forEach((r) => {
+        const u = (r.uid && byUid(r.uid)) || UNITS.find((x) => x.code === r.code);
+        if (!u) return;
+        if (ST[r.status]) u.status = r.status;
+        u.buyer = r.buyer || ""; u.phone = r.phone || ""; u.cccd = r.cccd || "";
+      });
+      if (!Array.isArray(d)) {
+        if (d.cust) Object.keys(d.cust).forEach((n) => { CUST[n] = Object.assign(defaultCust(n), d.cust[n]); });
+        if (Array.isArray(d.extra)) d.extra.forEach((x) => { if (x && x.name && !EXTRA.some((y) => y.name === x.name)) EXTRA.push(x); });
+      }
+    } catch (e) {}
+  }
+
+  /* ================= state ================= */
+  const S = { view: "project", pid: "orchard", tid: "SD", f: "all", ct: "all", q: "", sort: "desc", tab: 1, route: null, menu: "" };
+  let toastT = 0;
+
+  const curProj = () => PROJECTS.find((p) => p.id === S.pid) || PROJECTS[0];
+  const curTower = () => {
+    const p = curProj();
+    return p.towers.find((t) => t.id === S.tid) || p.towers[0];
+  };
+  const towerUnits = (pid, tid) => UNITS.filter((u) => u.proj === pid && u.tower === tid);
+  const shownUnits = () => towerUnits(curProj().id, curTower().id);
+  const fmtA = (n) => String(n).replace(".", ",");
+
+  function toast(msg) {
+    const t = $("#toast");
+    t.innerHTML = '<svg class="ic"><use href="#i-check"/></svg><span>' + esc(msg) + "</span>";
+    t.classList.add("on");
+    clearTimeout(toastT);
+    toastT = setTimeout(() => t.classList.remove("on"), 2400);
+  }
+
+  function field(label, input, req) {
+    return '<div class="field"><label>' + label + (req ? '<span class="req">*</span>' : "") + "</label>" + input + "</div>";
+  }
+
+  /* ================= chrome ================= */
+  function renderCrumb() {
+    const r = S.route;
+    if (r && r.kind === "unit") {
+      const u = byUid(r.uid);
+      if (u) {
+        $("#crumb").innerHTML =
+          '<span>Dự án</span><svg class="ic"><use href="#i-chevron-right"/></svg>' +
+          "<span>" + esc(projOf(u).short) + '</span><svg class="ic"><use href="#i-chevron-right"/></svg>' +
+          "<b>Căn " + u.code + " · " + esc(towerOf(u).name) + "</b>";
+        return;
+      }
+    }
+    if (r && r.kind === "cust") {
+      const c = customers().find((x) => x.id === r.id);
+      if (c) {
+        $("#crumb").innerHTML =
+          '<span>Khách hàng</span><svg class="ic"><use href="#i-chevron-right"/></svg><b>' + esc(c.name) + "</b>";
+        return;
+      }
+    }
+    $("#crumb").innerHTML =
+      S.view === "project"
+        ? '<span>Dự án</span><svg class="ic"><use href="#i-chevron-right"/></svg><b>' + esc(curProj().short) + " · " + esc(curTower().name) + "</b>"
+        : '<span>Khách hàng</span><svg class="ic"><use href="#i-chevron-right"/></svg><b>Tất cả khách hàng</b>';
+  }
+
+  function renderNav() {
+    $("#cnt-units").textContent = UNITS.length;
+    $("#cnt-cust").textContent = customers().length;
+    $$(".sb-nav .nav-item").forEach((b) => {
+      if (b.dataset.act === "nav") b.classList.toggle("on", b.dataset.view === S.view);
+      else b.classList.toggle("on", S.view === "project" && !S.route && S.f === b.dataset.f);
+    });
+    const c = countByStatus();
+    $$("[data-count]").forEach((el) => (el.textContent = c[el.dataset.count] || 0));
+  }
+
+  function renderViewbar() {
+    const vb = $("#viewbar");
+    if (S.view === "project") {
+      const us = shownUnits();
+      const c = countByStatus(us);
+      let chips = '<button class="chip ' + (S.f === "all" ? "on" : "") + '" data-act="filter" data-f="all">Tất cả <span class="cnt">' + us.length + "</span></button>";
+      ST_KEYS.forEach((k) => {
+        chips += '<button class="chip ' + (S.f === k ? "on" : "") + '" data-act="filter" data-f="' + k + '"><span class="dot" style="background:' + ST[k].hex + '"></span>' + ST[k].l + ' <span class="cnt">' + (c[k] || 0) + "</span></button>";
+      });
+      const fl = curTower().floors;
+      const from = S.sort === "desc" ? fl[0] : fl[fl.length - 1];
+      const to = S.sort === "desc" ? fl[fl.length - 1] : fl[0];
+      vb.innerHTML =
+        '<span class="vb-icon"><svg class="ic"><use href="#i-layers"/></svg></span>' +
+        '<span class="vb-title">Stacking plan</span>' +
+        '<span class="vb-count">· ' + esc(curProj().short) + " · " + esc(curTower().name) + " · " + us.length + " căn</span>" +
+        '<span class="vb-sep"></span>' + chips +
+        '<span class="vb-spacer"></span>' +
+        '<div class="vb-actions">' +
+        '<button class="btn" data-act="sort"><svg class="ic sm"><use href="#i-sort"/></svg>Tầng ' + from + " → " + to + "</button>" +
+        '<button class="btn" data-act="csv"><svg class="ic sm"><use href="#i-download"/></svg>Xuất CSV</button>' +
+        "</div>";
+    } else {
+      const all = customers();
+      const cnt = { all: all.length, owner: 0, tx: 0, prospect: 0 };
+      all.forEach((c) => cnt[c.tag]++);
+      let chips = '<button class="chip ' + (S.f === "all" ? "on" : "") + '" data-act="filter" data-f="all">Tất cả <span class="cnt">' + cnt.all + "</span></button>";
+      ["owner", "tx", "prospect"].forEach((k) => {
+        chips += '<button class="chip ' + (S.f === k ? "on" : "") + '" data-act="filter" data-f="' + k + '">' + TAG[k].l + ' <span class="cnt">' + cnt[k] + "</span></button>";
+      });
+      vb.innerHTML =
+        '<span class="vb-icon"><svg class="ic"><use href="#i-users"/></svg></span>' +
+        '<span class="vb-title">Khách hàng</span>' +
+        '<span class="vb-count" id="vbcount">· ' + all.length + ' người</span>' +
+        '<span class="vb-sep"></span>' + chips +
+        '<span class="vb-spacer"></span>' +
+        '<div class="vb-actions">' +
+        '<span class="qwrap"><svg class="ic"><use href="#i-search"/></svg>' +
+        '<input class="q" id="q" value="' + esc(S.q) + '" placeholder="Tên, SĐT, CCCD, mã căn…" autocomplete="off" spellcheck="false" /></span>' +
+        '<button class="btn" data-act="csv"><svg class="ic sm"><use href="#i-download"/></svg>Xuất CSV</button>' +
+        "</div>";
+    }
+  }
+
+  /* ================= project view ================= */
+  function viewProject() {
+    const p = curProj(), t = curTower();
+    const us = towerUnits(p.id, t.id);
+    const c = countByStatus(us);
+    const totalValue = us.reduce((a, u) => a + pricing(u).total, 0);
+    const legend = ST_KEYS.map((k) => '<span class="lg"><i style="background:' + ST[k].hex + '"></i>' + ST[k].l + " <b>" + (c[k] || 0) + "</b></span>").join("");
+
+    const projItems = PROJECTS.map((x) => {
+      const n = UNITS.filter((u) => u.proj === x.id).length;
+      return '<button class="pkpop-i ' + (x.id === p.id ? "on" : "") + '" data-act="pid" data-pid="' + x.id + '">' +
+        '<span>' + esc(x.short) + '</span><span class="cnt">' + n + " căn</span></button>";
+    }).join("");
+    const towerItems = p.towers.map((x) =>
+      '<button class="pkpop-i ' + (x.id === t.id ? "on" : "") + '" data-act="tid" data-tid="' + x.id + '">' +
+      '<span>' + esc(x.name) + '</span><span class="cnt">' + towerUnits(p.id, x.id).length + " căn</span></button>"
+    ).join("");
+
+    const selBtn = (menu, label, value, count, items, head) =>
+      '<div class="pkwrap">' +
+      '<button class="pk' + (S.menu === menu ? " on" : "") + '" data-act="menu" data-menu="' + menu + '" aria-haspopup="true">' +
+      '<span class="lb">' + label + '</span><b>' + esc(value) + '</b><span class="cnt">' + count + "</span>" +
+      '<svg class="ic chev"><use href="#i-chevron-down"/></svg></button>' +
+      (S.menu === menu ? '<div class="pkpop"><div class="pkpop-h">' + head + "</div>" + items + "</div>" : "") +
+      "</div>";
+
+    const pickers =
+      '<div class="pbar">' +
+      selBtn("pid", "Dự án", p.short, UNITS.filter((u) => u.proj === p.id).length + " căn", projItems, "Chọn dự án (" + PROJECTS.length + ")") +
+      selBtn("tid", "Toà", t.name.replace(/^Toà\s+/, ""), us.length + " căn", towerItems, "Chọn toà (" + p.towers.length + ")") +
+      '<span class="flex1"></span>' +
+      '<span class="note mono">' + t.floors.length + " tầng · " + p.cols.length + " căn/tầng · " + esc(p.addr) + "</span>" +
+      "</div>";
+
+    const props =
+      '<div class="plan-topbar">' +
+      '<div class="prop"><span>Dự án</span><b>' + esc(p.name) + "</b></div>" +
+      '<div class="prop"><span>Toà / Block</span><b>' + esc(t.name) + " (" + esc(p.short) + ")</b></div>" +
+      '<div class="prop"><span>Sản phẩm</span><b>' + us.length + " căn · " + t.floors.length + " tầng</b></div>" +
+      '<div class="prop"><span>Đơn giá TB</span><b class="mono">' + fmt(t.ppm) + "/m²</b></div>" +
+      '<div class="prop"><span>Tổng giá trị</span><b class="mono">' + shortVnd(totalValue) + "</b></div>" +
+      '<div class="legend">' + legend + "</div>" +
+      "</div>";
+
+    const head =
+      '<div class="phead"><div class="ph-floor">Tầng</div>' +
+      p.cols.map((cc) => '<div class="ph-col"><b>Căn ' + pad2(cc.n) + "</b><span>" + cc.type + " · " + fmtA(cc.area) + " m²</span></div>").join("") +
+      "</div>";
+
+    const floors = S.sort === "desc" ? t.floors.slice() : t.floors.slice().reverse();
+    const rows = floors.map((f) => {
+      const fu = us.filter((u) => u.floor === f);
+      const cells = p.cols.map((cc) => {
+        const u = fu.find((x) => x.col === cc.n);
+        if (!u) return '<div class="cell" style="border-style:dashed"></div>';
+        const st = ST[u.status];
+        const dim = S.f !== "all" && S.f !== u.status ? " dim" : "";
+        const lock = u.status === "UNRELEASED" ? '<svg class="ic"><use href="#i-lock"/></svg>' : "";
+        return (
+          '<button class="cell ' + st.c + dim + '" data-act="unit" data-uid="' + u.uid + '" title="' + esc("Căn " + u.code + " · " + u.type + " · " + fmtA(u.area) + " m² · " + st.l) + '">' +
+          '<span class="row1"><span class="code">' + u.code + '</span><span class="tdot"></span><span class="price">' + shortVnd(pricing(u).total) + "</span></span>" +
+          '<span class="row2">' + lock + u.type + " · " + fmtA(u.area) + " m²</span>" +
+          "</button>"
+        );
+      }).join("");
+      return '<div class="prow"><div class="fl"><b>T' + f + "</b><span>" + fu.length + " căn</span></div>" + cells + "</div>";
+    }).join("");
+
+    const note =
+      '<div class="viewnote"><span>Bấm một ô để mở hồ sơ nghiệp vụ của căn — đang xem <span class="mono">' + esc(t.name) + "</span>, " + (S.f === "all" ? "tất cả trạng thái" : ST[S.f].l) + "</span>" +
+      '<span class="saved"><svg class="ic"><use href="#i-check"/></svg>Lưu tự động trên máy</span></div>';
+
+    return pickers + '<div class="view">' + props + '<div class="plan-scroll"><div class="plan">' + head + rows + "</div></div>" + note + "</div>";
+  }
+
+  /* ================= customer view ================= */
+  function filteredCustomers() {
+    const q = S.q.trim().toLowerCase();
+    return customers().filter((c) => {
+      if (S.f !== "all" && c.tag !== S.f) return false;
+      if (S.ct !== "all" && c.type !== S.ct) return false;
+      if (!q) return true;
+      return (
+        c.name.toLowerCase().includes(q) ||
+        String(c.disp).toLowerCase().includes(q) ||
+        c.phone.includes(q) ||
+        String(c.cccd).includes(q) ||
+        String(c.legal).includes(q) ||
+        c.email.toLowerCase().includes(q) ||
+        String(c.rec.coname || "").toLowerCase().includes(q) ||
+        c.units.some((u) => u.code.includes(q) || (u.tower + "·" + u.code).toLowerCase().includes(q) || (u.proj + u.code).includes(q))
+      );
+    });
+  }
+
+  function viewCustomers() {
+    const all = customers();
+    const list = filteredCustomers();
+    const ct = [
+      ["all", "Tất cả", all.length],
+      ["ind", "Cá nhân", all.filter((c) => c.type === "ind").length],
+      ["org", "Doanh nghiệp", all.filter((c) => c.type === "org").length]
+    ];
+    const toolbar =
+      '<div class="toolbar"><span class="vt">Loại hồ sơ</span>' +
+      ct.map((x) => '<button class="chip' + (S.ct === x[0] ? " on" : "") + '" data-act="cfilter" data-t="' + x[0] + '">' + x[1] + ' <span class="mono">' + x[2] + "</span></button>").join("") +
+      '<span class="flex1"></span>' +
+      '<button class="btn pri" data-act="add-cust"><svg class="ic sm"><use href="#i-plus"/></svg>Thêm khách hàng</button></div>';
+
+    if (!list.length) {
+      return toolbar + '<div class="empty"><svg class="ic" style="width:22px;height:22px"><use href="#i-users"/></svg><b>Không tìm thấy khách hàng</b><span>Thử từ khoá khác: tên, số điện thoại, CCCD/MST hoặc mã căn.</span></div>';
+    }
+    const rows = list.map((c) => {
+      const tg = TAG[c.tag];
+      const units = c.units.length
+        ? c.units.map((u) => '<span class="unit-chip">' + u.tower + "·" + u.code + "</span>").join(" ")
+        : '<span style="color:var(--fg4)">—</span>';
+      return (
+        '<tr data-act="cust" data-id="' + c.id + '">' +
+        '<td><div class="cust"><span class="ava lg">' + initials(c.disp) + '</span><div class="nm"><b>' + esc(c.disp) + "</b><span>" + esc(c.email) + "</span></div></div></td>" +
+        '<td><span class="tag ' + (c.type === "org" ? "t-org" : "t-ind") + '">' + c.typeL + "</span></td>" +
+        '<td class="mono">' + esc(c.phone) + "</td>" +
+        '<td class="mono">' + esc(c.legal || "—") + "</td>" +
+        "<td>" + units + "</td>" +
+        '<td><span class="tag ' + tg.c + '">' + tg.l + "</span></td>" +
+        "<td>" + esc(c.sale) + "</td>" +
+        '<td style="width:28px;text-align:right"><svg class="ic sm" style="color:var(--fg4)"><use href="#i-chevron-right"/></svg></td>' +
+        "</tr>"
+      );
+    }).join("");
+
+    return (
+      toolbar +
+      '<table class="tbl"><thead><tr>' +
+      "<th>Khách hàng</th><th>Loại</th><th>Số điện thoại</th><th>CCCD / MST</th><th>Căn hộ</th><th>Trạng thái</th><th>Phụ trách</th><th></th>" +
+      "</tr></thead><tbody>" + rows + "</tbody></table>" +
+      '<div class="viewnote" style="padding:10px 16px 16px"><span>Hiển thị <span class="mono">' + list.length + "</span> / " + all.length + " khách hàng</span>" +
+      '<span class="saved"><svg class="ic"><use href="#i-check"/></svg>Lưu tự động trên máy</span></div>'
+    );
+  }
+
+  /* ================= panel: unit ================= */
+  const TABS = [
+    { n: 1, l: "Tổng quan", req: true },
+    { n: 2, l: "Khách hàng", req: true },
+    { n: 3, l: "Báo giá", req: false },
+    { n: 4, l: "HĐMB & mẫu", req: true },
+    { n: 5, l: "Hoa hồng", req: false },
+    { n: 6, l: "Chuyển nhượng", req: false },
+    { n: 7, l: "Báo cáo", req: false }
+  ];
+
+  function unitTab1(u) {
+    const p = pricing(u);
+    const opts = ST_KEYS.map(
+      (k) =>
+        '<button class="opt ' + (u.status === k ? "on" : "") + '" data-act="set-status" data-uid="' + u.uid + '" data-s="' + k + '">' +
+        '<i style="background:' + ST[k].hex + '"></i>' + ST[k].l +
+        "<span>" + (countByStatus(towerUnits(u.proj, u.tower))[k] || 0) + " căn</span></button>"
+    ).join("");
+    const info =
+      '<div class="fgrid">' +
+      field("Unit description", '<input class="inp mono" value="' + u.code + '" readonly />', true) +
+      field("Floor", '<input class="inp mono" value="' + esc(u.tower) + "-" + pad2(u.floor) + '" readonly />') +
+      field("Project", '<input class="inp" value="' + esc(projOf(u).name) + '" readonly />', true) +
+      field("Block", '<input class="inp mono" value="' + esc(u.tower) + '" readonly />', true) +
+      field("Deposit amount", '<input class="inp mono" value="' + fmt(u.deposit) + '" readonly />', true) +
+      field("Handover date", '<input class="inp" value="' + u.handover + '" readonly />', true) +
+      "</div>";
+    return (
+      '<div class="sec"><div class="sec-h"><span>Trạng thái căn hộ</span><span class="note">Lưu tự động</span></div>' + opts + "</div>" +
+      '<div class="sec"><div class="sec-h"><span>Thông tin bắt buộc</span></div>' + info + "</div>" +
+      '<div class="sec"><div class="sec-h"><span>Cơ cấu giá</span><span class="note mono">' + fmt(u.ppm) + "/m²</span></div>" +
+      '<div class="kv"><span>Giá bán (' + u.area + " m²)</span><b>" + fmt(p.base) + "</b></div>" +
+      '<div class="kv"><span>Thuế VAT 8,45%</span><b>' + fmt(p.vat) + "</b></div>" +
+      '<div class="kv"><span>Phí bảo trì 2%</span><b>' + fmt(p.mf) + "</b></div>" +
+      '<div class="kv total"><span>Tổng giá trị căn hộ</span><b>' + fmt(p.total) + "</b></div></div>"
+    );
+  }
+
+  function unitTab2(u) {
+    return (
+      '<div class="sec"><div class="sec-h"><span>Khách hàng giao dịch</span>' +
+      (u.buyer ? '<span class="tag t-acc">Đã liên kết</span>' : '<span class="note">Chưa có khách</span>') + "</div>" +
+      '<div class="fgrid one">' + field("Họ và tên", '<input class="inp" id="c-name" value="' + esc(u.buyer) + '" placeholder="Chưa có khách hàng" />', true) + "</div>" +
+      '<div class="fgrid" style="margin-top:8px">' +
+      field("Số điện thoại", '<input class="inp mono" id="c-phone" value="' + esc(u.phone) + '" />', true) +
+      field("CCCD / Hộ chiếu", '<input class="inp mono" id="c-cccd" value="' + esc(u.cccd) + '" />', true) +
+      "</div>" +
+      '<div class="fgrid" style="margin-top:8px">' +
+      field("Email", '<input class="inp" id="c-email" value="" placeholder="email@domain.com" />') +
+      field("Ngày sinh", '<input class="inp" value="01/01/1985" />') +
+      "</div></div>" +
+      '<div class="sec"><div class="sec-h"><span>Địa chỉ thường trú</span></div>' +
+      '<div class="fgrid one">' + field("Địa chỉ", '<input class="inp" id="c-addr" value="Khu đô thị An Phú, TP. Thủ Đức, TP.HCM" />') + "</div></div>" +
+      '<div class="sec"><div class="sec-h"><span>Ghi chú nội bộ</span></div>' +
+      '<textarea class="ta" id="c-note" placeholder="Nhu cầu, ngân sách, tiến độ liên hệ…"></textarea></div>' +
+      (u.buyer ? '<div class="sec"><button class="btn" data-act="cust-name" data-name="' + esc(u.buyer) + '"><svg class="ic sm"><use href="#i-users"/></svg>Mở hồ sơ khách hàng đầy đủ</button></div>' : "") +
+      '<div class="sec"><div class="warn">Thông tin khách hàng gắn với căn ' + u.code + '. Khi lưu, hệ thống cập nhật cả hồ sơ khách hàng trong tab “Khách hàng”.</div></div>'
+    );
+  }
+
+  function unitTab3(u) {
+    const p = pricing(u);
+    const sch = schedule(u);
+    const stTag = { paid: ["Đã thu", "t-sold"], due: ["Đến hạn", "t-tx"], wait: ["Chưa tới", "t-lock"] };
+    const rows = sch.map((r) => {
+      const t = stTag[r.st];
+      return (
+        '<tr><td><b style="font-weight:500">' + r.k + '</b> <span class="note mono">' + r.date + "</span></td>" +
+        "<td>" + r.w + "</td>" +
+        '<td class="num">' + fmt(r.amt) + "</td>" +
+        '<td><span class="tag ' + t[1] + '">' + t[0] + "</span></td></tr>"
+      );
+    }).join("");
+    return (
+      '<div class="sec"><div class="sec-h"><span>Báo giá · ' + u.code + '</span><span class="note">' + TODAY + "</span></div>" +
+      '<div class="kv"><span>Khách hàng</span><b>' + (u.buyer ? esc(u.buyer) : "—") + "</b></div>" +
+      '<div class="kv"><span>Loại căn · diện tích</span><b>' + u.type + " · " + u.area + " m²</b></div>" +
+      '<div class="kv"><span>Tổng giá trị</span><b>' + fmt(p.total) + "</b></div></div>" +
+      '<div class="sec"><div class="sec-h"><span>Tiến độ thanh toán</span>' +
+      '<button class="btn" data-act="toast" data-msg="Đã xuất báo giá PDF cho căn ' + u.code + '"><svg class="ic sm"><use href="#i-download"/></svg>Xuất PDF</button></div>' +
+      '<div class="mtable"><table class="itable tall"><thead><tr><th>Đợt</th><th>Điều kiện</th><th class="num">Số tiền</th><th>Trạng thái</th></tr></thead><tbody>' + rows + "</tbody></table></div>" +
+      '<div class="hr"></div><div class="kv"><span>Tổng cộng</span><b>' + fmt(p.total) + "</b></div>" +
+      '<div class="note" style="margin-top:6px">Đã bao gồm VAT 8,45% và phí bảo trì 2%. Báo giá có hiệu lực 15 ngày.</div></div>'
+    );
+  }
+
+  function unitTab4(u) {
+    const p = pricing(u);
+    const docs = DOCS.map((d) =>
+      '<button class="tpl" data-act="toast" data-msg="Đã tạo ' + d.t + ' cho căn ' + u.code + '">' +
+      '<span class="tpl-ic"><svg class="ic sm"><use href="#i-file"/></svg></span>' +
+      '<span class="tpl-tx"><b>' + d.t + "</b><span>" + d.d + "</span></span>" +
+      '<span class="tpl-dl iconbtn" title="Tải về"><svg class="ic sm"><use href="#i-download"/></svg></span></button>'
+    ).join("");
+    return (
+      '<div class="sec"><div class="sec-h"><span>Văn bản bán hàng</span><span class="note">' + DOCS.length + " mẫu</span></div>" + docs + "</div>" +
+      '<div class="sec"><div class="sec-h"><span>Lệ phí theo căn</span></div>' +
+      '<div class="kv"><span>Lệ phí trước bạ 0,5%</span><b>' + fmt(p.total * 0.005) + "</b></div>" +
+      '<div class="kv"><span>Phí công chứng 0,1%</span><b>' + fmt(p.total * 0.001) + "</b></div>" +
+      '<div class="kv"><span>Phí cấp sổ hồng</span><b>' + fmt(526000) + "</b></div></div>" +
+      '<div class="sec"><div class="sec-h"><span>Thanh lý &amp; bán lại</span><span class="tag t-tr">Bắt buộc</span></div>' +
+      '<div class="fgrid">' +
+      field("Date", '<input class="inp mono" value="16/12/2026" />', true) +
+      field("Type", '<input class="inp" value="Option Entry - Terminate" />', true) +
+      field("Termination type", '<input class="inp" value="Forfeiture Refund" />', true) +
+      field("Resell", '<select class="sel"><option>Yes — cho phép bán lại</option><option>No</option></select>', true) +
+      "</div>" +
+      '<div class="hr"></div><div class="kv"><span>Đã thanh toán</span><b>' + fmt(report(u).paid) + "</b></div>" +
+      '<div class="kv"><span>Khấu trừ khi thanh lý (10%)</span><b>' + fmt(report(u).paid * 0.1) + "</b></div>" +
+      '<div class="kv total"><span>Số tiền hoàn lại</span><b>' + fmt(report(u).paid * 0.9) + "</b></div></div>"
+    );
+  }
+
+  function unitTab5(u) {
+    const c = commission(u);
+    const stTxt = { paid: ["Đã nhận", "t-sold"], due: ["Đến hạn", "t-tx"], wait: ["Chưa tới", "t-lock"] };
+    const steps = c.steps.map((s) => {
+      const t = stTxt[s.st];
+      return (
+        '<div class="tl-row"><span class="tl-dot">' + (s.st === "paid" ? '<svg class="ic"><use href="#i-check"/></svg>' : "") + "</span>" +
+        '<div class="tl-tx"><b>' + s.k + " · " + Math.round(s.p * 100) + "%</b><span>" + fmt(s.amt) + "</span></div></div>"
+      );
+    }).join("");
+    const f2 = Math.round(c.f1 * 0.2), f3 = Math.round(c.f1 * 0.1), f1 = c.f1 - f2 - f3;
+    return (
+      '<div class="sec"><div class="stat2">' +
+      '<div class="stat"><span>Tỷ lệ hoa hồng F1</span><b>' + (c.rate * 100).toFixed(1).replace(".", ",") + " %</b></div>" +
+      '<div class="stat"><span>Hoa hồng F1</span><b class="g">' + fmt(c.f1) + "</b></div></div>" +
+      '<div style="margin-top:8px">' +
+      '<div class="kv"><span>Cơ sở tính (giá bán chưa VAT)</span><b>' + fmt(pricing(u).base) + "</b></div>" +
+      '<div class="kv"><span>Thưởng nóng khi ký HĐMB</span><b>' + (c.bonus ? fmt(c.bonus) : "—") + "</b></div>" +
+      '<div class="kv total"><span>Tổng thu nhập đại lý</span><b>' + fmt(c.total) + "</b></div></div></div>" +
+      '<div class="sec"><div class="sec-h"><span>Tiến độ chi trả</span></div><div class="tl">' + steps + "</div></div>" +
+      '<div class="sec"><div class="sec-h"><span>Phân chia theo cấp</span></div>' +
+      '<div class="kv"><span>F1 — Alex Dương (70%)</span><b>' + fmt(f1) + "</b></div>" +
+      '<div class="kv"><span>F2 — Trần Bảo (20%)</span><b>' + fmt(f2) + "</b></div>" +
+      '<div class="kv"><span>F3 — CTV (10%)</span><b>' + fmt(f3) + "</b></div></div>"
+    );
+  }
+
+  function unitTabTransfer(u) {
+    const base = pricing(u).base;
+    const list = TRANSFER[u.uid] || [];
+    const last = list.length ? list[list.length - 1] : null;
+    const lastPrice = last ? last.ppm * u.area : 0;
+    const diff = last ? lastPrice - base : 0;
+    const fee = last ? lastPrice * 0.025 : 0;
+    const pct = base ? (diff / base) * 100 : 0;
+
+    const cards = list.map((r, i) =>
+      '<div class="tr"><div class="tr-h"><b>Lần ' + (i + 1) + '</b>' +
+      '<span class="tag t-tr">Hoàn tất</span><span class="mono note">' + r.id + "</span></div>" +
+      '<div class="kv w"><span>Ngày chuyển nhượng</span><b>' + r.date + "</b></div>" +
+      '<div class="kv w"><span>Chủ cũ</span><b>' + esc(r.from) + "</b></div>" +
+      '<div class="kv w"><span>Chủ mới</span><b>' + esc(r.to) + "</b></div>" +
+      '<div class="kv w"><span>Giá chuyển nhượng</span><b>' + fmt(r.ppm * u.area) + "</b></div>" +
+      '<div class="kv w"><span>Số công chứng</span><b>' + r.notary + "</b></div></div>"
+    ).join("");
+
+    const table = list.length
+      ? '<div class="trs">' + cards + "</div>"
+      : '<div class="warn">Căn chưa qua chuyển nhượng — chỉ phát sinh sau khi đã bán và sang tên.</div>';
+
+    return (
+      '<div class="sec"><div class="sec-h"><span>Lịch sử chuyển nhượng · ' + u.code + '</span><span class="note">' + list.length + " lần</span></div>" +
+      '<div class="kv"><span>Giá CĐT ban đầu</span><b>' + fmt(base) + "</b></div>" +
+      (last
+        ? '<div class="kv"><span>Giá chuyển nhượng gần nhất</span><b>' + fmt(lastPrice) + "</b></div>" +
+          '<div class="kv"><span>Chênh lệch so với giá CĐT</span><b>' + fmt(diff) + ' <span class="note mono">' + (diff >= 0 ? "+" : "") + pct.toFixed(1) + "%</span></b></div>" +
+          '<div class="kv"><span>Phí sang tên (TNCN 2% + công chứng 0,5%)</span><b>' + fmt(fee) + "</b></div>"
+        : "") +
+      "</div>" +
+      '<div class="sec"><div class="sec-h"><span>Các lần sang tên</span>' +
+      '<button class="btn" data-act="toast" data-msg="Đã xuất bảng kê chuyển nhượng căn ' + u.code + '"><svg class="ic sm"><use href="#i-download"/></svg>Xuất bảng kê</button></div>' +
+      table +
+      "</div>"
+    );
+  }
+
+  function unitTab6(u) {
+    const r = report(u);
+    const sch = schedule(u);
+    const events = [
+      { k: "Tạo hồ sơ căn", d: "15/01/2026 · Alex Dương", ok: true },
+      { k: "Ký TTĐC", d: "15/01/2026 · " + (u.buyer ? u.buyer : "—"), ok: r.nPaid >= 1 },
+      { k: "Thu đợt 1", d: "28/01/2026 · Kế toán xác nhận", ok: r.nPaid >= 1 },
+      { k: "Thu đợt 2", d: sch[1].date + " · đáo hạn", ok: r.nPaid >= 2 },
+      { k: "Ký HĐMB", d: u.status === "SOLD" || u.status === "RESOLD" ? "20/02/2026 · hoàn tất" : "chưa thực hiện", ok: u.status === "SOLD" || u.status === "RESOLD" }
+    ];
+    const tl = events.map((e) =>
+      '<div class="tl-row"><span class="tl-dot"' + (e.ok ? ' style="background:#E9F6EC;color:#2E7D4F"' : "") + ">" + (e.ok ? '<svg class="ic"><use href="#i-check"/></svg>' : "") + "</span>" +
+      '<div class="tl-tx"><b' + (e.ok ? "" : ' style="color:var(--fg2);font-weight:400"') + ">" + e.k + "</b><span>" + e.d + "</span></div></div>"
+    ).join("");
+    return (
+      '<div class="sec"><div class="stat2">' +
+      '<div class="stat"><span>Đã thu</span><b class="g">' + fmt(r.paid) + "</b></div>" +
+      '<div class="stat"><span>Còn lại</span><b>' + fmt(r.total - r.paid) + "</b></div>" +
+      '<div class="stat"><span>Đợt đã thu</span><b>' + r.nPaid + " / " + SCHED.length + "</b></div>" +
+      '<div class="stat"><span>Giá trị căn</span><b>' + fmt(r.total) + "</b></div>" +
+      "</div></div>" +
+      '<div class="sec"><div class="sec-h"><span>Tiến độ thanh toán</span><span class="note mono">' + r.pct + "%</span></div>" +
+      '<div class="bar"><i style="width:' + r.pct + '%"></i></div>' +
+      '<div class="barline"><span>' + fmt(r.paid) + "</span><b>" + r.pct + "% / 100%</b></div></div>" +
+      '<div class="sec"><div class="sec-h"><span>Dòng thời gian</span>' +
+      '<button class="btn" data-act="toast" data-msg="Đã xuất báo cáo căn ' + u.code + '"><svg class="ic sm"><use href="#i-download"/></svg>Xuất</button></div>' +
+      '<div class="tl">' + tl + "</div></div>"
+    );
+  }
+
+  function unitTab(u, n) {
+    if (n === 2) return unitTab2(u);
+    if (n === 3) return unitTab3(u);
+    if (n === 4) return unitTab4(u);
+    if (n === 5) return unitTab5(u);
+    if (n === 6) return unitTabTransfer(u);
+    if (n === 7) return unitTab6(u);
+    return unitTab1(u);
+  }
+
+  /* ================= detail: helper ================= */
+  function kpi(l, v, cls) {
+    return '<div class="kpi"><span>' + l + "</span><b" + (cls ? ' class="' + cls + '"' : "") + ">" + v + "</b></div>";
+  }
+  function kv(l, v, cls) {
+    return '<div class="kv"><span>' + l + '</span><b' + (cls ? ' class="' + cls + '"' : "") + ">" + v + "</b></div>";
+  }
+
+  /* ================= detail: unit ================= */
+  function detailUnit(u) {
+    const p = pricing(u), r = report(u), c = commission(u), st = ST[u.status];
+    const proj = projOf(u), tw = towerOf(u);
+    const cu = u.buyer ? customers().find((x) => x.name === u.buyer) : null;
+    const tabs = TABS.map((t) =>
+      '<button class="tab ' + (S.tab === t.n ? "on" : "") + '" data-act="tab" data-tab="' + t.n + '">' + t.l + (t.req ? '<span class="req">*</span>' : "") + "</button>"
+    ).join("");
+
+    const opts = ST_KEYS.map((k) =>
+      '<button class="opt ' + (u.status === k ? "on" : "") + '" data-act="set-status" data-uid="' + u.uid + '" data-s="' + k + '">' +
+      '<i style="background:' + ST[k].hex + '"></i>' + ST[k].l +
+      "<span>" + (countByStatus(towerUnits(u.proj, u.tower))[k] || 0) + " căn</span></button>"
+    ).join("");
+
+    const cust = cu
+      ? '<div class="cust2"><span class="ava lg">' + initials(cu.name) + '</span><div class="nm"><b>' + esc(cu.name) + '</b><span class="mono">' + esc(cu.phone) + "</span></div></div>" +
+        kv("CCCD", esc(cu.cccd), "mono") +
+        kv("Email", esc(cu.email)) +
+        '<button class="btn wide" style="margin-top:8px" data-act="cust" data-id="' + cu.id + '">Mở hồ sơ khách hàng<svg class="ic sm"><use href="#i-chevron-right"/></svg></button>'
+      : '<div class="warn">Căn chưa gắn khách hàng. Chuyển sang bước “Khách hàng” để nhập thông tin người mua.</div>' +
+        '<button class="btn wide" style="margin-top:8px" data-act="tab" data-tab="2">Nhập thông tin khách hàng</button>';
+
+    const tl = schedule(u).filter((x) => x.st !== "wait").slice(0, 4).map((x) =>
+      '<div class="tl-row"><span class="tl-dot">' + (x.st === "paid" ? '<svg class="ic"><use href="#i-check"/></svg>' : "") + "</span>" +
+      '<div class="tl-tx"><b>' + x.k + " · " + x.date + "</b><span>" + fmt(x.amt) + "</span></div></div>"
+    ).join("") || '<div class="warn">Chưa phát sinh thanh toán.</div>';
+
+    return (
+      '<div class="detail">' +
+      '<div class="d-head">' +
+      '<div class="d-top">' +
+      '<button class="iconbtn" data-act="back" title="Quay lại (Esc)"><svg class="ic"><use href="#i-arrow-left"/></svg></button>' +
+      "<span>Dự án</span><svg class=\"ic sep\"><use href=\"#i-chevron-right\"/></svg>" +
+      "<span>" + esc(proj.short) + '</span><svg class="ic sep"><use href="#i-chevron-right"/></svg>' +
+      "<span>" + esc(tw.name) + '</span><svg class="ic sep"><use href="#i-chevron-right"/></svg>' +
+      "<b>Căn " + u.code + "</b>" +
+      '<span class="flex1"></span>' +
+      '<button class="btn ghost icon" data-act="toast" data-msg="Đã sao chép liên kết hồ sơ căn ' + u.code + '" title="Chia sẻ hồ sơ"><svg class="ic sm"><use href="#i-external"/></svg></button>' +
+      "</div>" +
+      '<div class="d-title">' +
+      '<h1 class="mono">Căn ' + u.code + '</h1><span class="tag ' + st.t + '">' + st.l + "</span>" +
+      '<span class="d-sub">' + u.type + " · " + fmtA(u.area) + " m² · Tầng " + u.floor + " · " + esc(tw.name) + " · " + esc(proj.name) + "</span>" +
+      "</div>" +
+      '<div class="kpis">' +
+      kpi("Tổng giá trị căn", fmt(p.total)) +
+      kpi("Đã thanh toán", fmt(r.paid), "g") +
+      kpi("Còn lại", fmt(r.total - r.paid)) +
+      kpi("Hoa hồng F1", fmt(c.f1)) +
+      "</div>" +
+      '<div class="d-tabs">' + tabs + "</div>" +
+      "</div>" +
+      '<div class="d-body">' +
+      '<div class="d-main">' + unitTab(u, S.tab) + "</div>" +
+      '<div class="d-side">' +
+      '<div class="sec"><div class="sec-h"><span>Trạng thái căn hộ</span><span class="note">Lưu tự động</span></div>' + opts + "</div>" +
+      '<div class="sec"><div class="sec-h"><span>Thông tin căn hộ</span></div>' +
+      kv("Dự án", esc(proj.short)) +
+      kv("Toà", esc(tw.name)) +
+      kv("Tầng", "Tầng " + u.floor) +
+      kv("Loại căn", u.type) +
+      kv("Diện tích", fmtA(u.area) + " m²") +
+      kv("Hướng", u.dir) +
+      kv("View", u.view) +
+      kv("Đơn giá", fmt(u.ppm) + "/m²", "mono") +
+      kv("Bàn giao", u.handover) +
+      "</div>" +
+      '<div class="sec"><div class="sec-h"><span>Khách hàng</span></div>' + cust + "</div>" +
+      '<div class="sec"><div class="sec-h"><span>Thanh toán</span><span class="note mono">' + r.nPaid + " / " + SCHED.length + "</span></div>" +
+      '<div class="bar"><i style="width:' + r.pct + '%"></i></div>' +
+      '<div class="barline"><span>' + fmt(r.paid) + "</span><b>" + r.pct + "%</b></div></div>" +
+      '<div class="sec"><div class="sec-h"><span>Hoạt động gần đây</span></div><div class="tl">' + tl + "</div></div>" +
+      "</div></div></div>"
+    );
+  }
+
+  /* ================= detail: customer ================= */
+  function detailCust(c) {
+    const rec = c.rec || custOf(c.name, c);
+    const org = rec.type === "org";
+    const tg = TAG[c.tag];
+    const trs = [];
+    Object.keys(TRANSFER).forEach((uid) => TRANSFER[uid].forEach((r) => {
+      if (r.from === c.name || r.to === c.name) trs.push({ uid, r });
+    }));
+    const held = c.units;
+    const total = held.reduce((a, u) => a + pricing(u).total, 0);
+    const paid = held.reduce((a, u) => a + report(u).paid, 0);
+    const sc = countByStatus(held);
+    const flds = org ? F_ORG : F_IND;
+    const groups = org ? G_ORG : G_IND;
+    const reqN = flds.filter((f) => f.req).length;
+    const doneN = flds.filter((f) => f.req && String(rec[f.k] || "").trim()).length;
+
+    const heldCards = held.length
+      ? '<div class="cunits">' + held.map((u) =>
+          '<button class="cunit" data-act="unit" data-uid="' + u.uid + '">' +
+          '<span class="cu-tx"><b>Căn ' + u.code + " · " + esc(towerOf(u).name) + "</b><span>" + u.type + " · " + fmtA(u.area) + " m² · " + fmt(pricing(u).total) + "</span></span>" +
+          '<span class="tag ' + ST[u.status].t + '">' + ST[u.status].l + "</span>" +
+          '<svg class="ic sm"><use href="#i-chevron-right"/></svg></button>'
+        ).join("") + "</div>"
+      : '<div class="warn">Khách hàng tiềm năng — chưa sở hữu căn nào.</div>';
+
+    const trCards = trs.length
+      ? '<div class="trs">' + trs.map((x) => {
+          const u = byUid(x.uid), r = x.r;
+          return (
+            '<div class="tr"><div class="tr-h"><b>' + (r.to === c.name ? "Nhận chuyển nhượng" : "Chuyển đi") + "</b>" +
+            '<span class="tag t-tr">' + r.id + '</span><span class="mono note">' + r.date + "</span></div>" +
+            '<div class="kv w"><span>Căn hộ</span><b><button class="cr-lnk" data-act="unit" data-uid="' + x.uid + '">' + esc(towerOf(u).name) + " · " + u.code + "</button></b></div>" +
+            '<div class="kv w"><span>Chủ cũ</span><b>' + esc(r.from) + "</b></div>" +
+            '<div class="kv w"><span>Chủ mới</span><b>' + esc(r.to) + "</b></div>" +
+            '<div class="kv w"><span>Giá chuyển nhượng</span><b>' + fmt(r.ppm * u.area) + "</b></div>" +
+            '<div class="kv w"><span>Số công chứng</span><b>' + r.notary + "</b></div></div>"
+          );
+        }).join("") + "</div>"
+      : '<div class="warn">Chưa có giao dịch chuyển nhượng nào liên quan khách hàng này.</div>';
+
+    const dist = ST_KEYS.filter((k) => sc[k]).map((k) => kv(ST[k].l, sc[k] + " căn")).join("");
+
+    const profile =
+      '<div class="sec"><div class="sec-h"><span>' + (org ? "Hồ sơ doanh nghiệp · 17 trường" : "Hồ sơ cá nhân · 15 trường") + "</span>" +
+      '<span class="note mono">' + doneN + "/" + reqN + " bắt buộc</span></div>" +
+      '<div class="seg">' +
+      '<button class="' + (org ? "" : "on") + '" data-act="ctype" data-name="' + esc(c.name) + '" data-t="ind">Cá nhân</button>' +
+      '<button class="' + (org ? "on" : "") + '" data-act="ctype" data-name="' + esc(c.name) + '" data-t="org">Doanh nghiệp</button>' +
+      "</div>" +
+      '<form id="cust-form" data-key="' + esc(c.name) + '" data-type="' + rec.type + '" autocomplete="off" style="margin-top:4px">' +
+      groups.map((g) => '<div class="sub-h">' + g.t + "</div>" +
+        '<div class="fgrid">' + flds.slice(g.a, g.b).map((f) => cfField(f, rec[f.k])).join("") + "</div>").join("") +
+      '<div class="sub-h">Ghi chú nội bộ</div>' +
+      '<div class="fgrid"><div class="field full"><label>Nhu cầu, ngân sách, tiến độ liên hệ</label>' +
+      '<textarea class="ta" data-f="note" rows="2" style="width:100%">' + esc(rec.note || "") + "</textarea></div></div>" +
+      "</form>" +
+      '<div class="fhint">Trường có <span class="req">*</span> là bắt buộc để lập báo giá, xuất HĐMB và xác nhận công nợ.</div></div>';
+
+    return (
+      '<div class="detail">' +
+      '<div class="d-head">' +
+      '<div class="d-top">' +
+      '<button class="iconbtn" data-act="back" title="Quay lại (Esc)"><svg class="ic"><use href="#i-arrow-left"/></svg></button>' +
+      '<span>Khách hàng</span><svg class="ic sep"><use href="#i-chevron-right"/></svg>' +
+      "<b>" + esc(c.disp) + "</b>" +
+      '<span class="flex1"></span>' +
+      '<span class="note mono">' + c.id + "</span>" +
+      "</div>" +
+      '<div class="d-title">' +
+      '<span class="ava lg">' + initials(c.disp) + "</span>" +
+      "<h1>" + esc(c.disp) + '</h1><span class="tag ' + (org ? "t-org" : "t-ind") + '">' + c.typeL + '</span><span class="tag ' + tg.c + '">' + tg.l + "</span>" +
+      '<span class="d-sub mono">' + esc(c.phone) + " · " + esc(c.email) + "</span>" +
+      "</div>" +
+      '<div class="kpis">' +
+      kpi("Căn hộ sở hữu", held.length + " căn") +
+      kpi("Tổng giá trị HĐ", fmt(total)) +
+      kpi("Đã thanh toán", fmt(paid), "g") +
+      kpi("Còn phải thu", fmt(total - paid)) +
+      "</div>" +
+      "</div>" +
+      '<div class="d-body">' +
+      '<div class="d-main">' +
+      profile +
+      '<div class="sec"><div class="sec-h"><span>Căn hộ đang sở hữu</span><span class="note mono">' + held.length + " căn</span></div>" + heldCards + "</div>" +
+      '<div class="sec"><div class="sec-h"><span>Lịch sử chuyển nhượng</span><span class="note mono">' + trs.length + " giao dịch</span></div>" + trCards + "</div>" +
+      "</div>" +
+      '<div class="d-side">' +
+      '<div class="sec"><div class="sec-h"><span>Định danh & thanh toán</span></div>' +
+      kv("Loại khách hàng", c.typeL) +
+      kv(org ? "Mã số thuế" : "CCCD / Passport", esc(c.legal || "—"), "mono") +
+      kv("Ngân hàng", esc(rec.bank || "—")) +
+      kv("Số tài khoản", esc(rec.ben_acc || "—"), "mono") +
+      kv("Thụ hưởng", esc(rec.ben_name || "—")) +
+      "</div>" +
+      '<div class="sec"><div class="sec-h"><span>Phân bố căn hộ</span></div>' + (dist || '<div class="warn">Chưa có căn nào.</div>') + "</div>" +
+      '<div class="sec"><div class="sec-h"><span>Nguồn & phụ trách</span></div>' +
+      kv("Mã khách hàng", c.id, "mono") + kv("Nguồn", esc(c.src)) + kv("Phụ trách", esc(c.sale)) + kv("Ngày tạo", esc(c.created), "mono") +
+      "</div>" +
+      '<div class="sec"><div class="sec-h"><span>Hành động</span></div>' +
+      '<button class="btn wide" data-act="toast" data-msg="Đã gửi thông báo tiến độ tới ' + esc(c.phone) + '"><svg class="ic sm"><use href="#i-mail"/></svg>Gửi thông báo tiến độ</button>' +
+      '<button class="btn wide" style="margin-top:6px" data-act="toast" data-msg="Đã xuất hồ sơ khách hàng ' + c.id + '"><svg class="ic sm"><use href="#i-download"/></svg>Xuất hồ sơ (PDF)</button>' +
+      '<button class="btn pri wide" style="margin-top:6px" data-act="save-cust"><svg class="ic sm"><use href="#i-check"/></svg>Lưu hồ sơ</button>' +
+      "</div>" +
+      "</div></div></div>"
+    );
+  }
+
+  /* ================= actions ================= */
+  function back() {
+    if (!S.route) return;
+    S.route = null;
+    render();
+    const c = $("#content");
+    if (c) c.scrollTop = 0;
+  }
+  function openUnit(uid, tab) {
+    if (!byUid(uid)) return;
+    S.route = { kind: "unit", uid };
+    S.tab = tab || 1;
+    render();
+    const c = $("#content");
+    if (c) c.scrollTop = 0;
+  }
+  function openCust(id) {
+    if (!customers().some((x) => x.id === id)) return;
+    S.route = { kind: "cust", id };
+    render();
+    const c = $("#content");
+    if (c) c.scrollTop = 0;
+  }
+
+  function setStatus(uid, st) {
+    const u = byUid(uid);
+    if (!u || u.status === st) return;
+    u.status = st;
+    persist();
+    render();
+    toast("Căn " + u.code + " · " + towerOf(u).name + " → " + ST[st].l);
+  }
+
+  function goSearch() {
+    if (S.view !== "customer" || S.route) {
+      S.view = "customer"; S.f = "all"; S.q = ""; S.route = null;
+      render();
+    }
+    const q = $("#q");
+    if (q) { q.focus(); q.select(); }
+  }
+
+  function exportCSV() {
+    let rows, name;
+    if (S.view === "project" && !S.route) {
+      const p = curProj(), t = curTower();
+      rows = [["Dự án", "Toà", "Mã căn", "Tầng", "Loại", "Diện tích (m2)", "Hướng", "View", "Trạng thái", "Khách hàng", "Giá bán (VND)", "Tổng giá trị (VND)"]].concat(
+        towerUnits(p.id, t.id).map((u) => [p.name, t.name, u.code, u.floor, u.type, u.area, u.dir, u.view, ST[u.status].l, u.buyer, pricing(u).base, pricing(u).total])
+      );
+      name = "stacking-plan-" + p.id + "-" + t.id + ".csv";
+    } else if (S.route && S.route.kind === "cust") {
+      const c = customers().find((x) => x.id === S.route.id);
+      const rec = c ? c.rec : null;
+      const flds = rec && rec.type === "org" ? F_ORG : F_IND;
+      rows = [["Hồ sơ khách hàng", c ? c.disp : "", "Loại", c ? c.typeL : "", "Mã KH", c ? c.id : ""]];
+      if (rec) flds.forEach((f) => rows.push([f.l, rec[f.k] || ""]));
+      rows.push(["Ghi chú nội bộ", rec ? rec.note || "" : ""]);
+      rows.push([]);
+      rows.push(["Căn hộ", "Dự án", "Toà", "Loại", "Diện tích (m2)", "Trạng thái", "Tổng giá trị (VND)", "Đã thanh toán (VND)"]);
+      (c ? c.units : []).forEach((u) => rows.push([u.code, projOf(u).name, u.tower, u.type, u.area, ST[u.status].l, pricing(u).total, report(u).paid]));
+      name = "ho-so-khach-hang-" + (c ? c.id : "x") + ".csv";
+    } else {
+      rows = [["Mã KH", "Tên trên hồ sơ", "Loại", "SĐT", "CCCD / MST", "Email", "Căn hộ", "Trạng thái", "Phụ trách"]].concat(
+        filteredCustomers().map((c) => [c.id, c.disp, c.typeL, c.phone, c.legal, c.email, c.units.map((u) => u.tower + "·" + u.code).join(" "), TAG[c.tag].l, c.sale])
+      );
+      name = "danh-sach-khach-hang.csv";
+    }
+    const csv = "\uFEFF" + rows.map((r) => r.map((v) => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"').join(",")).join("\r\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    toast("Đã xuất " + name);
+  }
+
+  function saveUnit(u) {
+    if (!u) return;
+    const g = (id) => { const el = $("#" + id); return el ? el.value : null; };
+    const name = g("c-name"), phone = g("c-phone"), cccd = g("c-cccd");
+    if (name !== null) { u.buyer = name.trim(); u.phone = phone || ""; u.cccd = cccd || ""; }
+    persist();
+    render();
+    toast("Đã lưu căn " + u.code);
+  }
+
+  function saveCust() {
+    const form = $("#cust-form");
+    if (!form) return;
+    const oldKey = form.dataset.key;
+    const org = form.dataset.type === "org";
+    const flds = org ? F_ORG : F_IND;
+    $$(".field.err", form).forEach((f) => f.classList.remove("err"));
+    const vals = {};
+    let bad = 0, first = null;
+    flds.forEach((f) => {
+      const inp = form.querySelector('[data-f="' + f.k + '"]');
+      let v = inp ? inp.value.trim() : "";
+      if (f.up) v = v.toUpperCase();
+      if (inp) inp.value = v;
+      vals[f.k] = v;
+      if (f.req && !v) {
+        bad++;
+        const box = inp && inp.closest(".field");
+        if (box) box.classList.add("err");
+        if (!first && inp) first = inp;
+      }
+    });
+    const noteEl = form.querySelector('[data-f="note"]');
+    vals.note = noteEl ? noteEl.value : "";
+    vals.type = form.dataset.type;
+    if (bad) {
+      toast("Còn " + bad + " trường bắt buộc chưa nhập");
+      if (first) {
+        first.focus();
+        try { first.scrollIntoView({ block: "center" }); } catch (err) {}
+      }
+      return;
+    }
+    const nextKey = (org ? vals.coname : vals.fullname) || oldKey;
+    if (nextKey !== oldKey) {
+      UNITS.forEach((u) => { if (u.buyer === oldKey) u.buyer = nextKey; });
+      PROSPECTS.forEach((p) => { if (p.name === oldKey) p.name = nextKey; });
+      EXTRA.forEach((p) => { if (p.name === oldKey) p.name = nextKey; });
+      Object.keys(TRANSFER).forEach((uid) => TRANSFER[uid].forEach((r) => {
+        if (r.from === oldKey) r.from = nextKey;
+        if (r.to === oldKey) r.to = nextKey;
+      }));
+    }
+    CUST[nextKey] = Object.assign({}, custOf(oldKey), vals);
+    if (nextKey !== oldKey) delete CUST[oldKey];
+    syncCust();
+    persist();
+    if (S.route && S.route.kind === "cust") {
+      const all = customers();
+      const i = all.findIndex((x) => x.name === nextKey);
+      if (i > -1) S.route = { kind: "cust", id: all[i].id };
+    }
+    render();
+    toast("Đã lưu hồ sơ " + (org ? "doanh nghiệp" : "cá nhân") + " · " + nextKey);
+  }
+
+  function setCtype(name, t) {
+    const r = custOf(name);
+    if (r.type === t) return;
+    const keep = r.type === "org" ? r.coname : r.fullname;
+    const next = Object.assign({}, r, { type: t });
+    if (t === "org") { if (!next.coname) next.coname = keep || String(name).toUpperCase(); }
+    else if (!next.fullname) next.fullname = keep || String(name).toUpperCase();
+    CUST[name] = next;
+    persist();
+    renderContent();
+    toast("Đã chuyển sang hồ sơ " + (t === "org" ? "doanh nghiệp (17 trường)" : "cá nhân (15 trường)"));
+  }
+
+  function addCust(type) {
+    const t = type || "ind";
+    let n = 1, name;
+    do { name = "KHÁCH HÀNG MỚI " + n++; } while (CUST[name] || EXTRA.some((x) => x.name === name) || UNITS.some((u) => u.buyer === name));
+    EXTRA.push({ name: name, type: t, phone: "", cccd: "", email: "", addr: "", note: "", created: TODAY });
+    CUST[name] = blankCust(t);
+    persist();
+    const all = customers();
+    const i = all.findIndex((x) => x.name === name);
+    if (i > -1) S.route = { kind: "cust", id: all[i].id };
+    render();
+    toast("Đã tạo hồ sơ mới — nhập " + (t === "org" ? "11" : "9") + " trường bắt buộc");
+  }
+
+  function openCustByName(name) {
+    const c = customers().find((x) => x.name === name);
+    if (c) openCust(c.id);
+  }
+
+  function resetData() {
+    if (!confirm("Khôi phục dữ liệu mẫu? Mọi thay đổi trạng thái trên máy sẽ mất.")) return;
+    try { localStorage.removeItem(LS); } catch (e) {}
+    UNITS.forEach((u) => {
+      const s0 = UNITS_INIT.find((x) => x.uid === u.uid) || {};
+      u.status = s0.status || "AVAILABLE";
+      u.buyer = s0.buyer || ""; u.phone = s0.phone || ""; u.cccd = s0.cccd || "";
+    });
+    Object.keys(CUST).forEach((k) => delete CUST[k]);
+    EXTRA.length = 0;
+    S.f = "all"; S.ct = "all"; S.q = ""; S.route = null;
+    render();
+    toast("Đã khôi phục dữ liệu mẫu");
+  }
+
+  /* ================= render ================= */
+  function renderContent() {
+    const box = $("#content");
+    const y = box.scrollTop;
+    const r = S.route;
+    if (r && r.kind === "unit") {
+      const u = byUid(r.uid);
+      if (u) { box.innerHTML = detailUnit(u); box.scrollTop = y; return; }
+      S.route = null;
+    } else if (r && r.kind === "cust") {
+      const c = customers().find((x) => x.id === r.id);
+      if (c) { box.innerHTML = detailCust(c); box.scrollTop = y; return; }
+      S.route = null;
+    }
+    box.innerHTML = S.view === "project" ? viewProject() : viewCustomers();
+    const el = $("#vbcount");
+    if (el) el.textContent = "· " + filteredCustomers().length + " người";
+    box.scrollTop = y;
+  }
+  function render() {
+    document.body.classList.toggle("detail-mode", !!S.route);
+    renderCrumb();
+    renderNav();
+    renderViewbar();
+    renderContent();
+  }
+
+  /* ================= events ================= */
+  document.addEventListener("click", (e) => {
+    const el = e.target.closest("[data-act]");
+    if (!el) {
+      if (S.menu) { S.menu = ""; renderContent(); }
+      return;
+    }
+    const a = el.dataset.act;
+    if (S.menu && a !== "menu" && a !== "pid" && a !== "tid") S.menu = "";
+    if (a === "menu") {
+      S.menu = S.menu === el.dataset.menu ? "" : el.dataset.menu;
+      renderContent();
+      return;
+    }
+    if (a === "nav") { S.view = el.dataset.view; S.f = "all"; S.ct = "all"; S.q = ""; S.route = null; S.menu = ""; render(); return; }
+    if (a === "pid") {
+      S.pid = el.dataset.pid;
+      S.tid = (PROJECTS.find((x) => x.id === S.pid) || PROJECTS[0]).towers[0].id;
+      S.route = null; S.f = "all"; S.menu = "";
+      render();
+      return;
+    }
+    if (a === "tid") { S.tid = el.dataset.tid; S.route = null; S.menu = ""; render(); return; }
+    if (a === "filter") {
+      const f = el.dataset.f;
+      S.f = S.view === "project" && S.f === f ? "all" : f;
+      render();
+      return;
+    }
+    if (a === "filter-toggle") {
+      if (S.view === "project") { S.f = S.f === "AVAILABLE" ? "all" : "AVAILABLE"; render(); }
+      else goSearch();
+      return;
+    }
+    if (a === "sort") { S.sort = S.sort === "desc" ? "asc" : "desc"; render(); return; }
+    if (a === "csv") { exportCSV(); return; }
+    if (a === "unit") { openUnit(el.dataset.uid); return; }
+    if (a === "cust") { openCust(el.dataset.id); return; }
+    if (a === "back") { back(); return; }
+    if (a === "tab") { S.tab = Number(el.dataset.tab); renderContent(); return; }
+    if (a === "set-status") { setStatus(el.dataset.uid, el.dataset.s); return; }
+    if (a === "save-unit") { saveUnit(byUid(el.dataset.uid)); return; }
+    if (a === "save-cust") { saveCust(); return; }
+    if (a === "ctype") { setCtype(el.dataset.name, el.dataset.t); return; }
+    if (a === "cfilter") { S.ct = el.dataset.t; renderContent(); return; }
+    if (a === "add-cust") { addCust(el.dataset.t || "ind"); return; }
+    if (a === "cust-name") { openCustByName(el.dataset.name); return; }
+    if (a === "reset") { resetData(); return; }
+    if (a === "toast") { toast(el.dataset.msg || "OK"); return; }
+  });
+
+  document.addEventListener("input", (e) => {
+    if (e.target.id === "q") { S.q = e.target.value; renderContent(); }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (S.menu) { S.menu = ""; renderContent(); return; }
+    if (S.route) { e.preventDefault(); back(); }
+  });
+
+  /* ================= kéo ngang các dải một dòng ================= */
+  function bindHScroll() {
+    const SEL = ".viewbar,.d-tabs,.plan-scroll";
+    const can = (el) => el && el.scrollWidth > el.clientWidth + 2;
+    let drag = null;
+
+    document.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return;
+      const el = e.target.closest(SEL);
+      if (!can(el)) return;
+      if (e.target.closest("button,a,input,select,textarea") && !e.target.closest(".chip,.tab")) return;
+      drag = { el, x: e.clientX, left: el.scrollLeft, moved: false, id: e.pointerId };
+      el.classList.add("dragging");
+      el.setPointerCapture && el.setPointerCapture(e.pointerId);
+    });
+
+    document.addEventListener("pointermove", (e) => {
+      if (!drag) return;
+      const dx = e.clientX - drag.x;
+      if (Math.abs(dx) > 4) {
+        drag.moved = true;
+        drag.el.scrollLeft = drag.left - dx;
+        drag.el.dataset.dragged = "1";
+      }
+    });
+
+    const end = () => {
+      if (!drag) return;
+      const el = drag.el;
+      el.classList.remove("dragging");
+      if (drag.moved) {
+        el.dataset.dragged = "1";
+        setTimeout(() => { delete el.dataset.dragged; }, 60);
+      }
+      drag = null;
+    };
+    document.addEventListener("pointerup", end);
+    document.addEventListener("pointercancel", end);
+    document.addEventListener("pointerleave", end);
+
+    document.addEventListener("click", (e) => {
+      const el = e.target.closest(SEL);
+      if (el && el.dataset.dragged) { e.preventDefault(); e.stopPropagation(); }
+    }, true);
+
+    document.addEventListener("wheel", (e) => {
+      const el = e.target.closest(".viewbar,.d-tabs");
+      if (!can(el)) return;
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+      el.scrollLeft += e.deltaY;
+      e.preventDefault();
+    }, { passive: false });
+  }
+
+  /* ================= boot ================= */
+  bindHScroll();
+  restore();
+  render();
+})();
+
+</script>
+</body>
+</html>
