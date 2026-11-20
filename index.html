@@ -1735,7 +1735,7 @@ body.detail-mode #viewbar{display:none}
   const TABS = [
     { n: 1, l: "Tổng quan", req: true },
     { n: 2, l: "Khách hàng", req: true },
-    { n: 3, l: "Báo giá", req: false },
+    { n: 3, l: "Lịch thanh toán", req: false },
     { n: 4, l: "HĐMB & mẫu", req: true },
     { n: 5, l: "Hoa hồng", req: false },
     { n: 6, l: "Chuyển nhượng", req: false },
@@ -1767,7 +1767,6 @@ body.detail-mode #viewbar{display:none}
       field("Floor", '<input class="inp mono" value="' + esc(u.tower) + "-" + pad2(u.floor) + '" readonly />') +
       field("Project", '<input class="inp" value="' + esc(projOf(u).name) + '" readonly />', true) +
       field("Block", '<input class="inp mono" value="' + esc(u.tower) + '" readonly />', true) +
-      field("Deposit amount", '<input class="inp mono" value="' + fmt(u.deposit) + '" readonly />', true) +
       field("Handover date", '<input class="inp" value="' + u.handover + '" readonly />', true) +
       "</div>";
     return (
@@ -1837,15 +1836,15 @@ body.detail-mode #viewbar{display:none}
       );
     }).join("");
     return (
-      '<div class="sec"><div class="sec-h"><span>Báo giá · ' + u.code + '</span><span class="note">' + TODAY + "</span></div>" +
+      '<div class="sec"><div class="sec-h"><span>Lịch thanh toán · ' + u.code + '</span><span class="note">' + TODAY + "</span></div>" +
       '<div class="kv"><span>Khách hàng</span><b>' + (u.buyer ? esc(u.buyer) : "—") + "</b></div>" +
       '<div class="kv"><span>Loại căn · diện tích</span><b>' + u.type + " · " + u.area + " m²</b></div>" +
       '<div class="kv"><span>Tổng giá trị</span><b>' + fmt(p.total) + "</b></div></div>" +
       '<div class="sec"><div class="sec-h"><span>Tiến độ thanh toán</span>' +
-      '<button class="btn" data-act="toast" data-msg="Đã xuất báo giá PDF cho căn ' + u.code + '"><svg class="ic sm"><use href="#i-download"/></svg>Xuất PDF</button></div>' +
+      '<button class="btn" data-act="toast" data-msg="Đã xuất lịch thanh toán PDF cho căn ' + u.code + '"><svg class="ic sm"><use href="#i-download"/></svg>Xuất PDF</button></div>' +
       '<div class="mtable"><table class="itable tall"><thead><tr><th>Đợt</th><th>Điều kiện</th><th class="num">Số tiền</th><th>Trạng thái</th></tr></thead><tbody>' + rows + "</tbody></table></div>" +
       '<div class="hr"></div><div class="kv"><span>Tổng cộng</span><b>' + fmt(p.total) + "</b></div>" +
-      '<div class="note" style="margin-top:6px">Đã bao gồm VAT 8,45% và phí bảo trì 2%. Báo giá có hiệu lực 15 ngày.</div></div>'
+      '<div class="note" style="margin-top:6px">Đã bao gồm VAT 8,45% và phí bảo trì 2%. Số tiền theo tiến độ ghi trong HĐMB.</div></div>'
     );
   }
 
@@ -2046,7 +2045,6 @@ body.detail-mode #viewbar{display:none}
       '<div class="d-body">' +
       '<div class="d-main">' + unitTab(u, tabN) + "</div>" +
       '<div class="d-side">' +
-      '<div class="sec"><div class="sec-h"><span>Trạng thái</span></div>' + stRead(u) + "</div>" +
       '<div class="sec"><div class="sec-h"><span>Thông tin căn hộ</span></div>' +
       kv("Dự án", esc(proj.short)) +
       kv("Toà", esc(tw.name)) +
