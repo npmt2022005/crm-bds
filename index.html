@@ -304,7 +304,6 @@ svg.ic.sm{width:14px;height:14px}
 .cell .price{margin-left:auto;font-family:'DM Mono',monospace;font-size:12px;color:var(--fg3);white-space:nowrap}
 .cell .row2{display:none}
 .cell .row2 svg.ic{width:11px;height:11px;opacity:.7}
-.cell .tdot{width:5px;height:5px;border-radius:50%;flex:0 0 auto}
 .uproj{font-size:13.5px;color:var(--fg2);font-weight:500}
 .uempty{color:var(--fg4)}
 .tbl thead th:nth-child(2),.tbl thead th:nth-child(3){width:130px}
@@ -316,10 +315,6 @@ svg.ic.sm{width:14px;height:14px}
 .cell.s-sold{background:var(--s-sold-bg);border-color:var(--s-sold-bd);color:var(--s-sold-fg)}
 .cell.s-tx{background:var(--s-tx-bg);border-color:var(--s-tx-bd);color:var(--s-tx-fg)}
 .cell.s-lock{background:var(--s-lock-bg);border-style:dashed;border-color:var(--s-lock-bd);color:var(--s-lock-fg)}
-.cell.s-av .tdot{background:var(--s-av-fg)}
-.cell.s-sold .tdot{background:var(--s-sold-fg)}
-.cell.s-tx .tdot{background:var(--s-tx-fg)}
-.cell.s-lock .tdot{background:var(--s-lock-fg)}
 .cell.s-tx .code,.cell.s-av .code,.cell.s-sold .code{color:var(--fg)}
 .cell.dim{opacity:.3}
 .cell.dim:hover{opacity:.75}
@@ -1665,7 +1660,7 @@ body.detail-mode #viewbar{display:none}
         if (!u) return '<div class="cell" style="border-style:dashed"></div>';
         const st = ST[u.status];
         const dim = S.f !== "all" && S.f !== u.status ? " dim" : "";
-        const lock = u.status === "UNRELEASED" ? '<svg class="ic"><use href="#i-lock"/></svg>' : '<span class="tdot"></span>';
+        const lock = u.status === "UNRELEASED" ? '<svg class="ic"><use href="#i-lock"/></svg>' : "";
         const star = hasTransfer(u) ? '<svg class="ic star"><use href="#i-star"/></svg>' : "";
         return (
           '<button class="cell ' + st.c + dim + '" data-act="unit" data-uid="' + u.uid + '" aria-label="' + esc("Căn " + u.code + " · " + st.l + (hasTransfer(u) ? " · đã chuyển nhượng" : "")) + '">' +
