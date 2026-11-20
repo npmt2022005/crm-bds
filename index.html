@@ -931,8 +931,8 @@ body.detail-mode #viewbar{display:none}
         { n: 5, type: "2PN", area: 110.0 }
       ],
       towers: [
-        { id: "SD", name: "Toà SD", ppm: 145000000, floors: [20, 19, 18, 17, 16, 15, 14, 13, 12, 11] },
-        { id: "SA", name: "Toà SA", ppm: 152000000, floors: [24, 23, 22, 21, 20, 19, 18, 17, 16, 15] }
+        { id: "SD", name: "Toà SD", ppm: 145000000, floors: [10, 9, 8, 7, 6, 5, 4, 3, 2, 1] },
+        { id: "SA", name: "Toà SA", ppm: 152000000, floors: [10, 9, 8, 7, 6, 5, 4, 3, 2, 1] }
       ]
     },
     {
@@ -946,8 +946,8 @@ body.detail-mode #viewbar{display:none}
         { n: 5, type: "3PN", area: 165.0 }
       ],
       towers: [
-        { id: "G1", name: "Toà G1", ppm: 168000000, floors: [12, 11, 10, 9, 8, 7, 6, 5, 4, 3] },
-        { id: "G2", name: "Toà G2", ppm: 172000000, floors: [15, 14, 13, 12, 11, 10, 9, 8, 7, 6] }
+        { id: "G1", name: "Toà G1", ppm: 168000000, floors: [10, 9, 8, 7, 6, 5, 4, 3, 2, 1] },
+        { id: "G2", name: "Toà G2", ppm: 172000000, floors: [10, 9, 8, 7, 6, 5, 4, 3, 2, 1] }
       ]
     }
   ];
@@ -1156,7 +1156,7 @@ body.detail-mode #viewbar{display:none}
       bank: "Techcombank",
       bank_branch: "Sài Gòn",
       ben_acc: "1900 0000 5522 13",
-      note: "Quan tâm 3 căn tầng 10–12, ngân sách 45–55 tỷ.",
+      note: "Quan tâm 3 căn tầng 8–10, ngân sách 45–55 tỷ.",
     },
     "CÔNG TY TNHH DỊCH VỤ LỮ HÀNH VŨNG TÀU": {
       type: "org", coname: "CÔNG TY TNHH DỊCH VỤ LỮ HÀNH VŨNG TÀU", nation: "Việt Nam",
@@ -1281,63 +1281,63 @@ body.detail-mode #viewbar{display:none}
 
   /* trạng thái mẫu theo từng toà */
   const SEED_ST = {
-    "orchard:SD": { SOLD: ["2002", "1902", "1602", "1502", "1904", "1604", "1402", "1302", "1202"], TX: ["1702", "1802", "1304"], LOCK: ["2005", "1505", "1105"] },
-    "orchard:SA": { SOLD: ["2402", "2302", "2202", "2404", "1802", "1702", "1602"], TX: ["2102", "2004", "1604"], LOCK: ["2405", "2305", "2205", "1505"] },
-    "global:G1":  { SOLD: ["1201", "1101", "1001", "0902", "0802", "0703", "1204", "0602", "0502", "0402"], TX: ["1202", "0404"], LOCK: ["1205", "1105", "0305"] },
-    "global:G2":  { SOLD: ["1502", "1402", "1302", "1201", "1504", "0902", "0802", "0702"], TX: ["1102", "0804"], LOCK: ["1505", "1405", "0605"] }
+    "orchard:SD": { SOLD: ["1002", "0902", "0602", "0502", "0904", "0604", "0402", "0302", "0202"], TX: ["0702", "0802", "0304"], LOCK: ["1005", "0505", "0105"] },
+    "orchard:SA": { SOLD: ["1002", "0902", "0802", "1004", "0402", "0302", "0202"], TX: ["0702", "0604", "0204"], LOCK: ["1005", "0905", "0805", "0105"] },
+    "global:G1":  { SOLD: ["1001", "0901", "0801", "0702", "0602", "0503", "1004", "0402", "0302", "0202"], TX: ["1002", "0204"], LOCK: ["1005", "0905", "0105"] },
+    "global:G2":  { SOLD: ["1002", "0902", "0802", "0701", "1004", "0402", "0302", "0202"], TX: ["0602", "0304"], LOCK: ["1005", "0905", "0105"] }
   };
   const SEED_BUY = {
-    "orchard:SD:1702": "Lê Văn Thành",
-    "orchard:SD:1802": "CÔNG TY CỔ PHẦN THƯƠNG MẠI HOÀNG GIA",
-    "orchard:SD:2002": "CÔNG TY TNHH ĐẦU TƯ BẤT ĐỘNG SẢN AN GIA PHÁT",
-    "orchard:SD:1902": "Võ Ngọc Hân",
-    "orchard:SD:1602": "Đặng Quốc Bảo",
-    "orchard:SD:1502": "Bùi Thanh Mai",
-    "orchard:SD:1904": "Trần Thị Thu Trang",
-    "orchard:SD:1604": "Trần Thị Thu Trang",
-    "orchard:SA:2402": "Đỗ Văn Khánh",
-    "orchard:SA:2302": "Trần Thị Thu Trang",
-    "orchard:SA:2404": "Lê Minh Châu",
-    "global:G1:1201": "Hoàng Anh Tuấn",
-    "global:G1:0902": "Phan Thị Kim Ngân",
-    "global:G2:1502": "Nguyễn Thanh Tùng",
-    "global:G2:1201": "Bùi Thanh Mai",
-    "orchard:SA:2202": "CÔNG TY CỔ PHẦN THƯƠNG MẠI HOÀNG GIA",
-    "global:G1:0703": "CÔNG TY TNHH ĐẦU TƯ BẤT ĐỘNG SẢN AN GIA PHÁT",
-    "global:G1:1101": "CÔNG TY TNHH XÂY DỰNG THIÊN PHÚ",
-    "global:G1:0802": "CÔNG TY CỔ PHẦN ĐẦU TƯ SÀI GÒN XANH",
-    "global:G2:1302": "CÔNG TY TNHH NỘI THẤT MINH LONG",
-    "global:G2:1402": "CÔNG TY CỔ PHẦN BẤT ĐỘNG SẢN PHƯƠNG ĐÔNG",
-    "orchard:SD:1402": "Nguyễn Văn An",
-    "orchard:SD:1302": "Phạm Minh Khoa",
-    "orchard:SD:1202": "Phan Thị Kim Ngân",
-    "orchard:SA:1802": "Hoàng Anh Tuấn",
-    "orchard:SA:1702": "Nguyễn Thanh Tùng",
-    "orchard:SA:1602": "Lê Văn Thành",
-    "global:G1:0602": "Võ Ngọc Hân",
-    "global:G1:0502": "Đặng Quốc Bảo",
-    "global:G1:0402": "Bùi Thanh Mai",
-    "global:G2:0902": "Lê Minh Châu",
-    "global:G2:0802": "Đỗ Văn Khánh",
-    "global:G2:0702": "Lê Văn Thành"
+    "orchard:SD:0702": "Lê Văn Thành",
+    "orchard:SD:0802": "CÔNG TY CỔ PHẦN THƯƠNG MẠI HOÀNG GIA",
+    "orchard:SD:1002": "CÔNG TY TNHH ĐẦU TƯ BẤT ĐỘNG SẢN AN GIA PHÁT",
+    "orchard:SD:0902": "Võ Ngọc Hân",
+    "orchard:SD:0602": "Đặng Quốc Bảo",
+    "orchard:SD:0502": "Bùi Thanh Mai",
+    "orchard:SD:0904": "Trần Thị Thu Trang",
+    "orchard:SD:0604": "Trần Thị Thu Trang",
+    "orchard:SA:1002": "Đỗ Văn Khánh",
+    "orchard:SA:0902": "Trần Thị Thu Trang",
+    "orchard:SA:1004": "Lê Minh Châu",
+    "global:G1:1001": "Hoàng Anh Tuấn",
+    "global:G1:0702": "Phan Thị Kim Ngân",
+    "global:G2:1002": "Nguyễn Thanh Tùng",
+    "global:G2:0701": "Bùi Thanh Mai",
+    "orchard:SA:0802": "CÔNG TY CỔ PHẦN THƯƠNG MẠI HOÀNG GIA",
+    "global:G1:0503": "CÔNG TY TNHH ĐẦU TƯ BẤT ĐỘNG SẢN AN GIA PHÁT",
+    "global:G1:0901": "CÔNG TY TNHH XÂY DỰNG THIÊN PHÚ",
+    "global:G1:0602": "CÔNG TY CỔ PHẦN ĐẦU TƯ SÀI GÒN XANH",
+    "global:G2:0802": "CÔNG TY TNHH NỘI THẤT MINH LONG",
+    "global:G2:0902": "CÔNG TY CỔ PHẦN BẤT ĐỘNG SẢN PHƯƠNG ĐÔNG",
+    "orchard:SD:0402": "Nguyễn Văn An",
+    "orchard:SD:0302": "Phạm Minh Khoa",
+    "orchard:SD:0202": "Phan Thị Kim Ngân",
+    "orchard:SA:0402": "Hoàng Anh Tuấn",
+    "orchard:SA:0302": "Nguyễn Thanh Tùng",
+    "orchard:SA:0202": "Lê Văn Thành",
+    "global:G1:0402": "Võ Ngọc Hân",
+    "global:G1:0302": "Đặng Quốc Bảo",
+    "global:G1:0202": "Bùi Thanh Mai",
+    "global:G2:0402": "Lê Minh Châu",
+    "global:G2:0302": "Đỗ Văn Khánh",
+    "global:G2:0202": "Lê Văn Thành"
   };
 
   /* lịch sử chuyển nhượng thứ cấp (giá thị trường, không phải giá CĐT) */
   const TRANSFER = {
-    "orchard:SD:1904": [
+    "orchard:SD:0904": [
       { id: "CN-2024-0117", date: "08/03/2024", from: "Nguyễn Thanh Tùng", to: "Lê Minh Châu", ppm: 149000000, notary: "CC-00412/2024" },
       { id: "CN-2026-0031", date: "12/06/2026", from: "Lê Minh Châu", to: "Trần Thị Thu Trang", ppm: 158000000, notary: "CC-01842/2026" }
     ],
-    "orchard:SD:1604": [
+    "orchard:SD:0604": [
       { id: "CN-2025-0088", date: "19/09/2025", from: "Đỗ Văn Khánh", to: "Trần Thị Thu Trang", ppm: 152000000, notary: "CC-01207/2025" }
     ],
-    "orchard:SA:2404": [
+    "orchard:SA:1004": [
       { id: "CN-2026-0044", date: "27/04/2026", from: "Hoàng Anh Tuấn", to: "Lê Minh Châu", ppm: 160500000, notary: "CC-01499/2026" }
     ],
-    "global:G1:1204": [
+    "global:G1:1004": [
       { id: "CN-2026-0058", date: "06/08/2026", from: "Phan Thị Kim Ngân", to: "Đỗ Văn Khánh", ppm: 178000000, notary: "CC-02071/2026" }
     ],
-    "global:G2:1504": [
+    "global:G2:1004": [
       { id: "CN-2026-0061", date: "21/09/2026", from: "Nguyễn Thanh Tùng", to: "Trần Thị Thu Trang", ppm: 181000000, notary: "CC-02118/2026" }
     ]
   };
@@ -1379,9 +1379,9 @@ body.detail-mode #viewbar{display:none}
   seedStatusMeta();
 
   const PROSPECTS = [
-    { name: "Nguyễn Thị Mai Hương", phone: "0906.555.777", cccd: "079188009012", email: "maihuong.nt@gmail.com", addr: "12 Nguyễn Văn Hưởng, Thảo Điền, TP.HCM", src: "Facebook Ads", note: "Quan tâm 2PN tầng 18–20, ngân sách 12–15 tỷ.", created: "02/11/2026" },
+    { name: "Nguyễn Thị Mai Hương", phone: "0906.555.777", cccd: "079188009012", email: "maihuong.nt@gmail.com", addr: "12 Nguyễn Văn Hưởng, Thảo Điền, TP.HCM", src: "Facebook Ads", note: "Quan tâm 2PN tầng 8–10, ngân sách 12–15 tỷ.", created: "02/11/2026" },
     { name: "Lý Gia Hân", phone: "0932.888.999", cccd: "079288003344", email: "giahan.ly@outlook.com", addr: "45 Xuân Thuỷ, Cầu Giấy, Hà Nội", src: "Giới thiệu", note: "Đầu tư cho thuê, ưu tiên view sông.", created: "08/11/2026" },
-    { name: "CÔNG TY CỔ PHẦN ĐẦU TƯ BẮC SÀI GÒN", phone: "028 3827 4455", email: "lienhe@bacsg.vn", addr: "Tầng 11, 90 Nguyễn Du, Quận 1, TP.HCM", src: "Hội thảo dự án", note: "Quan tâm 3 căn tầng 10–12, ngân sách 45–55 tỷ.", created: "05/11/2026" },
+    { name: "CÔNG TY CỔ PHẦN ĐẦU TƯ BẮC SÀI GÒN", phone: "028 3827 4455", email: "lienhe@bacsg.vn", addr: "Tầng 11, 90 Nguyễn Du, Quận 1, TP.HCM", src: "Hội thảo dự án", note: "Quan tâm 3 căn tầng 8–10, ngân sách 45–55 tỷ.", created: "05/11/2026" },
     { name: "CÔNG TY TNHH DỊCH VỤ LỮ HÀNH VŨNG TÀU", phone: "0254 3856 221", email: "sales@vungtautravel.vn", addr: "Số 12 Trưng Trắc, TP. Vũng Tàu", src: "Facebook Ads", note: "Mua căn cho thuê homestay, ưu tiên view biển.", created: "10/11/2026" }
   ];
 
@@ -2050,7 +2050,6 @@ body.detail-mode #viewbar{display:none}
       '<h1 class="mono">Căn ' + u.code + '</h1>' +
       (hasTransfer(u) ? '<span class="tag star-tag" title="Căn đã qua chuyển nhượng"><svg class="ic star"><use href="#i-star"/></svg>Đã chuyển nhượng</span>' : "") +
       '<span class="tag ' + st.t + '">' + st.l + "</span>" +
-      '<span class="d-sub">' + u.type + " · " + fmtA(u.area) + " m² · Tầng " + u.floor + " · " + esc(tw.name) + " · " + esc(proj.name) + "</span>" +
       "</div>" +
       '<div class="d-tabs">' + tabs + "</div>" +
       "</div>" +
@@ -2179,7 +2178,6 @@ body.detail-mode #viewbar{display:none}
       kv("Mã khách hàng", c.id, "mono") + kv("Nguồn", esc(c.src)) + kv("Phụ trách", esc(c.sale)) + kv("Ngày tạo", esc(c.created), "mono") +
       "</div>" +
       '<div class="sec"><div class="sec-h"><span>Hành động</span></div>' +
-      '<button class="btn wide" data-act="toast" data-msg="Đã gửi thông báo tiến độ tới ' + esc(c.phone) + '"><svg class="ic sm"><use href="#i-mail"/></svg>Gửi thông báo tiến độ</button>' +
       '<button class="btn wide" style="margin-top:6px" data-act="toast" data-msg="Đã xuất hồ sơ khách hàng ' + c.id + '"><svg class="ic sm"><use href="#i-download"/></svg>Xuất hồ sơ (PDF)</button>' +
       '<button class="btn pri wide" style="margin-top:6px" data-act="save-cust"><svg class="ic sm"><use href="#i-check"/></svg>Lưu hồ sơ</button>' +
       "</div>" +
