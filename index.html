@@ -595,6 +595,7 @@ body.detail-mode #viewbar{display:none}
 .d-tabs::-webkit-scrollbar{display:none}
 .d-tabs .tab{height:32px;padding:0 10px;font-size:14.5px}
 .d-body{display:grid;grid-template-columns:minmax(0,1fr) 316px;gap:16px;padding:14px 16px 0;align-items:start}
+.d-body.one{grid-template-columns:minmax(0,1fr)}
 .d-main{min-width:0}
 .d-side{min-width:0;display:flex;flex-direction:column;gap:10px}
 .d-side .sec{margin:0;padding:10px 11px;border:1px solid var(--bd);border-radius:var(--r-sm);background:#fff;min-width:0}
@@ -918,7 +919,7 @@ body.detail-mode #viewbar{display:none}
     });
   }
 
-  /* 2 dự án × 2 toà × 6 tầng × 5 căn = 120 căn */
+  /* 2 dự án × 2 toà × 10 tầng × 5 căn = 200 căn */
   const PROJECTS = [
     {
       id: "orchard", name: "The Orchard – Sycamore", short: "The Orchard",
@@ -1403,6 +1404,28 @@ body.detail-mode #viewbar{display:none}
     { t: "Công văn xác nhận chuyển nhượng", d: "Gửi chủ đầu tư & phòng công chứng" }
   ];
 
+  const HANDOVER = {
+    orchard: {
+      type: "Bàn giao hoàn thiện",
+      desc: "Sàn gỗ, trần thạch cao, bếp và thiết bị vệ sinh đã lắp đặt; nhận nhà ở ngay.",
+      gifts: [
+        { t: "Gói nội thất bếp", v: 180000000 },
+        { t: "Điều hoà 2 phòng ngủ", v: 60000000 },
+        { t: "Khoá cửa thông minh", v: 12000000 },
+        { t: "Miễn phí quản lý 12 tháng", v: 26400000 }
+      ]
+    },
+    global: {
+      type: "Bàn giao thô",
+      desc: "Trần, sàn, tường ở dạng thô; chủ nhà tự thi công nội thất.",
+      gifts: [
+        { t: "Voucher nội thất", v: 80000000 },
+        { t: "Hỗ trợ thi công trần thạch cao", v: 35000000 },
+        { t: "Miễn phí quản lý 12 tháng", v: 31200000 }
+      ]
+    }
+  };
+
   const LS = "twenty-re-crm-v3";
 
   function pricing(u) {
@@ -1749,7 +1772,7 @@ body.detail-mode #viewbar{display:none}
     { n: 2, l: "Khách hàng", req: true },
     { n: 3, l: "Lịch thanh toán", req: false },
     { n: 4, l: "HĐMB & mẫu", req: true },
-    { n: 5, l: "Hoa hồng", req: false },
+    { n: 5, l: "Điều kiện bàn giao", req: false },
     { n: 6, l: "Chuyển nhượng", req: false },
     { n: 7, l: "Báo cáo", req: false }
   ];
@@ -1887,6 +1910,23 @@ body.detail-mode #viewbar{display:none}
     );
   }
 
+  function unitTabHandover(u) {
+    const p = projOf(u);
+    const h = HANDOVER[u.proj] || HANDOVER.orchard;
+    const tot = h.gifts.reduce((s, g) => s + g.v, 0);
+    const rows = h.gifts.map((g) => kv(g.t, fmt(g.v))).join("");
+    return (
+      '<div class="sec"><div class="sec-h"><span>Hình thức bàn giao</span></div>' +
+      kv("Hình thức", esc(h.type)) +
+      kv("Diện tích thông thuỷ", fmtA(u.area) + " m²", "mono") +
+      kv("Ngày bàn giao dự kiến", esc(p.handover), "mono") +
+      '<div class="note" style="margin-top:8px">' + esc(h.desc) + "</div></div>" +
+      '<div class="sec"><div class="sec-h"><span>Quà tặng khi bàn giao</span><span class="note mono">' + h.gifts.length + " hạng mục</span></div>" +
+      rows + '<div class="kv total"><span>Tổng giá trị quà tặng</span><b>' + fmt(tot) + "</b></div></div>" +
+      '<div class="sec"><div class="note">Quà tặng theo chính sách bán hàng của dự án tại thời điểm ký HĐMB, không quy đổi thành tiền mặt.</div></div>'
+    );
+  }
+
   function unitTab5(u) {
     const c = commission(u);
     const stTxt = { paid: ["Đã nhận", "t-sold"], due: ["Đến hạn", "t-tx"], wait: ["Chưa tới", "t-lock"] };
@@ -1987,7 +2027,7 @@ body.detail-mode #viewbar{display:none}
     if (n === 2) return unitTab2(u);
     if (n === 3) return unitTab3(u);
     if (n === 4) return unitTab4(u);
-    if (n === 5) return unitTab5(u);
+    if (n === 5) return unitTabHandover(u);
     if (n === 6) return unitTabTransfer(u);
     if (n === 7) return unitTab6(u);
     return unitTab1(u);
@@ -2029,11 +2069,6 @@ body.detail-mode #viewbar{display:none}
       : '<div class="warn">Căn chưa gắn khách hàng. Chuyển sang bước “Khách hàng” để nhập thông tin người mua.</div>' +
         '<button class="btn wide" style="margin-top:8px" data-act="tab" data-tab="2">Nhập thông tin khách hàng</button>';
 
-    const tl = schedule(u).filter((x) => x.st !== "wait").slice(0, 4).map((x) =>
-      '<div class="tl-row"><span class="tl-dot">' + (x.st === "paid" ? '<svg class="ic"><use href="#i-check"/></svg>' : "") + "</span>" +
-      '<div class="tl-tx"><b>' + x.k + " · " + x.date + "</b><span>" + fmt(x.amt) + "</span></div></div>"
-    ).join("") || '<div class="warn">Chưa phát sinh thanh toán.</div>';
-
     return (
       '<div class="detail">' +
       '<div class="d-head">' +
@@ -2049,13 +2084,12 @@ body.detail-mode #viewbar{display:none}
       '<div class="d-title">' +
       '<h1 class="mono">Căn ' + u.code + '</h1>' +
       (hasTransfer(u) ? '<span class="tag star-tag" title="Căn đã qua chuyển nhượng"><svg class="ic star"><use href="#i-star"/></svg>Đã chuyển nhượng</span>' : "") +
-      '<span class="tag ' + st.t + '">' + st.l + "</span>" +
       "</div>" +
       '<div class="d-tabs">' + tabs + "</div>" +
       "</div>" +
-      '<div class="d-body">' +
+      '<div class="d-body' + (tabN === 1 ? "" : " one") + '">' +
       '<div class="d-main">' + unitTab(u, tabN) + "</div>" +
-      '<div class="d-side">' +
+      (tabN === 1 ? '<div class="d-side">' +
       '<div class="sec"><div class="sec-h"><span>Thông tin căn hộ</span></div>' +
       kv("Dự án", esc(proj.short)) +
       kv("Toà", esc(tw.name)) +
@@ -2072,8 +2106,7 @@ body.detail-mode #viewbar{display:none}
       '<div class="sec"><div class="sec-h"><span>Thanh toán</span><span class="note mono">' + r.nPaid + " / " + SCHED.length + "</span></div>" +
       '<div class="bar"><i style="width:' + r.pct + '%"></i></div>' +
       '<div class="barline"><span>' + fmt(r.paid) + "</span><b>" + r.pct + "%</b></div></div>" +
-      '<div class="sec"><div class="sec-h"><span>Hoạt động gần đây</span></div><div class="tl">' + tl + "</div></div>" +
-      "</div></div></div>"
+      "</div>" + "" : "") + "</div></div>"
     );
   }
 
@@ -2124,10 +2157,6 @@ body.detail-mode #viewbar{display:none}
     const profile =
       '<div class="sec"><div class="sec-h"><span>' + (org ? "Hồ sơ doanh nghiệp · 17 trường" : "Hồ sơ cá nhân · 15 trường") + "</span>" +
       '<span class="note mono">' + doneN + "/" + reqN + " bắt buộc</span></div>" +
-      '<div class="seg">' +
-      '<button class="' + (org ? "" : "on") + '" data-act="ctype" data-name="' + esc(c.name) + '" data-t="ind">Cá nhân</button>' +
-      '<button class="' + (org ? "on" : "") + '" data-act="ctype" data-name="' + esc(c.name) + '" data-t="org">Doanh nghiệp</button>' +
-      "</div>" +
       '<form id="cust-form" data-key="' + esc(c.name) + '" data-type="' + rec.type + '" autocomplete="off" style="margin-top:4px">' +
       groups.map((g) => '<div class="sub-h">' + g.t + "</div>" +
         '<div class="fgrid">' + flds.slice(g.a, g.b).map((f) => cfField(f, rec[f.k])).join("") + "</div>").join("") +
@@ -2149,8 +2178,7 @@ body.detail-mode #viewbar{display:none}
       "</div>" +
       '<div class="d-title">' +
       '<span class="ava lg">' + initials(c.disp) + "</span>" +
-      "<h1>" + esc(c.disp) + '</h1><span class="tag ' + (org ? "t-org" : "t-ind") + '">' + c.typeL + '</span><span class="tag ' + tg.c + '">' + tg.l + "</span>" +
-      '<span class="d-sub mono">' + esc(c.phone) + " · " + esc(c.email) + "</span>" +
+      "<h1>" + esc(c.disp) + "</h1>" +
       "</div>" +
       '<div class="kpis">' +
       kpi("Căn hộ sở hữu", held.length + " căn") +
