@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>The Orchard – Stacking plan</title>
+<title>Meraki Land · CRM bất động sản</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
 /* ============================================================
    Tokens — lấy từ twenty-ui (ThemeLight): background, border,
@@ -555,9 +555,6 @@ select.inp{
 .seg button:hover{color:var(--fg)}
 .seg button.on{background:#fff;color:var(--fg);font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,.06)}
 .fhint{font-size:13.5px;color:var(--fg4);margin-top:9px}
-.pickrow{display:flex;flex-direction:column;gap:5px;margin:4px 0 10px}
-.pickrow label{font-size:13.5px;color:var(--fg3);font-weight:500}
-.uc-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .toolbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:10px 16px 10px;border-bottom:1px solid var(--bdl)}
 .toolbar .flex1{flex:1;min-width:8px}
 .toolbar .vt{font-size:14px;color:var(--fg3);margin-right:2px}
@@ -583,14 +580,6 @@ body.detail-mode #viewbar{display:none}
 .d-title h1.mono{font-family:'DM Mono',monospace;font-weight:500;letter-spacing:0;font-size:20px}
 .d-title .d-sub{font-size:14px;color:var(--fg3)}
 .d-title .ava.lg{width:26px;height:26px;font-size:12px}
-.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
-.kpi{
-  display:flex;flex-direction:column;gap:3px;padding:8px 10px;min-width:0;
-  border:1px solid var(--bd);border-radius:var(--r-sm);background:var(--bg2);
-}
-.kpi span{font-size:13px;color:var(--fg3)}
-.kpi b{font-family:'DM Mono',monospace;font-size:15.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.kpi b.g{color:#00824D}
 .d-tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin:0 -2px}
 .d-tabs::-webkit-scrollbar{display:none}
 .d-tabs .tab{height:32px;padding:0 10px;font-size:14.5px}
@@ -634,7 +623,6 @@ body.detail-mode #viewbar{display:none}
 }
 @media (max-width:1080px){
   .d-body{grid-template-columns:1fr}
-  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
   .d-side{flex-direction:row;flex-wrap:wrap}
   .d-side .sec{flex:1 1 260px}
 }
@@ -653,7 +641,6 @@ body.detail-mode #viewbar{display:none}
   .d-head{padding:8px 12px 0}
   .d-body{padding:12px 12px 0}
   .d-title h1{font-size:19px}
-  .kpis{grid-template-columns:1fr 1fr;gap:6px}
   .fgrid{grid-template-columns:1fr}
   .toolbar{padding:9px 12px}
   .stat2{grid-template-columns:1fr}
@@ -717,6 +704,7 @@ body.detail-mode #viewbar{display:none}
 <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5l0 14"/><path d="M18 13l-6 6"/><path d="M6 13l6 6"/></symbol>
 <symbol id="i-grid" viewBox="0 0 24 24"><path d="M4 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/><path d="M14 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/><path d="M4 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/><path d="M14 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/></symbol>
 <symbol id="i-clock" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/><path d="M12 7v5l3 3"/></symbol>
+<symbol id="i-agent" viewBox="0 0 24 24"><path d="M12 2c0 5-3 8-8 8 5 0 8 3 8 8 0-5 3-8 8-8-5 0-8-3-8-8z"/><path d="M20 15v6m-3-3h6M4 15v4m-2-2h4"/></symbol>
 </defs></svg>
 
 <!-- ============================================================
@@ -724,12 +712,12 @@ body.detail-mode #viewbar{display:none}
      ============================================================ -->
 <aside class="sb">
   <div class="sb-head">
-    <button class="ws" data-act="toast" data-msg="Chuyển không gian làm việc">
-      <span class="ws-logo">ML</span>
-      <span class="ws-name">Meraki Land</span>
+    <button class="ws" data-act="toast" data-msg="Chuyển không gian làm việc" aria-label="Meraki Land · Chuyển không gian làm việc">
+      <span class="ws-logo" aria-hidden="true"><svg class="ic"><use href="#i-building"/></svg></span>
+      <span class="ws-name">Meraki Land<small>CRM bất động sản</small></span>
       <svg class="ic"><use href="#i-chevron-down"/></svg>
     </button>
-    <button class="sb-search" data-act="search-cust">
+    <button class="sb-search" data-act="search-cust" aria-label="Tìm khách hàng">
       <svg class="ic sm"><use href="#i-search"/></svg>
       <span>Tìm khách hàng</span>
       <kbd>⌘K</kbd>
@@ -737,18 +725,20 @@ body.detail-mode #viewbar{display:none}
   </div>
 
   <nav class="sb-nav">
-    <div class="nav-label">Làm việc</div>
-    <button class="nav-item on" data-act="nav" data-view="project">
+    <div class="nav-label">Không gian làm việc</div>
+    <button class="nav-item on" data-act="nav" data-view="work" aria-label="Giao dịch" aria-current="page">
+      <svg class="ic"><use href="#i-clock"/></svg><span>Giao dịch</span>
+    </button>
+    <button class="nav-item" data-act="nav" data-view="project" aria-label="Dự án">
       <svg class="ic"><use href="#i-layers"/></svg>
       <span>Dự án</span>
-      <span class="nav-count" id="cnt-units">30</span>
+      <span class="nav-count" id="cnt-units" title="Tổng số căn hộ"></span>
     </button>
-    <button class="nav-item" data-act="nav" data-view="customer">
+    <button class="nav-item" data-act="nav" data-view="customer" aria-label="Khách hàng">
       <svg class="ic"><use href="#i-users"/></svg>
       <span>Khách hàng</span>
-      <span class="nav-count" id="cnt-cust">8</span>
+      <span class="nav-count" id="cnt-cust" title="Tổng số khách hàng"></span>
     </button>
-
   </nav>
 
   <div class="sb-foot">
@@ -767,6 +757,9 @@ body.detail-mode #viewbar{display:none}
   <header class="topbar">
     <div class="crumb" id="crumb"></div>
     <div class="top-actions">
+      <button type="button" class="btn top-agent" data-act="nav" data-view="agent" aria-label="Hỏi CRM" title="Hỏi CRM">
+        <svg class="ic sm" aria-hidden="true"><use href="#i-agent"/></svg><span>Hỏi CRM</span>
+      </button>
       <button class="iconbtn" data-act="search-cust" title="Tìm khách hàng (⌘K)">
         <svg class="ic"><use href="#i-search"/></svg>
       </button>
@@ -789,6 +782,89 @@ body.detail-mode #viewbar{display:none}
 
 <div class="utip" id="utip"></div>
 <div class="toast" id="toast"></div>
+<dialog class="customer-dialog customer-import" id="customer-import" aria-labelledby="customer-import-title">
+  <header>
+    <h2 id="customer-import-title">Nhập khách hàng từ Excel</h2>
+    <form method="dialog"><button class="iconbtn" aria-label="Đóng"><svg class="ic"><use href="#i-x"/></svg></button></form>
+  </header>
+  <p>Chọn tệp .xlsx hoặc .xls. Dùng hàng đầu tiên làm tiêu đề và định dạng SĐT, CCCD, MST dưới dạng văn bản để giữ số 0 ở đầu.</p>
+  <div class="customer-import-controls">
+    <label for="customer-import-file">Tệp Excel</label>
+    <input id="customer-import-file" type="file" accept=".xlsx,.xls" />
+    <button class="btn" data-act="customer-template">Tải tệp mẫu</button>
+    <button class="btn ghost" data-act="preview-demo-import">Xem thử</button>
+  </div>
+  <p id="customer-import-status" role="status"></p>
+  <div id="customer-import-preview"></div>
+  <footer>
+    <form method="dialog"><button class="btn">Đóng</button></form>
+    <button class="btn pri" id="customer-import-submit" data-act="commit-customers" disabled>Nhập khách hàng</button>
+  </footer>
+</dialog>
+<dialog class="customer-dialog" id="customer-message" aria-labelledby="customer-message-title">
+  <header><h2 id="customer-message-title">Gửi tin nhắn</h2>
+    <form method="dialog"><button class="iconbtn" aria-label="Đóng"><svg class="ic"><use href="#i-x"/></svg></button></form>
+  </header>
+  <p class="message-demo-note">Chế độ mô phỏng. Nội dung chỉ hiển thị trong bản demo.</p>
+  <form id="customer-message-form">
+    <div class="field"><label for="message-recipient">Người nhận</label><input class="inp" id="message-recipient" required /></div>
+    <div class="field" id="message-subject-field"><label for="message-subject">Tiêu đề</label><input class="inp" id="message-subject" /></div>
+    <div class="field"><label for="message-body">Nội dung</label><textarea class="ta" id="message-body" rows="5" required></textarea></div>
+    <p id="customer-message-result" role="status"></p>
+    <footer><button class="btn pri" id="customer-message-submit">Mô phỏng gửi</button></footer>
+  </form>
+</dialog>
+<dialog class="customer-dialog contract-preview" id="contract-preview" aria-labelledby="contract-preview-title">
+  <header><h2 id="contract-preview-title">Xem trước biểu mẫu</h2>
+    <form method="dialog"><button class="iconbtn" aria-label="Đóng"><svg class="ic"><use href="#i-x"/></svg></button></form>
+  </header>
+  <div class="field"><label for="contract-template">Biểu mẫu áp dụng</label><select class="inp" id="contract-template"></select></div>
+  <div class="contract-preview-paper" id="contract-preview-paper"></div>
+  <p id="contract-preview-result" role="status"></p>
+  <footer><form method="dialog"><button class="btn">Đóng</button></form>
+    <div class="escrow-file-actions">
+      <button class="btn" type="button" data-act="escrow-pdf-view" hidden>Xem PDF</button>
+      <button class="btn pri" type="button" data-act="escrow-pdf-download" hidden><svg class="ic sm"><use href="#i-download"/></svg>Tải PDF</button>
+      <button class="btn pri" type="button" data-act="contract-generate"><svg class="ic sm"><use href="#i-file"/></svg>Mô phỏng tạo tệp</button>
+    </div>
+  </footer>
+</dialog>
+<dialog class="customer-dialog escrow-pdf-dialog" id="escrow-pdf-dialog" aria-labelledby="escrow-pdf-title">
+  <header><h2 id="escrow-pdf-title">Hợp đồng ký quỹ · Bản mẫu</h2>
+    <form method="dialog"><button class="iconbtn" aria-label="Đóng bản xem PDF"><svg class="ic"><use href="#i-x"/></svg></button></form>
+  </header>
+  <p id="escrow-pdf-status" role="status"></p>
+  <iframe id="escrow-pdf-frame" title="Bản PDF hợp đồng ký quỹ" hidden></iframe>
+  <footer class="escrow-pdf-footer">
+    <a class="btn" id="escrow-pdf-new-tab" target="_blank" rel="noopener" hidden>Mở trong tab mới</a>
+    <a class="btn pri" id="escrow-pdf-save" download hidden><svg class="ic sm"><use href="#i-download"/></svg>Tải PDF</a>
+  </footer>
+</dialog>
+<dialog class="customer-dialog" id="payment-receipt" aria-labelledby="payment-receipt-title">
+  <header><h2 id="payment-receipt-title">Ghi nhận khoản thu</h2>
+    <form method="dialog"><button class="iconbtn" aria-label="Đóng"><svg class="ic"><use href="#i-x"/></svg></button></form>
+  </header>
+  <p id="receipt-context"></p>
+  <form id="payment-receipt-form">
+    <div class="fgrid">
+      <div class="field"><label for="receipt-amount">Số tiền nhận (₫)</label><input class="inp" type="number" min="1" step="1" id="receipt-amount" required /></div>
+      <div class="field"><label for="receipt-date">Ngày nhận</label><input class="inp" type="date" id="receipt-date" required /></div>
+      <div class="field"><label for="receipt-method">Hình thức nhận</label><select class="inp" id="receipt-method"><option>Chuyển khoản</option><option>Tiền mặt</option></select></div>
+      <div class="field"><label for="receipt-reference">Mã tham chiếu (nếu có)</label><input class="inp" id="receipt-reference" maxlength="80" /></div>
+    </div>
+    <p id="receipt-error" role="alert"></p>
+    <footer><button type="button" class="btn" data-act="payment-half">Điền một phần mẫu</button><button class="btn pri">Ghi nhận mô phỏng</button></footer>
+  </form>
+</dialog>
+<dialog class="customer-dialog payment-document" id="payment-preview" aria-labelledby="payment-preview-title">
+  <header><h2 id="payment-preview-title">Xem trước tài liệu thu</h2>
+    <form method="dialog"><button class="iconbtn" aria-label="Đóng"><svg class="ic"><use href="#i-x"/></svg></button></form>
+  </header>
+  <div class="payment-preview-paper" id="payment-preview-paper"></div>
+  <p id="payment-preview-result" role="status"></p>
+  <footer><form method="dialog"><button class="btn">Đóng</button></form>
+    <button class="btn pri" data-act="payment-export-demo">Mô phỏng xuất PDF</button></footer>
+</dialog>
 
 <style>
 /* bổ sung cho shell (giữ toàn bộ token ở khối style chính) */
@@ -841,6 +917,10 @@ body.detail-mode #viewbar{display:none}
 .cell.s-lock .code{color:var(--fg2)}
 .viewnote .saved{margin-left:auto}
 </style>
+<link rel="stylesheet" href="./meraki.css" />
+<script src="./customer-data.js"></script>
+<script src="./escrow-pdf.js"></script>
+<script src="./crm-agent.js"></script>
 
 <script>
 "use strict";
@@ -860,7 +940,8 @@ body.detail-mode #viewbar{display:none}
     String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/gi, "d").toLowerCase().replace(/[^a-z0-9]+/g, ".").replace(/^\.|\.$/g, "");
 
   /* ================= domain ================= */
-  const VAT = 0.0845, MF = 0.02, TODAY = "19/11/2026";
+  const DEMO = new URLSearchParams(location.search).get("demo") === "1";
+  const VAT = 0.0845, MF = 0.02, TODAY = "22/11/2026";
   const ST = {
     AVAILABLE:       { l: "Chưa bán",           c: "s-av",   t: "t-av",   hex: "#00824D" },
     SOLD:            { l: "Đã bán",             c: "s-sold", t: "t-sold", hex: "#E5484D" },
@@ -1022,7 +1103,7 @@ body.detail-mode #viewbar{display:none}
     { t: "Liên hệ & tài khoản thụ hưởng", a: 10, b: 17 }
   ];
   const BANKS = ["Vietcombank", "BIDV", "Techcombank", "VietinBank", "ACB", "MB Bank"];
-  const CUST = {};   /* tên gốc -> hồ sơ đầy đủ */
+  const CUST = Object.create(null);
   const EXTRA = [];  /* khách hàng tạo mới trong phiên */
   /* dataset doanh nghiệp — hồ sơ 17 trường */
   const ORG_RECS = {
@@ -1248,12 +1329,15 @@ body.detail-mode #viewbar{display:none}
     return CUST[name];
   }
   function cfField(f, v) {
-    const lab = "<label>" + f.l + (f.req ? '<span class="req">*</span>' : "") + "</label>";
+    const id = "customer-field-" + f.k;
+    const attributes = ' id="' + id + '" data-f="' + f.k + '"' + (f.req ? ' aria-required="true"' : "");
+    const lab = '<label for="' + id + '">' + f.l + (f.req ? '<span class="req">*</span>' : "") + "</label>";
     let inp;
     if (f.t === "select") {
-      inp = '<select class="inp" data-f="' + f.k + '">' + f.o.map((x) => "<option" + (x === v ? " selected" : "") + ">" + x + "</option>").join("") + "</select>";
+      const prompt = f.prompt ? '<option value="">' + esc(f.prompt) + '</option>' : '';
+      inp = '<select class="inp"' + attributes + '>' + prompt + f.o.map((x) => "<option" + (x === v ? " selected" : "") + ">" + x + "</option>").join("") + "</select>";
     } else {
-      inp = '<input class="inp' + (f.mono ? " mono" : "") + '" data-f="' + f.k + '" type="' + (f.t || "text") + '"' + (f.ph ? ' placeholder="' + f.ph + '"' : "") + ' value="' + esc(v || "") + '" />';
+      inp = '<input class="inp' + (f.mono ? " mono" : "") + '"' + attributes + ' type="' + (f.t || "text") + '"' + (f.ph ? ' placeholder="' + f.ph + '"' : "") + ' value="' + esc(v || "") + '" />';
     }
     return '<div class="field' + (f.full ? " full" : "") + '">' + lab + inp + "</div>";
   }
@@ -1387,8 +1471,8 @@ body.detail-mode #viewbar{display:none}
   ];
 
   const SCHED = [
-    { k: "Đợt 1", w: "Ký thoả thuận đặt cọc", p: 0.10, date: "15/01/2026" },
-    { k: "Đợt 2", w: "30 ngày sau khi cọc", p: 0.15, date: "28/01/2026" },
+    { k: "Đợt 1", w: "Thanh toán đợt đầu", p: 0.10, date: "15/01/2026" },
+    { k: "Đợt 2", w: "30 ngày sau đợt đầu", p: 0.15, date: "14/02/2026" },
     { k: "Đợt 3", w: "Theo tiến độ xây dựng", p: 0.15, date: "31/03/2026" },
     { k: "Đợt 4", w: "Cất nóc", p: 0.15, date: "30/06/2026" },
     { k: "Đợt 5", w: "Bàn giao nhà", p: 0.40, date: "29/08/2027" },
@@ -1396,12 +1480,13 @@ body.detail-mode #viewbar{display:none}
   ];
 
   const DOCS = [
-    { t: "Hợp đồng mua bán (HĐMB)", d: "Tự điền căn, khách hàng, tiến độ thanh toán" },
-    { t: "Thoả thuận đặt cọc (TTĐC)", d: "Giá trị cọc 300.000.000 ₫ · mẫu 2026" },
-    { t: "Phụ lục hoàn thiện nội thất", d: "Danh mục bàn giao căn hộ" },
-    { t: "Biên bản bàn giao căn hộ", d: "Checklist bàn giao & chỉ số đồng hồ" },
-    { t: "Thanh lý hợp đồng", d: "Mẫu thanh lý & hoàn cọc" },
-    { t: "Công văn xác nhận chuyển nhượng", d: "Gửi chủ đầu tư & phòng công chứng" }
+    { id: "ky-quy", t: "Thỏa thuận ký quỹ", d: "Mẫu ký quỹ · tự điền dự án, căn hộ và khách hàng" },
+    { id: "dat-coc", t: "Thỏa thuận đặt cọc", d: "Mẫu đặt cọc · tự điền giá trị cọc" },
+    { id: "hdmb", t: "Hợp đồng mua bán (HĐMB)", d: "Mẫu HĐMB · tự điền thông tin hợp đồng và PTTT" },
+    { id: "noi-that", t: "Phụ lục hoàn thiện nội thất", d: "Danh mục bàn giao căn hộ" },
+    { id: "ban-giao", t: "Biên bản bàn giao căn hộ", d: "Checklist bàn giao & chỉ số đồng hồ" },
+    { id: "thanh-ly", t: "Thanh lý hợp đồng", d: "Mẫu thanh lý & hoàn cọc" },
+    { id: "chuyen-nhuong", t: "Công văn xác nhận chuyển nhượng", d: "Gửi chủ đầu tư & phòng công chứng" }
   ];
 
   const HANDOVER = {
@@ -1426,7 +1511,36 @@ body.detail-mode #viewbar{display:none}
     }
   };
 
-  const LS = "twenty-re-crm-v3";
+  const LS = "twenty-re-crm-v3" + (DEMO ? "-presentation" : "");
+  const CUSTOMER_ACTOR = $(".sb-user b").textContent.trim();
+  let storedSnapshot = null;
+
+  function customerName(key) {
+    const record = CUST[key];
+    return (record?.type === "org" ? record.coname : record?.fullname) || key;
+  }
+
+  function recordCustomerChange(before, after, action) {
+    const fields = after.type === "org" ? F_ORG : F_IND;
+    const changes = [...fields, { k: "type", l: "Loại khách hàng" }, { k: "note", l: "Ghi chú nội bộ" }].flatMap((field) => {
+      const oldValue = before?.[field.k] || "";
+      const newValue = after[field.k] || "";
+      return oldValue === newValue ? [] : [{ field: field.l, before: oldValue, after: newValue }];
+    });
+    if (!before || changes.length) {
+      after.history = [...(Array.isArray(before?.history) ? before.history : []), {
+        at: Date.now(), actor: CUSTOMER_ACTOR, action, changes
+      }];
+    }
+    return after;
+  }
+
+  function addCustomer(record, source) {
+    const key = "customer-" + crypto.getRandomValues(new Uint32Array(4)).join("-");
+    CUST[key] = record;
+    EXTRA.push({ name: key, src: source, created: new Date().toLocaleDateString("vi-VN") });
+    return key;
+  }
 
   function pricing(u) {
     const base = Math.round(u.area * (u.ppm || 145000000));
@@ -1435,16 +1549,26 @@ body.detail-mode #viewbar{display:none}
     return { base, vat, mf, total: base + vat + mf };
   }
   function builtArea(u) { return Math.round(u.area * 1.08 * 10) / 10; }
-  function schedule(u) {
-    const total = pricing(u).total;
-    let acc = 0;
-    const rows = SCHED.map((s, i) => {
-      const amt = i === SCHED.length - 1 ? total - acc : Math.round(total * s.p);
-      acc += amt;
-      return { ...s, amt };
+  const dateISO = (value) => /^\d{2}\/\d{2}\/\d{4}$/.test(value) ? value.split("/").reverse().join("-") : "";
+  const dateVN = (value) => value.split("-").reverse().join("/");
+
+  function schedule(u, draft = contractDraft(u)) {
+    const total = draft.appliedSchedule?.total ?? pricing(u).total;
+    const steps = draft.appliedSchedule?.steps || paymentScheduleSteps(u, draft);
+    let credit = draft.openingReceived + draft.receipts.reduce((sum, receipt) => sum + receipt.amount, 0);
+    let allocated = 0;
+    const asOf = dateISO(TODAY);
+    return steps.map((step, i) => {
+      const amt = step.amt ?? (i === steps.length - 1 ? total - allocated : Math.round(total * step.p));
+      allocated += amt;
+      const received = Math.min(amt, credit);
+      credit -= received;
+      const remaining = amt - received;
+      const date = dateISO(step.date);
+      const overdue = remaining > 0 && Boolean(date) && date < asOf;
+      const st = !amt ? "milestone" : !remaining ? "paid" : received ? "partial" : overdue ? "late" : date === asOf ? "due" : date ? "upcoming" : "milestone";
+      return { ...step, k: step.k || "Đợt " + (i + 1), amt, received, remaining, overdue, st };
     });
-    const paid = u.status === "SOLD" ? 6 : u.status === "IN_TRANSACTION" ? 2 : 0;
-    return rows.map((r, i) => ({ ...r, st: i < paid ? "paid" : i === paid && u.status === "IN_TRANSACTION" ? "due" : "wait" }));
   }
   function commission(u) {
     const p = pricing(u);
@@ -1462,10 +1586,10 @@ body.detail-mode #viewbar{display:none}
       ]
     };
   }
-  function report(u) {
-    const sch = schedule(u), total = pricing(u).total;
-    const paid = sch.filter((r) => r.st === "paid").reduce((a, r) => a + r.amt, 0);
-    return { paid, total, pct: Math.round((paid / total) * 100), nPaid: sch.filter((r) => r.st === "paid").length };
+  function report(u, sch = schedule(u)) {
+    const total = sch.reduce((sum, step) => sum + step.amt, 0);
+    const paid = sch.reduce((a, r) => a + r.received, 0);
+    return { paid, total, pct: total ? Math.round((paid / total) * 100) : 0, nPaid: sch.filter((r) => r.st === "paid").length };
   }
   const hasTransfer = (u) => (TRANSFER[u.uid] || []).length > 0;
 
@@ -1499,7 +1623,7 @@ body.detail-mode #viewbar{display:none}
         rec: rec,
         phone: rec.phone || c.phone,
         cccd: legal || c.cccd,
-        email: rec.email || c.email || slug(c.name) + "@gmail.com",
+        email: rec.email || c.email || "",
         addr: rec.addr_contact || rec.hq || rec.addr_perm || c.addr || "Khu đô thị An Phú, TP. Thủ Đức, TP.HCM",
         src: c.src || "Website", sale: "Alex Dương",
         created: c.created || TODAY,
@@ -1515,19 +1639,29 @@ body.detail-mode #viewbar{display:none}
   };
 
   /* ================= persistence ================= */
-  function persist() {
+  function persist(checkStale = false) {
     try {
-      localStorage.setItem(LS, JSON.stringify({
+      if (checkStale && localStorage.getItem(LS) !== storedSnapshot) return false;
+      const snapshot = JSON.stringify({
         v: 2,
         units: UNITS.map((u) => ({ uid: u.uid, status: u.status, buyer: u.buyer, phone: u.phone, cccd: u.cccd, reason: u.reason, log: u.log || [] })),
         cust: CUST,
-        extra: EXTRA
-      }));
-    } catch (e) {}
+        extra: EXTRA,
+        saleDrafts: Array.from(saleDrafts).filter(([, draft]) => saleInProgress(draft) || draft.signedDate),
+        saleContracts: Array.from(contractDrafts).filter(([uid]) => saleDrafts.get(uid)?.signedDate),
+        reminderDrafts: agentSession.drafts
+      });
+      localStorage.setItem(LS, snapshot);
+      storedSnapshot = snapshot;
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
   function restore() {
     try {
       const raw = localStorage.getItem(LS);
+      storedSnapshot = raw;
       if (!raw) return;
       const d = JSON.parse(raw);
       const units = Array.isArray(d) ? d : d.units || [];
@@ -1543,12 +1677,22 @@ body.detail-mode #viewbar{display:none}
       if (!Array.isArray(d)) {
         if (d.cust) Object.keys(d.cust).forEach((n) => { CUST[n] = Object.assign(defaultCust(n), d.cust[n]); });
         if (Array.isArray(d.extra)) d.extra.forEach((x) => { if (x && x.name && !EXTRA.some((y) => y.name === x.name)) EXTRA.push(x); });
+        const savedSales = d.saleDrafts || d.signedSales;
+        if (Array.isArray(savedSales)) for (const [uid, draft] of savedSales) {
+          if (byUid(uid) && draft?.step >= 1 && draft.step <= 4 && draft.contacts?.[draft.type]) saleDrafts.set(uid, draft);
+        }
+        if (Array.isArray(d.saleContracts)) for (const [uid, draft] of d.saleContracts) {
+          if (saleDrafts.get(uid)?.signedDate && draft && contractStages.some((item) => item.id === draft.stage)) contractDrafts.set(uid, draft);
+        }
+        if (Array.isArray(d.reminderDrafts)) agentSession.drafts = d.reminderDrafts.filter((draft) =>
+          draft && byUid(draft.uid) && typeof draft.body === "string" && typeof draft.key === "string");
       }
     } catch (e) {}
   }
 
   /* ================= state ================= */
-  const S = { view: "project", pid: "orchard", tid: "SD", f: "all", ct: "all", q: "", sort: "desc", tab: 1, route: null, menu: "", ut: "ind" };
+  const S = { view: "work", pid: "orchard", tid: "SD", f: "all", ct: "all", q: "", unitQuery: "", sort: "desc", tab: 1, route: null, menu: "", ut: "ind" };
+  const saleDrafts = new Map();
   let toastT = 0;
 
   const curProj = () => PROJECTS.find((p) => p.id === S.pid) || PROJECTS[0];
@@ -1557,7 +1701,6 @@ body.detail-mode #viewbar{display:none}
     return p.towers.find((t) => t.id === S.tid) || p.towers[0];
   };
   const towerUnits = (pid, tid) => UNITS.filter((u) => u.proj === pid && u.tower === tid);
-  const shownUnits = () => towerUnits(curProj().id, curTower().id);
   const fmtA = (n) => String(n).replace(".", ",");
 
   function toast(msg) {
@@ -1593,27 +1736,32 @@ body.detail-mode #viewbar{display:none}
         return;
       }
     }
-    $("#crumb").innerHTML =
+    $("#crumb").innerHTML = S.view === "work" ? "<b>Giao dịch</b>" : S.view === "agent" ? "<b>Hỏi CRM</b>" :
       S.view === "project"
         ? '<span>Dự án</span><svg class="ic"><use href="#i-chevron-right"/></svg><b>' + esc(curProj().short) + " · " + esc(curTower().name) + "</b>"
         : '<span>Khách hàng</span><svg class="ic"><use href="#i-chevron-right"/></svg><b>Tất cả khách hàng</b>';
   }
 
   function renderNav() {
-    $("#cnt-units").textContent = UNITS.length;
+    $("#cnt-units").textContent = UNITS.length + " căn";
     $("#cnt-cust").textContent = customers().length;
+    $('[data-act="filter-toggle"]').hidden = ["agent", "work"].includes(S.view);
+    $(".top-agent").setAttribute("aria-current", S.view === "agent" ? "page" : "false");
     $$(".sb-nav .nav-item").forEach((b) => {
-      if (b.dataset.act === "nav") b.classList.toggle("on", b.dataset.view === S.view);
-      else b.classList.toggle("on", S.view === "project" && !S.route && S.f === b.dataset.f);
+      if (b.dataset.act === "nav") {
+        const active = b.dataset.view === S.view;
+        b.classList.toggle("on", active);
+        b.setAttribute("aria-current", active ? "page" : "false");
+      } else b.classList.toggle("on", S.view === "project" && !S.route && S.f === b.dataset.f);
     });
     const c = countByStatus();
     $$("[data-count]").forEach((el) => (el.textContent = c[el.dataset.count] || 0));
   }
 
-  function pickMenu(menu, label, value, count, items, head) {
+  function pickMenu(menu, label, value, items) {
     return '<div class="pkwrap">' +
       '<button class="pk' + (S.menu === menu ? " on" : "") + '" data-act="menu" data-menu="' + menu + '" aria-haspopup="true" aria-expanded="' + (S.menu === menu) + '" aria-label="' + esc(label) + ': ' + esc(value) + '">' +
-      '<b>' + esc(value) + "</b>" +
+      '<span class="lb">' + esc(label) + '</span><b>' + esc(value) + "</b>" +
       '<svg class="ic chev"><use href="#i-chevron-down"/></svg></button>' +
       (S.menu === menu ? '<div class="pkpop">' + items + "</div>" : "") +
       "</div>";
@@ -1621,31 +1769,16 @@ body.detail-mode #viewbar{display:none}
 
   function renderViewbar() {
     const vb = $("#viewbar");
-    if (S.view === "project") {
-      const us = shownUnits();
-      const fl = curTower().floors;
-      const from = S.sort === "desc" ? fl[0] : fl[fl.length - 1];
-      const to = S.sort === "desc" ? fl[fl.length - 1] : fl[0];
-      vb.innerHTML =
-        '<span class="vb-icon"><svg class="ic"><use href="#i-layers"/></svg></span>' +
-        '<span class="vb-title">Stacking plan</span>' +
-        '<span class="vb-spacer"></span>' +
-        '<div class="vb-actions">' +
-        '<button class="btn" data-act="sort"><svg class="ic sm"><use href="#i-sort"/></svg>Tầng ' + from + " → " + to + "</button>" +
-        '<button class="btn" data-act="csv"><svg class="ic sm"><use href="#i-download"/></svg>Xuất CSV</button>' +
-        "</div>";
-    } else {
-      const all = customers();
-      vb.innerHTML =
-        '<span class="vb-icon"><svg class="ic"><use href="#i-users"/></svg></span>' +
-        '<span class="vb-title">Khách hàng</span>' +
-        '<span class="vb-spacer"></span>' +
-        '<div class="vb-actions">' +
-        '<span class="qwrap"><svg class="ic"><use href="#i-search"/></svg>' +
-        '<input class="q" id="q" value="' + esc(S.q) + '" placeholder="Tên, CCCD (cá nhân) hoặc MST (doanh nghiệp)…" autocomplete="off" spellcheck="false" /></span>' +
-        '<button class="btn" data-act="csv"><svg class="ic sm"><use href="#i-download"/></svg>Xuất CSV</button>' +
-        "</div>";
-    }
+    vb.hidden = S.view !== "customer";
+    vb.innerHTML = vb.hidden ? "" :
+      '<h1 class="vb-title" id="customer-list-title">Tất cả khách hàng</h1>' +
+      '<div class="vb-actions">' +
+      '<span class="qwrap"><svg class="ic"><use href="#i-search"/></svg>' +
+      '<input class="q" id="q" type="search" value="' + esc(S.q) + '" aria-label="Tìm theo tên, CCCD hoặc mã số thuế" placeholder="Tên, CCCD hoặc mã số thuế…" autocomplete="off" spellcheck="false" /></span>' +
+      '<button class="btn" data-act="import-customers"><svg class="ic sm"><use href="#i-file"/></svg>Nhập Excel</button>' +
+      '<button class="btn" data-act="csv"><svg class="ic sm"><use href="#i-download"/></svg>Xuất CSV</button>' +
+      '<button class="btn" data-act="customer-xlsx">Xuất Excel</button>' +
+      "</div>";
   }
 
   /* ================= project view ================= */
@@ -1664,23 +1797,29 @@ body.detail-mode #viewbar{display:none}
       '<span>' + esc(x.name) + '</span><span class="cnt">' + towerUnits(p.id, x.id).length + " căn</span></button>"
     ).join("");
 
-    const selBtn = pickMenu;
     const fltItems =
       '<button class="pkpop-i ' + (S.f === "all" ? "on" : "") + '" data-act="filter" data-f="all"><span>Tất cả trạng thái</span><span class="cnt">' + us.length + "</span></button>" +
       ST_KEYS.map((k) => '<button class="pkpop-i ' + (S.f === k ? "on" : "") + '" data-act="filter" data-f="' + k + '">' +
-        '<i class="pdot" style="background:' + ST[k].hex + '"></i><span>' + ST[k].l + '</span><span class="cnt">' + (c[k] || 0) + "</span></button>").join("");
+        '<i class="status-dot ' + ST[k].c + '" aria-hidden="true"></i><span>' + ST[k].l + '</span><span class="cnt">' + (c[k] || 0) + "</span></button>").join("");
 
     const pickers =
       '<div class="pbar">' +
-      selBtn("pid", "Dự án", p.short, UNITS.filter((u) => u.proj === p.id).length + " căn", projItems, "Chọn dự án (" + PROJECTS.length + ")") +
-      selBtn("tid", "Toà", t.name.replace(/^Toà\s+/, ""), us.length + " căn", towerItems, "Chọn toà (" + p.towers.length + ")") +
-      selBtn("flt", "Lọc", S.f === "all" ? "Tất cả" : ST[S.f].l, (S.f === "all" ? us.length : c[S.f] || 0) + " căn", fltItems, "Trạng thái căn") +
-      "</div>";
+      pickMenu("pid", "Dự án", p.short, projItems) +
+      pickMenu("tid", "Toà", t.id, towerItems) +
+      pickMenu("flt", "Trạng thái", S.f === "all" ? "Tất cả" : ST[S.f].l, fltItems) +
+      '</div>';
 
-    const props =
-      '<div class="plan-topbar">' +
-      '<div class="prop"><span>Sản phẩm</span><b>' + us.length + " căn · " + t.floors.length + " tầng</b></div>" +
-      "</div>";
+    const hero =
+      '<header class="project-hero"><h1>' + esc(p.short) + '</h1>' +
+      '<div class="project-meta"><span><svg class="ic sm"><use href="#i-map"/></svg>' + esc(p.addr) + '</span>' +
+      '<span><svg class="ic sm"><use href="#i-building"/></svg>' + esc(t.name) + '</span></div>' +
+      '<span class="project-image-label">Ảnh minh họa</span></header>';
+
+    const summary = '<dl class="inventory" aria-label="Trạng thái căn hộ của ' + esc(t.name) + '">' +
+      ST_KEYS.map((k) =>
+        '<div class="inventory-card ' + ST[k].c + '"><dt><i class="status-dot"></i>' + ST[k].l + '</dt>' +
+        '<dd><b>' + (c[k] || 0) + '</b><span>căn</span></dd></div>'
+      ).join("") + '</dl>';
 
     const head =
       '<div class="phead"><div class="ph-floor">Tầng</div>' +
@@ -1688,6 +1827,9 @@ body.detail-mode #viewbar{display:none}
       "</div>";
 
     const floors = S.sort === "desc" ? t.floors.slice() : t.floors.slice().reverse();
+    const actions = '<div class="plan-actions">' +
+      '<button class="btn" data-act="sort"><svg class="ic sm"><use href="#i-sort"/></svg>Tầng ' + floors[0] + " → " + floors[floors.length - 1] + '</button>' +
+      '<button class="btn" data-act="csv"><svg class="ic sm"><use href="#i-download"/></svg>Xuất CSV</button></div>';
     const rows = floors.map((f) => {
       const fu = us.filter((u) => u.floor === f);
       const cells = p.cols.map((cc) => {
@@ -1699,14 +1841,20 @@ body.detail-mode #viewbar{display:none}
         const star = hasTransfer(u) ? '<svg class="ic star"><use href="#i-star"/></svg>' : "";
         return (
           '<button class="cell ' + st.c + dim + '" data-act="unit" data-uid="' + u.uid + '" aria-label="' + esc("Căn " + u.code + " · " + st.l + (hasTransfer(u) ? " · đã chuyển nhượng" : "")) + '">' +
-          '<span class="row1"><span class="code">' + u.code + '</span>' + star + lock + "</span>" +
+          '<span class="row1"><i class="status-dot" aria-hidden="true"></i><span class="code">' + u.code + '</span>' + star + lock + "</span>" +
           "</button>"
         );
       }).join("");
       return '<div class="prow"><div class="fl"><b>T' + f + "</b></div>" + cells + "</div>";
     }).join("");
 
-    return pickers + '<div class="view">' + props + '<div class="plan-scroll"><div class="plan">' + head + rows + "</div></div>" + "</div>";
+    return '<div class="view project-view">' + hero + summary +
+      '<section class="plan-card" aria-labelledby="plan-title">' +
+      '<div class="plan-heading"><div class="plan-heading-copy"><h2 id="plan-title">Sơ đồ căn hộ</h2>' +
+      '<p>' + us.length + ' căn · ' + t.floors.length + ' tầng</p></div>' +
+      '<div class="plan-legend"><svg class="ic star"><use href="#i-star"/></svg>Đã chuyển nhượng</div></div>' +
+      '<div class="plan-toolbar">' + pickers + actions + '</div>' +
+      '<div class="plan-scroll"><div class="plan">' + head + rows + "</div></div></section></div>";
   }
 
   /* ================= customer view ================= */
@@ -1715,7 +1863,7 @@ body.detail-mode #viewbar{display:none}
     const digits = q.replace(/[^0-9]/g, "");
     return customers().filter((c) => {
       if (!q) return true;
-      const names = [c.name, c.disp, c.rec.coname, c.rec.fullname].map((x) => String(x || "").toLowerCase());
+      const names = [c.disp, c.rec.coname, c.rec.fullname].map((x) => String(x || "").toLowerCase());
       if (names.some((n) => n.includes(q))) return true;
       const legal = String(c.type === "org" ? c.rec.taxno || c.legal || "" : c.rec.idno || c.legal || "");
       if (!legal) return false;
@@ -1729,9 +1877,6 @@ body.detail-mode #viewbar{display:none}
     const all = customers();
     const list = filteredCustomers();
 
-    if (!list.length) {
-      return '<div class="empty"><svg class="ic" style="width:22px;height:22px"><use href="#i-users"/></svg><b>Không tìm thấy khách hàng</b><span>Thử từ khoá khác: tên, CCCD (cá nhân) hoặc MST (doanh nghiệp).</span></div>';
-    }
     const rows = list.map((c) => {
       const dash = '<span class="uempty">—</span>';
       const towers = Array.from(new Set(c.units.map((u) => u.tower)));
@@ -1748,41 +1893,41 @@ body.detail-mode #viewbar{display:none}
         : dash;
       return (
         '<tr data-act="cust" data-id="' + c.id + '">' +
-        '<td><div class="cust"><span class="ava lg">' + initials(c.disp) + '</span><div class="nm"><b>' + esc(c.disp) + "</b><span>" + esc(c.email) + "</span></div></div></td>" +
-        "<td>" + towerCell + "</td>" +
+        '<td><div class="cust"><span class="ava lg" aria-hidden="true">' + esc(initials(c.disp)) + '</span><button class="cust-link" data-act="cust" data-id="' + c.id + '">' + esc(c.disp) + "</button></div></td>" +
         "<td>" + projCell + "</td>" +
+        "<td>" + towerCell + "</td>" +
         "<td>" + units + "</td>" +
-        '<td style="width:28px;text-align:right"><svg class="ic sm" style="color:var(--fg4)"><use href="#i-chevron-right"/></svg></td>' +
+        '<td class="customer-row-arrow"><svg class="ic sm" aria-hidden="true"><use href="#i-chevron-right"/></svg></td>' +
         "</tr>"
       );
     }).join("");
 
+    const table = list.length
+      ? '<div class="customer-scroll" role="region" aria-label="Danh sách khách hàng" tabindex="0">' +
+        '<table class="tbl" aria-labelledby="customer-list-title"><thead><tr>' +
+        '<th scope="col">Khách hàng</th><th scope="col">Dự án</th><th scope="col">Tòa</th><th scope="col">Căn hộ</th><th></th>' +
+        '</tr></thead><tbody>' + rows + '</tbody></table></div>'
+      : '<div class="empty" role="status"><b>Không tìm thấy khách hàng</b><span>Thử tìm bằng tên, CCCD hoặc mã số thuế khác.</span></div>';
+
     return (
-      '<table class="tbl"><thead><tr>' +
-      "<th>Khách hàng</th><th>Toà</th><th>Khối</th><th>Căn hộ</th><th></th>" +
-      "</tr></thead><tbody>" + rows + "</tbody></table>" +
-      '<div class="viewnote" style="padding:10px 16px 16px"><span>Hiển thị <span class="mono">' + list.length + "</span> / " + all.length + " khách hàng</span>" +
-      '<span class="saved"><svg class="ic"><use href="#i-check"/></svg>Lưu tự động trên máy</span></div>'
+      '<div class="customer-list">' + table +
+      '<div class="viewnote"><span>Hiển thị <span class="mono">' + list.length + "</span> / " + all.length + " khách hàng</span>" +
+      '<span class="saved"><svg class="ic"><use href="#i-check"/></svg>Lưu tự động trên máy</span></div></div>'
     );
   }
 
   /* ================= panel: unit ================= */
   const TABS = [
-    { n: 1, l: "Tổng quan", req: true },
-    { n: 2, l: "Khách hàng", req: true },
-    { n: 3, l: "Lịch thanh toán", req: false },
-    { n: 4, l: "HĐMB & mẫu", req: true },
-    { n: 5, l: "Điều kiện bàn giao", req: false },
-    { n: 6, l: "Chuyển nhượng", req: false },
-    { n: 7, l: "Báo cáo", req: false }
+    { n: 1, l: "Thông tin căn" },
+    { n: 4, l: "Giao dịch" },
+    { n: 3, l: "Lịch thanh toán" },
+    { n: 2, l: "Khách hàng" },
+    { n: 5, l: "Điều kiện bàn giao" },
+    { n: 6, l: "Chuyển nhượng" },
+    { n: 7, l: "Báo cáo" }
   ];
+  const SALE_STEPS = ["Khách hàng", "Lịch thanh toán", "Thông tin giao dịch", "Thỏa thuận ký quỹ"];
 
-  function stRead(u) {
-    return '<div class="stread">' +
-      '<div class="kv"><span>Status</span><b class="bw"><span class="tag ' + ST[u.status].t + '">' + ST[u.status].l + "</span></b></div>" +
-      '<div class="kv"><span>Status reason</span><b class="bw">' + esc(REASON_L[reasonOf(u)] || "—") + "</b></div>" +
-      "</div>";
-  }
   function stActs(u) {
     const list = TRANS[u.status] || [];
     if (!list.length) return "";
@@ -1792,28 +1937,64 @@ body.detail-mode #viewbar{display:none}
         (dis ? ' disabled title="Cần liên kết khách hàng trước"' : "") + '>' +
         '<svg class="ic sm"><use href="#i-' + (t.danger ? "x" : "check") + '"/></svg>' + t.l + '<span class="to">→ ' + ST[t.to].l + "</span></button>";
     }).join("");
-    return '<div class="stacts">' + btns + "</div>";
+    const hint = !u.buyer && list.some((t) => t.need)
+      ? '<p class="transaction-hint">Liên kết khách hàng để thực hiện các thao tác này.</p>' : "";
+    return '<div class="stacts">' + btns + "</div>" + hint;
   }
-  function unitTab1(u) {
+  function unitDealAction(u, inDeal = false) {
+    const draft = saleDrafts.get(u.uid);
+    const activeDraft = draft && saleInProgress(draft);
+    if (u.status === "UNRELEASED") {
+      return '<section class="unit-next"><div><h2>Căn chưa mở bán</h2></div>' +
+        (!inDeal ? '<button type="button" class="btn" data-act="tab" data-tab="4">Mở hồ sơ</button>' : '') + '</section>';
+    }
+    if (u.status === "AVAILABLE" && !draft?.signedDate) {
+      return '<section class="unit-next"><div><h2>' + (activeDraft ? 'Hồ sơ bán căn đang làm' : 'Hồ sơ bán căn') + '</h2><p>' +
+        (activeDraft ? 'Bước ' + draft.step + ' / 4 · ' + SALE_STEPS[draft.step - 1] :
+          'Nhập thông tin khách hàng để bắt đầu lập hồ sơ cho căn này.') + '</p></div>' +
+        '<button type="button" class="btn pri" data-act="open-sale">' +
+        (activeDraft ? 'Tiếp tục hồ sơ' : 'Lập hồ sơ bán căn') + '</button></section>';
+    }
+    return '<section class="unit-next"><div><h2>Hồ sơ giao dịch</h2><p>' +
+      (u.buyer ? esc(customerName(u.buyer)) + ' · ' : '') + esc(contractStages.find((stage) =>
+        stage.id === contractDraft(u).stage).label) + '</p></div>' +
+      '<button type="button" class="btn" data-act="tab" data-tab="4">Xem giao dịch</button></section>';
+  }
+
+  function unitOverview(u) {
     const p = pricing(u);
-    const info =
-      '<div class="fgrid">' +
-      field("Unit description", '<input class="inp mono" value="' + u.code + '" readonly />', true) +
-      field("Floor", '<input class="inp mono" value="' + esc(u.tower) + "-" + pad2(u.floor) + '" readonly />') +
-      field("Project", '<input class="inp" value="' + esc(projOf(u).name) + '" readonly />', true) +
-      field("Block", '<input class="inp mono" value="' + esc(u.tower) + '" readonly />', true) +
-      field("Handover date", '<input class="inp" value="' + u.handover + '" readonly />', true) +
-      "</div>";
+    const fact = (label, value) => '<div><dt>' + label + '</dt><dd>' + esc(value) + '</dd></div>';
+
     return (
-      '<div class="sec"><div class="sec-h"><span>Trạng thái</span></div>' +
-      stRead(u) + stActs(u) + "</div>" +
-      '<div class="sec"><div class="sec-h"><span>Thông tin bắt buộc</span></div>' + info + "</div>" +
-      '<div class="sec"><div class="sec-h"><span>Cơ cấu giá</span><span class="note mono">' + fmt(u.ppm) + "/m²</span></div>" +
-      '<div class="kv"><span>Giá bán (' + u.area + " m²)</span><b>" + fmt(p.base) + "</b></div>" +
-      '<div class="kv"><span>Thuế VAT 8,45%</span><b>' + fmt(p.vat) + "</b></div>" +
-      '<div class="kv"><span>Phí bảo trì 2%</span><b>' + fmt(p.mf) + "</b></div>" +
-      '<div class="kv total"><span>Tổng giá trị căn hộ</span><b>' + fmt(p.total) + "</b></div></div>"
+      '<div class="d-body overview">' +
+      '<section class="sec overview-facts" aria-labelledby="overview-facts-title">' +
+      '<h2 id="overview-facts-title">Thông tin chính</h2><dl>' +
+      fact("Loại căn", u.type) +
+      fact("Diện tích thông thủy", fmtA(u.area) + " m²") +
+      fact("Giá niêm yết trước VAT và phí", fmt(p.base)) +
+      fact("Bàn giao dự kiến", u.handover) +
+      '</dl></section>' + unitDealAction(u) +
+      '<details class="sec overview-facts unit-overview-details"><summary>Thông số căn hộ</summary><dl>' +
+      fact("Diện tích xây dựng", fmtA(builtArea(u)) + " m²") +
+      fact("Tầng", "Tầng " + u.floor + " · " + u.tower + "-" + pad2(u.floor)) +
+      fact("Hướng", u.dir) +
+      fact("Tầm nhìn", u.view) +
+      '</dl></details>' +
+      '<details class="sec overview-breakdown unit-overview-details"><summary>Cơ cấu giá tham khảo</summary>' +
+      '<p class="note">Bảng giá tham khảo · ' + fmt(u.ppm) + '/m²</p>' +
+      kv("Giá bán (" + fmtA(u.area) + " m²)", fmt(p.base)) +
+      kv("Thuế VAT 8,45%", fmt(p.vat)) +
+      kv("Phí bảo trì 2%", fmt(p.mf)) +
+      '<div class="kv total"><span>Tổng giá trị tham khảo</span><b>' + fmt(p.total) + '</b></div></details>' +
+      '</div>'
     );
+  }
+
+  function customerLookup() {
+    return '<div class="field unit-customer-lookup"><label for="uc-search">Hoặc liên kết khách hàng có sẵn</label>' +
+      '<div class="unit-customer-search"><svg class="ic sm" aria-hidden="true"><use href="#i-search"/></svg>' +
+      '<input class="inp" type="search" id="uc-search" placeholder="Tên, SĐT, CCCD hoặc MST" autocomplete="off" aria-controls="uc-matches" />' +
+      '<div class="unit-customer-matches" id="uc-matches" hidden></div></div></div>';
   }
 
   function unitTab2(u) {
@@ -1824,75 +2005,890 @@ body.detail-mode #viewbar{display:none}
     const groups = org ? G_ORG : G_IND;
     const reqN = flds.filter((f) => f.req).length;
     const doneN = flds.filter((f) => f.req && String((rec || {})[f.k] || "").trim()).length;
-    const others = customers().filter((c) => c.name !== u.buyer);
-    const pick = linked ? "" :
-      '<div class="pickrow"><label>Hoặc liên kết khách đã có</label>' +
-      '<select class="inp" id="uc-pick"><option value="">— Khách hàng mới —</option>' +
-      others.map((c) => '<option value="' + esc(c.name) + '">' + esc(c.disp) + " · " + esc(c.phone || "chưa có SĐT") + "</option>").join("") +
-      "</select></div>";
-    const seg = linked ? "" :
-      '<div class="seg" style="margin:2px 0 6px">' +
-      '<button type="button" class="' + (org ? "" : "on") + '" data-act="utype" data-t="ind">Cá nhân</button>' +
-      '<button type="button" class="' + (org ? "on" : "") + '" data-act="utype" data-t="org">Doanh nghiệp</button>' +
-      "</div>";
-    const form =
-      '<form id="uc-form" data-type="' + (org ? "org" : "ind") + '" autocomplete="off">' +
-      groups.map((g) => '<div class="sub-h">' + g.t + "</div>" +
-        '<div class="fgrid">' + flds.slice(g.a, g.b).map((f) => cfField(f, (rec || {})[f.k])).join("") + "</div>").join("") +
-      '<div class="sub-h">Ghi chú nội bộ</div>' +
-      '<div class="fgrid"><div class="field full"><label>Nhu cầu, ngân sách, tiến độ liên hệ</label>' +
-      '<textarea class="ta" data-f="note" rows="2" style="width:100%">' + esc((rec && rec.note) || "") + "</textarea></div></div>" +
-      "</form>";
-    const acts =
-      '<div class="uc-acts">' +
-      '<button class="btn pri" data-act="save-unit" data-uid="' + u.uid + '"><svg class="ic sm"><use href="#i-check"/></svg>' + (linked ? "Lưu thay đổi" : "Tạo khách hàng") + "</button>" +
-      (linked ? '<button class="btn" data-act="unlink-cust" data-uid="' + u.uid + '">Gỡ liên kết</button>' : "") +
-      "</div>";
+    const typeLabel = org ? "Doanh nghiệp" : "Cá nhân";
+    const setup = linked ? "" :
+      '<div class="unit-customer-setup">' +
+      '<div><span class="customer-control-label" id="unit-customer-type">Loại hồ sơ mới</span>' +
+      '<div class="seg" role="group" aria-labelledby="unit-customer-type">' +
+      '<button type="button" class="' + (org ? "" : "on") + '" aria-pressed="' + !org + '" data-act="utype" data-t="ind">Cá nhân</button>' +
+      '<button type="button" class="' + (org ? "on" : "") + '" aria-pressed="' + org + '" data-act="utype" data-t="org">Doanh nghiệp</button>' +
+      '</div></div>' +
+      customerLookup() + '</div>';
+
     return (
-      '<div class="sec"><div class="sec-h"><span>Khách hàng giao dịch</span>' +
-      (linked ? '<span class="tag t-acc">Đã liên kết</span>' : '<span class="note">Chưa có khách</span>') +
-      '<span class="note mono" style="margin-left:auto">' + doneN + "/" + reqN + " bắt buộc</span></div>" +
-      seg + pick + form + acts +
-      '<div class="fhint">Trường có <span class="req">*</span> là bắt buộc. Lưu sẽ tạo (hoặc cập nhật) hồ sơ khách hàng và gắn với căn ' + u.code + ".</div></div>"
+      '<section class="unit-customer" aria-labelledby="unit-customer-title">' +
+      '<header class="unit-customer-header"><div>' +
+      '<h2 id="unit-customer-title">Khách hàng giao dịch</h2>' +
+      (linked ? '<p>' + esc(customerName(u.buyer)) + ' · ' + typeLabel + '</p>' : '') +
+      '</div>' +
+      (linked ? '<span class="tag t-acc">Đã liên kết</span>' : '<span class="tag t-lock">Chưa liên kết</span>') +
+      '</header>' +
+      setup +
+      '<form id="uc-form" data-type="' + (org ? "org" : "ind") + '" autocomplete="off">' +
+      groups.map((g, i) =>
+        '<section class="customer-form-group" aria-labelledby="customer-form-group-' + i + '">' +
+        '<h3 id="customer-form-group-' + i + '">' + g.t + '</h3>' +
+        '<div class="fgrid">' + flds.slice(g.a, g.b).map((f) => cfField(f, rec?.[f.k])).join("") + '</div></section>'
+      ).join("") +
+      '<section class="customer-form-group" aria-labelledby="unit-customer-note-title">' +
+      '<h3 id="unit-customer-note-title">Ghi chú nội bộ</h3>' +
+      '<div class="field"><label for="unit-customer-note">Nhu cầu, ngân sách, tiến độ liên hệ</label>' +
+      '<textarea class="ta" id="unit-customer-note" data-f="note" rows="2">' + esc(rec?.note || "") + '</textarea></div></section>' +
+      '</form>' +
+      '<div class="unit-customer-actions">' +
+      '<p>Đã có ' + doneN + '/' + reqN + ' trường bắt buộc <span class="unit-customer-required">*</span></p>' +
+      '<div>' +
+      (linked ? '<button class="btn ghost" data-act="unlink-cust" data-uid="' + u.uid + '">Gỡ liên kết</button>' : '') +
+      '<button class="btn pri" data-act="save-unit" data-uid="' + u.uid + '"><svg class="ic sm"><use href="#i-check"/></svg>' +
+      (linked ? "Lưu thay đổi" : "Tạo và liên kết") + '</button></div></div></section>'
     );
+  }
+
+  function saleDraft(u) {
+    if (!saleDrafts.has(u.uid)) {
+      const draft = {
+        step: 1, type: "ind", customerKey: "", paymentPlan: "", discountsByPlan: {},
+        contacts: { ind: blankCust("ind"), org: blankCust("org") },
+        agency: "", amount: "", date: "", template: "project", generated: false,
+        signingDate: "", signedDate: ""
+      };
+      if (u.buyer) prefillSaleCustomer(draft, u.buyer, custOf(u.buyer, u));
+      saleDrafts.set(u.uid, draft);
+    }
+    return saleDrafts.get(u.uid);
+  }
+
+  function saleInProgress(draft) {
+    if (draft.step > 1 || draft.paymentPlan) return true;
+    const original = blankCust(draft.type);
+    return (draft.type === "org" ? F_ORG : F_IND)
+      .some((field) => draft.contacts[draft.type][field.k] !== original[field.k]);
+  }
+
+  function presentationCustomer() {
+    return {
+      ...blankCust("ind"), fullname: "Nguyễn An Minh", gender: "Nam", dob: "16/06/1988",
+      idno: "099188007261", iddate: "16/05/2022", idplace: "Cục Cảnh sát QLHC về TTXH",
+      nation: "Việt Nam", addr_perm: "12 Đường Mẫu, TP. Hồ Chí Minh", addr_contact: "12 Đường Mẫu, TP. Hồ Chí Minh",
+      email: "an.minh@example.com", phone: "0999007261", ben_name: "Nguyễn An Minh",
+      ben_acc: "12345678901", bank: "Vietcombank", bank_branch: "TP. Hồ Chí Minh"
+    };
+  }
+
+  function seedPresentation() {
+    if (!DEMO || storedSnapshot !== null) return;
+    const unit = byUid("orchard:SD:1003");
+    if (unit?.status !== "AVAILABLE") return;
+    const draft = saleDraft(unit);
+    Object.assign(draft, { step: 4, paymentPlan: "standard", agency: "Meraki Land", amount: "300000000", date: dateISO(TODAY) });
+    draft.contacts.ind = { ...presentationCustomer(), fullname: "Trần Ngọc An", ben_name: "Trần Ngọc An",
+      idno: "099188007262", phone: "0999007262", email: "ngoc.an@example.com" };
+    persist(true);
+  }
+
+  function prefillSaleCustomer(draft, key, record) {
+    draft.customerKey = key;
+    draft.type = record.type === "org" ? "org" : "ind";
+    draft.contacts[draft.type] = { ...blankCust(draft.type), ...record };
+    draft.generated = false;
+  }
+
+  function saleCustomerName(draft) {
+    return String(draft.contacts[draft.type][draft.type === "org" ? "coname" : "fullname"] || "").trim();
+  }
+
+  function readyEscrowDraft(u) {
+    const draft = saleDrafts.get(u.uid);
+    return draft?.step === 4 || draft?.generated ? draft : null;
+  }
+
+  function saleCustomerForm(draft) {
+    const org = draft.type === "org";
+    const record = draft.contacts[draft.type];
+    const fields = org ? F_ORG : F_IND;
+    const groups = org ? G_ORG : G_IND;
+    return '<form id="sale-customer-form" data-type="' + draft.type + '">' +
+      '<div class="sale-step-heading sale-customer-heading"><div><h2>Thông tin khách hàng</h2>' +
+      '<p>Điền đủ ' + fields.length + ' trường hồ sơ để tiếp tục.</p></div>' +
+      (DEMO && !draft.customerKey && !saleInProgress(draft) ? '<button type="button" class="btn" data-act="sale-demo-customer">Điền dữ liệu mẫu</button>' : '') + '</div>' +
+      (draft.customerKey
+        ? '<div class="sale-selected"><div><b>' + esc(customerName(draft.customerKey)) + '</b><p>Đã điền trước từ hồ sơ có sẵn</p></div>' +
+          '<button type="button" class="btn" data-act="sale-clear-customer">Đổi khách hàng</button></div>'
+        : '<div class="sale-customer-options"><div><span class="customer-control-label" id="sale-customer-type">Loại hồ sơ</span>' +
+          '<div class="seg" role="group" aria-labelledby="sale-customer-type">' +
+          '<button type="button" class="' + (org ? "" : "on") + '" aria-pressed="' + !org + '" data-act="sale-customer-type" data-type="ind">Cá nhân</button>' +
+          '<button type="button" class="' + (org ? "on" : "") + '" aria-pressed="' + org + '" data-act="sale-customer-type" data-type="org">Doanh nghiệp</button>' +
+          '</div></div>' + customerLookup() + '</div>') +
+      groups.map((group, index) =>
+        '<section class="customer-form-group" aria-labelledby="sale-group-' + index + '"><h3 id="sale-group-' + index + '">' +
+        esc(group.t) + '</h3><div class="fgrid">' +
+        fields.slice(group.a, group.b).map((field) => cfField({
+          ...field, req: true, t: field.k === "phone" ? "tel" : field.t,
+          prompt: field.k === "gender" ? "Chọn giới tính" : ""
+        }, record[field.k])).join("") + '</div></section>'
+      ).join("") +
+      '<section class="customer-form-group" aria-labelledby="sale-note-title">' +
+      '<h3 id="sale-note-title">Ghi chú nội bộ</h3><div class="field"><label for="sale-note">Nhu cầu, ngân sách, tiến độ liên hệ</label>' +
+      '<textarea class="ta" id="sale-note" data-f="note" rows="2">' + esc(record.note || "") + '</textarea></div></section>' +
+      '<p class="sale-error" role="alert"></p>' +
+      '<div class="sale-actions">' + saleContinueButton("Sang lịch thanh toán") + '</div></form>';
+  }
+
+  function saleContinueButton(label) {
+    return '<button type="submit" class="btn pri">' + (S.route.reviewEdit ? 'Lưu và quay lại kiểm tra' : label) +
+      '<svg class="ic sm" aria-hidden="true"><use href="#i-chevron-right"/></svg></button>';
+  }
+
+  function escrowDocumentData(u, draft, template) {
+    const record = draft ? draft.contacts[draft.type] : u.buyer ? custOf(u.buyer, u) : null;
+    const org = record?.type === "org";
+    return {
+      number: "KYQ-" + u.tower + "-" + u.code,
+      version: template === "standard" ? "Mẫu chuẩn 2026" : "Mẫu dự án · " + projOf(u).short,
+      sections: [
+        { title: "Thông tin khách hàng", rows: [
+          ["Khách hàng", (draft ? saleCustomerName(draft) : customerName(u.buyer)) || "Chưa liên kết"],
+          [org ? "Mã số thuế" : "CCCD / Hộ chiếu", (org ? record?.taxno : record?.idno) || "—"],
+          ["Số điện thoại", record?.phone || "—"],
+          ["Email", record?.email || "—"],
+          ["Địa chỉ", (org ? record?.hq : record?.addr_perm) || "—"]
+        ] },
+        { title: "Thông tin giao dịch", rows: [
+          ["Dự án", projOf(u).name],
+          ["Căn hộ", towerOf(u).name + " · " + u.code],
+          ["Tầng", "Tầng " + u.floor],
+          ["Sàn giao dịch", draft?.agency || "Chưa nhập"],
+          ["Người lập", CUSTOMER_ACTOR]
+        ] },
+        { title: "Khoản ký quỹ", rows: [
+          ["Số tiền ký quỹ", fmt(draft ? Number(draft.amount) : u.deposit)],
+          ["Ngày ký quỹ", draft?.date ? dateVN(draft.date) : "Chưa nhập"],
+          ["Ngày ký thỏa thuận", draft?.signedDate ? dateVN(draft.signedDate) : "Chưa xác nhận"]
+        ] }
+      ]
+    };
+  }
+
+  function saleAgreementFields(u, draft) {
+    return escrowDocumentData(u, draft, draft?.template).sections.flatMap((section) =>
+      section.rows.map(([label, value]) => kv(esc(label), esc(value)))
+    ).join("");
+  }
+
+  function salePaymentForm(u, draft) {
+    return '<form id="sale-payment-form" class="payment-page"><div class="sale-step-heading">' +
+      '<h2>Lịch thanh toán</h2><p>' + esc(saleCustomerName(draft)) +
+      ' · Chọn phương án để xác nhận báo giá và lịch thu dự kiến cho căn này.</p></div>' +
+      paymentQuotation(draft.paymentPlan || "standard", u, draft.discountsByPlan, true) +
+      '<div class="sale-actions"><button type="button" class="btn" data-act="sale-previous">Quay lại</button>' +
+      saleContinueButton("Xác nhận lịch và tiếp tục") + '</div></form>';
+  }
+
+  function saleTransactionForm(u, draft) {
+    return '<form id="sale-transaction-form"><div class="sale-step-heading"><h2>Thông tin giao dịch</h2>' +
+      '<p>Kiểm tra căn đã chọn và nhập sàn bán, số tiền và ngày ký quỹ.</p></div>' +
+      '<dl class="sale-facts"><div><dt>Khách hàng</dt><dd>' + esc(saleCustomerName(draft)) + '</dd></div>' +
+      '<div><dt>Căn đã chọn</dt><dd>' + esc(towerOf(u).name + " · Căn " + u.code + " · Tầng " + u.floor) + '</dd></div>' +
+      '<div><dt>Lịch thanh toán dự kiến</dt><dd>' + seniquePaymentPlans[draft.paymentPlan].label + '</dd></div>' +
+      '<div><dt>Người nhập</dt><dd>' + esc(CUSTOMER_ACTOR) + '</dd></div></dl>' +
+      '<div class="fgrid"><div class="field full"><label for="sale-agency">Sàn giao dịch <span class="req">*</span></label>' +
+      '<input class="inp" id="sale-agency" data-sale-field="agency" value="' + esc(draft.agency) + '" placeholder="Ví dụ: Meraki Land" maxlength="100" required /></div>' +
+      '<div class="field"><label for="sale-amount">Số tiền ký quỹ (₫) <span class="req">*</span></label>' +
+      '<input class="inp" type="number" id="sale-amount" data-sale-field="amount" min="1" step="1" value="' + esc(draft.amount) + '" placeholder="300000000" required />' +
+      '<p class="note" id="sale-amount-formatted">' + (draft.amount ? fmt(Number(draft.amount)) : '') + '</p></div>' +
+      '<div class="field"><label for="sale-date">Ngày ký quỹ <span class="req">*</span></label>' +
+      '<input class="inp" type="date" id="sale-date" data-sale-field="date" value="' + esc(draft.date) + '" required /></div></div>' +
+      '<p class="sale-error" role="alert"></p><div class="sale-actions">' +
+      '<button type="button" class="btn" data-act="sale-previous">Quay lại</button>' +
+      saleContinueButton("Kiểm tra thỏa thuận ký quỹ") + '</div></form>';
+  }
+
+  function saleAgreement(u, draft) {
+    const template = draft.template === "standard" ? "Mẫu chuẩn 2026" : "Mẫu dự án · " + projOf(u).short;
+    const plan = seniquePaymentPlans[draft.paymentPlan];
+    const quote = plan && seniqueQuote(plan, u, draft.discountsByPlan?.[draft.paymentPlan]);
+    const review = [
+      ["Khách hàng", saleCustomerName(draft), 1],
+      ["Lịch thanh toán", plan ? plan.label + " · " + fmt(quote.total) : "Chưa xác nhận", 2],
+      ["Ký quỹ", fmt(Number(draft.amount)) + " · " + (draft.date ? dateVN(draft.date) : "Chưa nhập ngày"), 3]
+    ];
+    return '<section class="sale-agreement"><div class="sale-step-heading"><h2>Kiểm tra thỏa thuận ký quỹ</h2>' +
+      '<p>Đối chiếu thông tin trước khi xác nhận khách đã ký.</p></div>' +
+      '<dl class="sale-review">' + review.map(([label, value, step]) =>
+        '<div><dt>' + esc(label) + '</dt><dd>' + esc(value) + '</dd><button type="button" class="btn ghost" data-act="sale-edit-step" data-step="' +
+        step + '" aria-label="Sửa ' + esc(label.toLowerCase()) + '">Sửa</button></div>'
+      ).join("") + '</dl>' +
+      '<div class="field"><label for="sale-template">Biểu mẫu áp dụng</label><select class="inp" id="sale-template" data-sale-field="template">' +
+      '<option value="project"' + (draft.template === "project" ? " selected" : "") + '>Mẫu dự án · ' + esc(projOf(u).short) + '</option>' +
+      '<option value="standard"' + (draft.template === "standard" ? " selected" : "") + '>Mẫu chuẩn 2026</option></select></div>' +
+      '<details class="sale-agreement-paper"><summary>Xem đầy đủ thông tin thỏa thuận</summary><p class="note">' +
+      esc(template) + '</p>' + saleAgreementFields(u, draft) + '</details>' +
+      '<div class="sale-document-actions"><button class="btn" data-act="escrow-pdf-view">Xem PDF</button>' +
+      '<button class="btn" data-act="escrow-pdf-download"><svg class="ic sm"><use href="#i-download"/></svg>Tải PDF</button></div>' +
+      '<form id="sale-sign-form"><div class="field"><label for="sale-sign-date">Ngày ký thỏa thuận <span class="req">*</span></label>' +
+      '<input class="inp" type="date" id="sale-sign-date" data-sale-field="signingDate" value="' + esc(draft.signingDate) + '" required /></div>' +
+      '<p class="note">Xác nhận sẽ chuyển căn sang Đang giao dịch và mở hồ sơ đặt cọc.</p>' +
+      '<p class="sale-error" role="alert"></p></form>' +
+      '<div class="sale-actions">' +
+      '<button class="btn" data-act="sale-previous">Quay lại</button>' +
+      '<button class="btn pri" type="submit" form="sale-sign-form">Xác nhận ký và sang đặt cọc <svg class="ic sm"><use href="#i-chevron-right"/></svg></button></div></section>';
+  }
+
+  function saleWizard(u) {
+    const draft = saleDraft(u);
+    const progress = SALE_STEPS.map((label, index) => {
+      const number = index + 1;
+      const active = number === draft.step;
+      const completed = number < draft.step;
+      return '<li class="' + (active ? "current" : completed ? "complete" : "") + '"' +
+        (active ? ' aria-current="step"' : '') + '><span>' +
+        (completed ? '<svg class="ic sm" aria-label="Hoàn tất"><use href="#i-check"/></svg>' : number) +
+        '</span><b>' + label + '</b></li>';
+    }).join("");
+    const content = [
+      () => saleCustomerForm(draft),
+      () => salePaymentForm(u, draft),
+      () => saleTransactionForm(u, draft),
+      () => saleAgreement(u, draft)
+    ][draft.step - 1]();
+    return '<div class="detail sale-wizard"><header class="d-head">' +
+      '<div class="sale-bar"><div><h1>Hồ sơ bán căn ' + esc(u.code) + '</h1><p class="note">' +
+      esc(projOf(u).short + ' · ' + towerOf(u).name) + '</p></div>' +
+      '<button type="button" class="btn" data-act="sale-exit">Lưu và thoát</button></div>' +
+      '<p class="sale-step-count">Bước ' + draft.step + ' / ' + SALE_STEPS.length +
+      ' <span>· ' + SALE_STEPS[draft.step - 1] + '</span></p>' +
+      '<ol class="sale-progress" aria-label="Tiến trình bán căn">' + progress + '</ol></header>' +
+      '<div class="sale-body">' + content + '</div></div>';
+  }
+
+  function showSaleStep(u, step) {
+    const draft = saleDraft(u);
+    draft.step = step;
+    if (saleInProgress(draft)) persist(true);
+    renderContent();
+    $("#content").scrollTop = 0;
+    const heading = $(".sale-step-heading h2");
+    heading?.setAttribute("tabindex", "-1");
+    heading?.focus({ preventScroll: true });
+  }
+
+  function completeSaleStep(u, next) {
+    const returnToReview = S.route.reviewEdit;
+    delete S.route.reviewEdit;
+    showSaleStep(u, returnToReview ? 4 : next);
+  }
+
+  function submitSaleStep(form, u) {
+    const draft = saleDraft(u);
+    const error = form.querySelector(".sale-error");
+    if (error) error.textContent = "";
+    if (form.id === "sale-customer-form" && draft.step === 1) {
+      const inputs = $$("[data-f]", form);
+      const fields = draft.contacts[draft.type];
+      for (const input of inputs) {
+        const value = input.value.trim();
+        if (fields[input.dataset.f] !== value) draft.generated = false;
+        fields[input.dataset.f] = value;
+        input.closest(".field").classList.remove("err");
+      }
+      const missing = inputs.filter((input) => input.getAttribute("aria-required") === "true" && !fields[input.dataset.f]);
+      missing.forEach((input) => input.closest(".field").classList.add("err"));
+      if (missing.length) error.textContent = "Còn " + missing.length + " trường bắt buộc chưa nhập.";
+      const invalid = showUnitCustomerDuplicates(form, u, draft.customerKey) || missing[0];
+      if (invalid) {
+        invalid.focus({ preventScroll: true });
+        invalid.scrollIntoView({ block: "center" });
+        return;
+      }
+      completeSaleStep(u, 2);
+      return;
+    }
+    if (form.id === "sale-payment-form" && draft.step === 2) {
+      if (!updateSaleDiscounts(form, u, draft)) return;
+      draft.paymentPlan ||= "standard";
+      delete S.route.quotePlan;
+      completeSaleStep(u, 3);
+      return;
+    }
+    if (form.id === "sale-transaction-form" && draft.step === 3) {
+      draft.agency = $("#sale-agency").value.trim();
+      draft.amount = $("#sale-amount").value;
+      draft.date = $("#sale-date").value;
+      const amount = Number(draft.amount);
+      if (!draft.agency || !Number.isSafeInteger(amount) || amount <= 0 || !draft.date) {
+        error.textContent = "Nhập sàn giao dịch, số tiền ký quỹ hợp lệ và ngày ký quỹ.";
+        return;
+      }
+      completeSaleStep(u, 4);
+      return;
+    }
+    if (form.id === "sale-sign-form" && draft.step === 4 && !draft.signedDate) {
+      const signed = $("#sale-sign-date").value;
+      if (!signed) return;
+      const contract = contractDraft(u);
+      const prior = { stage: contract.stage, source: contract.source, templates: contract.templates };
+      draft.signingDate = draft.signedDate = signed;
+      Object.assign(contract, { stage: "dat-coc", source: "ky-quy", templates: { ...contract.templates, "ky-quy": draft.template } });
+      if (!linkSignedSaleCustomer(u, draft)) {
+        draft.signedDate = "";
+        Object.assign(contract, prior);
+        error.textContent = "Không thể lưu hồ sơ khách hàng. Kiểm tra hồ sơ trùng hoặc tải lại nếu vừa có thay đổi ở tab khác.";
+        return;
+      }
+      S.route.sale = false;
+      delete S.route.quotePlan;
+      S.tab = 4;
+      renderContent();
+      $("#content").scrollTop = 0;
+      toast("Đã xác nhận ký ngày " + dateVN(signed) + " · Chuyển sang đặt cọc");
+    }
+  }
+
+  function linkSignedSaleCustomer(u, draft) {
+    const candidate = draft.contacts[draft.type];
+    const priorKey = draft.customerKey || u.buyer;
+    const before = priorKey ? custOf(priorKey, u) : null;
+    if (CustomerData.duplicateIndex(customers()).find(candidate, priorKey, before).length) return false;
+    const original = { buyer: u.buyer, phone: u.phone, cccd: u.cccd, status: u.status, reason: u.reason, log: u.log };
+    const originalKey = draft.customerKey;
+    const originalRecord = priorKey ? CUST[priorKey] : undefined;
+    const record = recordCustomerChange(before, { ...(before || {}), ...candidate }, before ? "Cập nhật từ giao dịch" : "Tạo từ giao dịch");
+    const key = priorKey || addCustomer(record, "Giao dịch");
+    CUST[key] = record;
+    draft.customerKey = u.buyer = key;
+    u.phone = record.phone || "";
+    u.cccd = (draft.type === "org" ? record.taxno : record.idno) || "";
+    if (u.status === "AVAILABLE") {
+      u.status = "IN_TRANSACTION";
+      u.reason = "HOLD";
+      u.log = [...(u.log || []), { at: Date.now(), from: original.status, to: u.status, reason: u.reason, by: ME }];
+    }
+    if (persist(true)) return true;
+    Object.assign(u, original);
+    draft.customerKey = originalKey;
+    if (originalRecord) CUST[key] = originalRecord;
+    else delete CUST[key];
+    if (!priorKey) EXTRA.pop();
+    return false;
+  }
+
+  function renderUnitCustomerMatches(input) {
+    const results = $("#uc-matches");
+    const query = input.value.trim();
+    results.hidden = !query;
+    if (!query) {
+      results.innerHTML = "";
+      return;
+    }
+
+    const normalize = (value) => String(value || "").toLowerCase().normalize("NFD")
+      .replace(/\p{M}/gu, "").replace(/đ/g, "d").replace(/\s+/g, " ");
+    const term = normalize(query);
+    const digits = /^[\d\s.+()/-]+$/.test(query) ? query.replace(/\D/g, "") : "";
+    const matches = customers().filter((c) =>
+      [c.disp, c.legal].some((value) => normalize(value).includes(term)) ||
+      (digits && [c.phone, c.legal].some((value) => String(value || "").replace(/\D/g, "").includes(digits)))
+    );
+    results.innerHTML = matches.length
+      ? '<ul>' + matches.map((c) => '<li><button type="button" data-act="link-cust" data-name="' + esc(c.name) + '">' +
+        '<b>' + esc(c.disp) + '</b><span>' + esc(c.typeL) + (c.phone ? ' · ' + esc(c.phone) : '') + '</span></button></li>').join("") + '</ul>'
+      : '<p role="status">Không tìm thấy khách hàng.</p>';
+  }
+
+  const paymentStates = {
+    paid: ["Đã thu đủ", "t-av"],
+    partial: ["Thu một phần", "t-acc"],
+    late: ["Quá hạn", "t-sold"],
+    due: ["Đến hạn", "t-tx"],
+    upcoming: ["Chưa đến hạn", "t-tr"],
+    milestone: ["Chờ mốc", "t-lock"]
+  };
+
+  function paymentTable(installments) {
+    const rows = installments.map((item) => {
+      const [label, tag] = paymentStates[item.st];
+      return '<tr><th scope="row"><b>' + item.k + '</b><span>' + esc(item.w) + '</span></th>' +
+        '<td>' + esc(item.date) + '</td><td class="num">' + fmt(item.amt) + '</td>' +
+        '<td class="num">' + fmt(item.received) + '</td><td class="num"><b>' + fmt(item.remaining) + '</b></td>' +
+        '<td><span class="tag ' + tag + '">' + label + '</span>' +
+        (item.st === "partial" && item.overdue ? '<span class="payment-late-note">Quá hạn</span>' : '') +
+        '</td></tr>';
+    }).join("");
+    return '<div class="mtable payment-table"><table class="itable" aria-label="Các đợt thanh toán"><thead><tr>' +
+      '<th scope="col">Đợt / mốc</th><th scope="col">Hạn / điều kiện</th><th scope="col" class="num">Phải thu</th>' +
+      '<th scope="col" class="num">Đã thu</th><th scope="col" class="num">Còn lại</th><th scope="col">Trạng thái</th>' +
+      '</tr></thead><tbody>' + rows + '</tbody></table></div>';
+  }
+
+  const quoteVatRate = 0.10;
+  const quoteMaintenanceRate = 0.02;
+  const seniquePaymentPlans = {
+    standard: { label: "Tiêu chuẩn", summary: "Chia thành nhiều đợt thu trước bàn giao.", discount: 5,
+      milestones: ["30/06/2026", "30/09/2026", "31/12/2026"], handover: 45 },
+    special: { label: "Đặc biệt 30/70", summary: "Có ít đợt thu hơn trước bàn giao, phần lớn thanh toán ở mốc bàn giao.", discount: 4,
+      milestones: ["30/06/2026"], handover: 65 }
+  };
+
+  function quoteDiscounts(plan, rates) {
+    return [
+      { label: "Chiết khấu đặc biệt", rate: 5 },
+      { label: "Chiết khấu theo phương thức thanh toán", rate: plan.discount },
+      { label: "Chiết khấu độc quyền", rate: 1 }
+    ].map((discount, i) => ({ ...discount, rate: rates?.[i] ?? discount.rate }));
+  }
+
+  function seniqueQuote(plan, u, rates) {
+    const listed = u ? pricing(u).base : 10807093000;
+    const landValue = u ? Math.round(u.area * 489351.91) : 65426350;
+    const discounts = quoteDiscounts(plan, rates)
+      .map((discount) => ({ ...discount, amount: Math.round(listed * discount.rate / 100) }));
+    const net = listed - discounts.reduce((sum, discount) => sum + discount.amount, 0);
+    const vat = Math.round((net - landValue) * quoteVatRate);
+    const maintenance = Math.round(net * quoteMaintenanceRate);
+    const total = net + vat + maintenance;
+    const deposit = 200000000;
+    // Match the supplied workbook's installment basis and reconcile at handover.
+    const installment = (rate) => Math.round(net * 1.1 * (rate / 100));
+    const first = installment(20) - deposit;
+    const certificate = installment(5);
+    const beforeHandover = deposit + first + plan.milestones.length * installment(10);
+    const handover = total - beforeHandover - maintenance - certificate;
+    return { listed, discounts, net, vat, maintenance, total, beforeHandover, rows: [
+      ["Đặt cọc", "Khi ký Phiếu Xác Nhận", "Số tiền cố định", deposit],
+      ["Thanh toán đợt 1", "Trong 14 ngày từ ngày công ty ký xác nhận phiếu", "20% · đã trừ " + fmt(deposit) + " tiền cọc", first],
+      ["Ký HĐMB", "Cùng thời hạn thanh toán đợt 1", "Mốc ký", 0],
+      ...plan.milestones.map((date, i) => ["Thanh toán đợt " + (i + 2), u ? "Theo lịch dự án · Chưa chốt ngày" : "Chậm nhất " + date, "10%", installment(10)]),
+      ["Bàn giao căn hộ", "Trong 14 ngày từ thông báo bàn giao · Dự kiến " + (u ? u.handover : "30/06/2027"), plan.handover + "% · thu phần còn lại", handover],
+      ["Phí bảo trì", "Cùng đợt bàn giao", "2% giá sau chiết khấu", maintenance],
+      ["Giấy chứng nhận", "Trong 14 ngày từ thông báo về việc cấp giấy chứng nhận", "5%", certificate]
+    ] };
+  }
+
+  function paymentQuotation(selected, u, discountsByPlan, editable = false) {
+    const plan = seniquePaymentPlans[selected];
+    const quote = seniqueQuote(plan, u, discountsByPlan?.[selected]);
+    const context = u ? projOf(u).short + " · Căn " + u.code + " · " + fmtA(u.area) + " m² sử dụng" :
+      "Mẫu Senique · Căn S2.29.03 · 133,7 m² sử dụng · Bàn giao cơ bản";
+    return '<div class="payment-quote"><header class="payment-heading"><div>' +
+      (editable ? '<h3>Báo giá dự kiến</h3>' : '<h2>Báo giá & lịch thanh toán dự kiến</h2>') +
+      '<p>' + esc(context) + '</p></div></header>' +
+      '<div class="payment-plan-picker" role="group" aria-labelledby="quote-plan-label">' +
+      '<div class="payment-plan-caption" id="quote-plan-label">Phương án mẫu từ file Senique' + (u ? ' · dùng để minh họa' : '') + '</div>' +
+      Object.entries(seniquePaymentPlans).map(([id, option]) =>
+        '<button type="button" class="btn" data-act="quote-plan" data-plan="' + id + '" aria-pressed="' +
+        (id === selected) + '">' + option.label + '</button>'
+      ).join("") + '<p class="payment-plan-summary">' + plan.summary + '</p></div>' +
+      (editable ? '<fieldset class="payment-discounts"><legend>Chiết khấu áp dụng (%)</legend><div class="payment-discount-fields">' +
+        quote.discounts.map((item, i) => '<div class="field"><label for="sale-discount-' + i + '">' +
+          item.label + '</label><input class="inp" id="sale-discount-' + i + '" data-quote-discount type="number"' +
+          ' min="0" max="100" step="0.01" required value="' + item.rate + '" aria-describedby="sale-discount-help sale-discount-error"></div>'
+        ).join("") + '</div><p id="sale-discount-help" class="payment-footnote">Nhập tỷ lệ trên giá niêm yết. Mỗi phương án lưu mức chiết khấu riêng.</p>' +
+        '<p id="sale-discount-error" class="sale-error" role="alert"></p></fieldset>' +
+        '<details class="sale-plan-comparison" id="sale-plan-comparison"' + (S.route.saleCompareOpen ? ' open' : '') +
+        '><summary>So sánh hai phương án</summary><div class="sale-plan-comparison-body">' +
+        quoteComparison(u, discountsByPlan) + '</div></details>' : '') +
+      '<div class="payment-quote-details">' + paymentQuoteDetails(quote) + '</div></div>';
+  }
+
+  function updateSaleDiscounts(form, u, draft) {
+    const inputs = $$("[data-quote-discount]", form);
+    const rates = inputs.map((input) => input.valueAsNumber);
+    const selected = draft.paymentPlan || "standard";
+    const quote = seniqueQuote(seniquePaymentPlans[selected], u, rates);
+    const error = inputs.some((input) => !input.validity.valid) ? "Nhập tỷ lệ từ 0 đến 100%, tối đa hai chữ số thập phân." :
+      rates.reduce((sum, rate) => sum + rate, 0) >= 100 ? "Tổng chiết khấu phải dưới 100%." :
+      quote.vat < 0 || quote.rows.some((row) => row[3] < 0) ? "Mức chiết khấu này làm số tiền thu không hợp lệ. Hãy giảm tỷ lệ." : "";
+    const details = $(".payment-quote-details", form);
+    const comparison = $("#sale-plan-comparison", form);
+    $("#sale-discount-error", form).textContent = error;
+    details.hidden = Boolean(error);
+    comparison.hidden = Boolean(error);
+    if (error) return false;
+    draft.discountsByPlan[selected] = rates;
+    details.innerHTML = paymentQuoteDetails(quote);
+    $(".sale-plan-comparison-body", comparison).innerHTML = quoteComparison(u, draft.discountsByPlan);
+    return true;
+  }
+
+  function paymentQuoteDetails(quote) {
+    const totalDiscount = quote.discounts.reduce((sum, item) => sum + item.rate, 0)
+      .toLocaleString("vi-VN", { maximumFractionDigits: 2 });
+    const breakdown = [
+      ["Giá niêm yết", fmt(quote.listed)],
+      ...quote.discounts.map((item) => [item.label + " (" + item.rate + "%)", "−" + fmt(item.amount)]),
+      ["Tổng chiết khấu (" + totalDiscount + "%)", "−" + fmt(quote.listed - quote.net)],
+      ["Giá sau chiết khấu", fmt(quote.net), "payment-quote-net"],
+      ["VAT " + Math.round(quoteVatRate * 100) + "%", fmt(quote.vat)],
+      ["Phí bảo trì " + Math.round(quoteMaintenanceRate * 100) + "%", fmt(quote.maintenance)]
+    ];
+    return '<section class="payment-quote-summary" aria-label="Chi tiết báo giá">' +
+      '<dl>' + breakdown.map(([label, value, className]) =>
+        '<div' + (className ? ' class="' + className + '"' : '') + '><dt>' + label + '</dt><dd>' + value + '</dd></div>'
+      ).join("") + '</dl>' +
+      '<div class="payment-quote-total"><span>Tổng giá căn hộ</span><strong>' + fmt(quote.total) + '</strong>' +
+      '<span>Đã gồm VAT và phí bảo trì</span></div></section>' +
+      '<p class="payment-footnote">Theo mẫu Senique, VAT tính trên giá sau chiết khấu trừ phần giá trị đất. Phí bảo trì tính trên giá sau chiết khấu.</p>' +
+      '<section class="sec" aria-labelledby="quote-timeline-title"><h3 id="quote-timeline-title">Tiến độ dự kiến</h3>' +
+      '<div class="mtable payment-table quote-table" role="region" aria-label="Tiến độ dự kiến theo phương án" tabindex="0"><table class="itable"><thead><tr>' +
+      '<th scope="col">Đợt / mốc</th><th scope="col">Hạn thanh toán</th><th scope="col">Cách tính</th>' +
+      '<th scope="col" class="num">Số tiền (VND)</th></tr></thead><tbody>' +
+      quote.rows.map(([title, date, basis, amount]) => '<tr><th scope="row">' + title + '</th><td>' +
+        date + '</td><td>' + basis + '</td><td class="num">' + (amount ? fmt(amount) : '—') + '</td></tr>').join("") +
+      '</tbody><tfoot><tr><th scope="row" colspan="3">Tổng lịch thanh toán</th>' +
+      '<td class="num">' + fmt(quote.total) + '</td></tr></tfoot></table></div>' +
+      '<p class="payment-footnote">Tiến độ chính thức được ghi trong HĐMB.</p></section>';
   }
 
   function unitTab3(u) {
-    const p = pricing(u);
+    const view = S.route.paymentView || (tracksPayments(u) ? "collection" : "quote");
+    const draft = saleDrafts.get(u.uid);
+    const selectedPlan = draft?.step >= 3 ? draft.paymentPlan : "";
+    const quoteUnit = u;
+    const views = [["quote", "Lịch dự kiến"], ["collection", "Theo dõi thu"]];
+    return '<div class="payment-page"><div class="payment-toolbar"><div class="payment-view-picker" role="group" aria-label="Nội dung lịch thanh toán">' +
+      views.map(([id, label]) => '<button type="button" class="btn" data-act="payment-view" data-view="' + id +
+        '" aria-pressed="' + (view === id) + '">' + label + '</button>').join("") + '</div>' +
+      '<button type="button" class="btn payment-agent-toggle" data-act="payment-agent" aria-expanded="' +
+      Boolean(S.route.paymentAgent) + '" aria-controls="payment-agent-panel">Trợ lý AI</button></div>' +
+      '<div id="payment-agent-panel"' + (S.route.paymentAgent ? '' : ' hidden') + '>' +
+      (S.route.paymentAgent ? paymentAgentPanel(u, view, quoteUnit, draft?.discountsByPlan) : '') + '</div>' +
+      (view === "quote" ? paymentQuotation(S.route.quotePlan || selectedPlan || "standard", quoteUnit, quoteUnit ? draft?.discountsByPlan : null) :
+        paymentCollection(u)) + '</div>';
+  }
+
+  function paymentAgentPanel(u, view, quoteUnit, discountsByPlan) {
+    const comparison = view === "quote";
+    const request = comparison ? "So sánh hai phương án" : "Soạn nhắc khoản thu tiếp theo";
+    let result = "";
+    if (S.route.paymentAgentResult) {
+      if (comparison) {
+        result = '<div class="payment-agent-result">' + quoteComparison(quoteUnit, discountsByPlan) +
+          '<p class="note">Nguồn dữ liệu · Hai bảng báo giá dự kiến của căn ' + esc(quoteUnit?.code || "S2.29.03") + '</p></div>';
+      } else {
+        const next = tracksPayments(u) && schedule(u).find((item) => item.remaining > 0);
+        const message = next && 'Kính gửi Quý khách, Meraki Land xin thông tin về khoản thanh toán căn ' + u.code +
+          '. Khoản ' + next.k.toLowerCase() + ' (' + next.w + ') còn ' + fmt(next.remaining) +
+          '. Hạn / điều kiện thanh toán theo hồ sơ: ' + next.date + '. Cảm ơn Quý khách.';
+        result = next
+          ? '<div class="payment-agent-result"><label for="payment-agent-draft">Bản nháp nhắc thanh toán</label>' +
+            '<textarea class="inp" id="payment-agent-draft" rows="3">' + esc(message) + '</textarea>' +
+            '<p class="note">Nguồn dữ liệu · Đợt thu tiếp theo trong lịch của căn ' + esc(u.code) + '</p></div>'
+          : '<p class="payment-agent-result">' + (tracksPayments(u) ? 'Đã thu đủ theo lịch hiện tại.' : 'Chưa có lịch thu đang theo dõi.') + '</p>';
+      }
+    }
+    return '<section class="payment-agent" aria-labelledby="payment-agent-title">' +
+      '<div class="payment-heading"><div><h3 id="payment-agent-title">Trợ lý giao dịch <span class="tag t-lock">Mô phỏng</span></h3>' +
+      '<p>' + (comparison ? (quoteUnit ? 'Báo giá dự kiến căn ' + esc(quoteUnit.code) : 'Báo giá mẫu Senique') :
+        'Lịch thu của căn ' + esc(u.code)) + '</p></div>' +
+      '<button type="button" class="btn" data-act="payment-agent-request">' + request + '</button></div>' +
+      '<div id="payment-agent-result" aria-live="polite" tabindex="-1">' + result + '</div></section>';
+  }
+
+  function quoteComparison(u, discountsByPlan) {
+    const standard = seniqueQuote(seniquePaymentPlans.standard, u, discountsByPlan?.standard);
+    const special = seniqueQuote(seniquePaymentPlans.special, u, discountsByPlan?.special);
+    const totalDifference = special.total - standard.total;
+    const upfrontDifference = special.beforeHandover - standard.beforeHandover;
+    const compare = (difference, label) =>
+      '<b>' + seniquePaymentPlans[difference > 0 ? "standard" : "special"].label +
+      '</b> ' + label + ' ' + fmt(Math.abs(difference)) + '.';
+    return '<p>' + (totalDifference ? compare(totalDifference, "có tổng giá thấp hơn") : "Hai phương án có cùng tổng giá.") +
+      '</p><p>' + (upfrontDifference ? compare(upfrontDifference, "cần trả ít hơn trước bàn giao") :
+        "Hai phương án có cùng số tiền trước bàn giao.") + '</p>';
+  }
+
+  function paymentCollection(u) {
+    const draft = contractDraft(u);
+    if (!tracksPayments(u)) {
+      return '<section class="sec"><h2>Chưa có lịch đang theo dõi thu</h2>' +
+        '<p class="payment-footnote">Lịch dự kiến theo báo giá có thể xem trong hồ sơ căn.</p></section>';
+    }
+    const sch = schedule(u, draft);
+    const summary = report(u, sch);
+    const next = sch.find((item) => item.remaining > 0);
+    const overdue = sch.reduce((sum, item) => sum + (item.overdue ? item.remaining : 0), 0);
+    const customer = u.buyer ? customerName(u.buyer) : "Chưa liên kết khách hàng";
+    const receipts = draft.receipts.slice().reverse().map((entry) =>
+      '<li><div><b>' + esc(entry.id) + '</b><span>' + dateVN(entry.date) + ' · ' + esc(entry.method) +
+      (entry.reference ? ' · ' + esc(entry.reference) : '') + '</span></div><b class="mono">' + fmt(entry.amount) + '</b></li>'
+    ).join("") + (draft.openingReceived
+      ? '<li><div><b>Số đã thu đầu kỳ</b><span>Dữ liệu mẫu</span></div><b class="mono">' + fmt(draft.openingReceived) + '</b></li>' : '');
+
+    return '<div>' +
+      '<header class="payment-heading"><div><h2>Lịch thanh toán <span class="tag t-lock">Mô phỏng</span></h2>' +
+      '<p>' + esc(customer) + (draft.number ? ' · ' + esc(draft.number) : '') +
+      ' · ' + esc(u.type) + ' · ' + fmtA(u.area) + ' m² · ' +
+      esc(draft.appliedSchedule?.label || contractPlans[draft.plan]) + '</p></div>' +
+      '<div class="payment-actions"><button class="btn" data-act="payment-preview" data-document="statement"><svg class="ic sm"><use href="#i-download"/></svg>Xuất PDF</button>' +
+      '<button class="btn pri" data-act="payment-receipt"' + (next ? '' : ' disabled') + '><svg class="ic sm"><use href="#i-plus"/></svg>Ghi nhận thu</button></div></header>' +
+      '<dl class="payment-totals">' +
+      '<div><dt>Tổng phải thu</dt><dd>' + fmt(summary.total) + '</dd></div>' +
+      '<div><dt>Đã thu <span>· ' + summary.pct + '%</span></dt><dd>' + fmt(summary.paid) + '</dd></div>' +
+      '<div><dt>Còn phải thu</dt><dd>' + fmt(summary.total - summary.paid) + '</dd></div>' +
+      '<div><dt>Quá hạn</dt><dd' + (overdue ? ' class="payment-overdue"' : '') + '>' + fmt(overdue) + '</dd></div></dl>' +
+      '<section class="sec" aria-labelledby="payment-installments-title"><div class="payment-heading">' +
+      '<div><h3 id="payment-installments-title">Các đợt thanh toán</h3><p>' + esc(draft.appliedSchedule?.label || contractMethods[draft.method].label) +
+      ' · Dữ liệu mẫu đến ' + TODAY + '</p></div>' +
+      '<button class="btn ghost" data-act="tab" data-tab="4">Xem lịch trong HĐMB<svg class="ic sm"><use href="#i-chevron-right"/></svg></button></div>' +
+      (next ? '<div class="payment-next"><span><b>' + (next.overdue ? "Cần theo dõi" : "Đợt tiếp theo") + '</b> · ' +
+        next.k + ' còn ' + fmt(next.remaining) + '</span><button class="btn" data-act="payment-preview" data-document="reminder">Xem thông báo thu</button></div>' :
+        '<p class="payment-next">Đã thu đủ theo lịch hiện tại.</p>') +
+      paymentTable(sch) +
+      '<p class="payment-footnote">' + (draft.appliedSchedule ? 'Số tiền theo lịch đã áp dụng vào HĐMB.' :
+        'Các khoản phải thu đã gồm VAT 8,45% và phí bảo trì 2% theo dữ liệu mẫu.') + '</p></section>' +
+      '<section class="sec" aria-labelledby="payment-history-title"><h3 id="payment-history-title">Lịch sử ghi nhận thu</h3>' +
+      (receipts ? '<ul class="payment-history">' + receipts + '</ul>' : '<p class="payment-footnote">Chưa có khoản thu nào được ghi nhận.</p>') +
+      '</section></div>';
+  }
+
+  function openPaymentReceipt(u) {
+    const installments = schedule(u);
+    const next = installments.find((item) => item.remaining > 0);
+    if (!next) return;
+    const dialog = $("#payment-receipt");
+    $("#payment-receipt-form").reset();
+    dialog.dataset.uid = u.uid;
+    const amount = $("#receipt-amount");
+    const summary = report(u, installments);
+    amount.max = summary.total - summary.paid;
+    $("#receipt-date").value = dateISO(TODAY);
+    $("#receipt-date").max = dateISO(TODAY);
+    $("#receipt-context").textContent = "Khoản thu mẫu sẽ bù từ " + next.k.toLowerCase() + " còn thiếu " + fmt(next.remaining) + ".";
+    $("#receipt-error").textContent = "";
+    dialog.showModal();
+  }
+
+  function recordPaymentReceipt() {
+    const dialog = $("#payment-receipt");
+    const u = byUid(dialog.dataset.uid);
+    if (!dialog.open || !u) return;
+    const amount = $("#receipt-amount").valueAsNumber;
+    const date = $("#receipt-date").value;
+    const summary = report(u);
+    if (!Number.isSafeInteger(amount) || amount < 1 || amount > summary.total - summary.paid || !date || date > dateISO(TODAY)) {
+      $("#receipt-error").textContent = "Kiểm tra số tiền còn phải thu và ngày nhận trong kỳ dữ liệu mẫu.";
+      return;
+    }
+    const draft = contractDraft(u);
+    draft.receipts.push({
+      id: "PT-MẪU-" + pad2(draft.receipts.length + 1), amount, date,
+      method: $("#receipt-method").value, reference: $("#receipt-reference").value.trim()
+    });
+    if (saleDrafts.get(u.uid)?.signedDate && !persist(true)) {
+      draft.receipts.pop();
+      $("#receipt-error").textContent = "Chưa lưu được khoản thu. Tải lại nếu dữ liệu vừa đổi ở tab khác.";
+      return;
+    }
+    dialog.close();
+    renderContent();
+    toast("Đã ghi nhận khoản thu mô phỏng " + fmt(amount));
+  }
+
+  function openPaymentDocument(u, type) {
+    const dialog = $("#payment-preview");
     const sch = schedule(u);
-    const stTag = { paid: ["Đã thu", "t-sold"], due: ["Đến hạn", "t-tx"], wait: ["Chưa tới", "t-lock"] };
-    const rows = sch.map((r) => {
-      const t = stTag[r.st];
-      return (
-        '<tr><td><b style="font-weight:500">' + r.k + '</b> <span class="note mono">' + r.date + "</span></td>" +
-        "<td>" + r.w + "</td>" +
-        '<td class="num">' + fmt(r.amt) + "</td>" +
-        '<td><span class="tag ' + t[1] + '">' + t[0] + "</span></td></tr>"
-      );
+    const next = sch.find((item) => item.remaining > 0);
+    const reminder = type === "reminder";
+    if (reminder && !next) return;
+    const title = reminder ? "Thông báo thu tiền" : "Lịch thanh toán";
+    $("#payment-preview-title").textContent = title;
+    const details = kv("Căn hộ", esc(u.tower + " · " + u.code)) +
+      kv("Khách hàng", esc(u.buyer ? customerName(u.buyer) : "Chưa liên kết"));
+    $("#payment-preview-paper").innerHTML = '<p class="note">Meraki Land · Bản xem trước mô phỏng</p><h3>' + title + '</h3>' +
+      details + (reminder ? kv("Đợt", esc(next.k + " · " + next.w)) + kv("Hạn / điều kiện", esc(next.date)) +
+        kv("Số tiền còn phải thu", fmt(next.remaining)) : paymentTable(sch));
+    $("#payment-preview-result").textContent = "";
+    dialog.showModal();
+  }
+
+  const contractDrafts = new Map();
+  const contractStages = [
+    { id: "ky-quy", label: "Thỏa thuận ký quỹ" },
+    { id: "dat-coc", label: "Thỏa thuận đặt cọc" },
+    { id: "hdmb", label: "Hợp đồng mua bán" }
+  ];
+  const contractStatuses = ["Nháp", "Chờ duyệt", "Đã duyệt", "Đã ký", "Đang thực hiện", "Hoàn tất", "Thanh lý", "Hủy"];
+  const contractMethods = {
+    progress: { label: "Theo tiến độ", plans: ["progress", "milestones"] },
+    fast: { label: "Thanh toán nhanh", plans: ["fast"] },
+    loan: { label: "Vay ngân hàng", plans: ["loan"] }
+  };
+  const contractPlans = {
+    progress: "Tiến độ tiêu chuẩn · 6 đợt",
+    milestones: "Theo mốc xây dựng · 4 đợt",
+    fast: "Thanh toán nhanh · 3 đợt",
+    loan: "Vốn tự có và giải ngân · 4 đợt"
+  };
+
+  function contractDraft(u) {
+    if (!contractDrafts.has(u.uid)) {
+      const sold = u.status === "SOLD";
+      const sale = saleDrafts.get(u.uid);
+      const stage = sold ? "hdmb" : sale?.signedDate || reasonOf(u) === "DEPOSIT" ? "dat-coc" : "ky-quy";
+      const initialStatus = UNITS_INIT.find((record) => record.uid === u.uid)?.status;
+      const total = pricing(u).total;
+      const openingReceived = initialStatus === "SOLD" ? total : initialStatus === "IN_TRANSACTION"
+        ? SCHED.slice(0, 2).reduce((sum, step) => sum + Math.round(total * step.p), 0) : 0;
+      contractDrafts.set(u.uid, {
+        stage, source: sold ? "dat-coc" : sale?.signedDate ? "ky-quy" : "", status: sold ? "Đã ký" : "Nháp",
+        number: sold ? "HĐMB-" + u.tower + "-" + u.code : "",
+        signed: sold ? "2026-02-20" : "", effective: sold ? "2026-02-20" : "",
+        expiry: sold ? "2027-11-30" : "", method: "progress", plan: "progress",
+        templates: sale?.signedDate ? { "ky-quy": sale.template } : {}, generated: {},
+        openingReceived, receipts: []
+      });
+    }
+    return contractDrafts.get(u.uid);
+  }
+
+  function tracksPayments(u) {
+    if (u.status === "UNRELEASED") return false;
+    if (u.status === "SOLD" || contractDrafts.get(u.uid)?.appliedSchedule) return true;
+    return u.status === "IN_TRANSACTION" && !saleDrafts.get(u.uid)?.signedDate;
+  }
+
+  function paymentScheduleSteps(u, d) {
+    const signed = d.signed ? dateVN(d.signed) : "Theo ngày ký";
+    const progress = SCHED.map((step, i) => {
+      if (i === 4) return { ...step, date: u.handover };
+      if (i === 5 && dateISO(step.date) < dateISO(u.handover)) return { ...step, date: "Theo thông báo" };
+      return step;
+    });
+    const plans = {
+      progress,
+      milestones: [
+        { w: "Ký HĐMB", p: .20, date: signed },
+        { w: "Cất nóc", p: .35, date: "Theo tiến độ" },
+        { w: "Bàn giao nhà", p: .40, date: u.handover },
+        { w: "Nhận sổ hồng", p: .05, date: "Theo thông báo" }
+      ],
+      fast: [
+        { w: "Ký HĐMB", p: .30, date: signed },
+        { w: "Thanh toán trước hạn", p: .65, date: "Theo chính sách" },
+        { w: "Nhận sổ hồng", p: .05, date: "Theo thông báo" }
+      ],
+      loan: [
+        { w: "Vốn tự có khi ký HĐMB", p: .20, date: signed },
+        { w: "Ngân hàng giải ngân", p: .50, date: "Theo hồ sơ vay" },
+        { w: "Bàn giao nhà", p: .25, date: u.handover },
+        { w: "Nhận sổ hồng", p: .05, date: "Theo thông báo" }
+      ]
+    };
+    return plans[d.plan];
+  }
+
+  function contractSchedule(u, d) {
+    const total = d.appliedSchedule?.total ?? pricing(u).total;
+    const rows = schedule(u, d).map((step) =>
+      '<tr><th scope="row">' + step.k + '</th><td>' + esc(step.w) + '</td><td>' +
+      esc(step.date) + '</td><td class="num">' + (d.appliedSchedule ? esc(step.basis) : Math.round(step.p * 100) + '%') +
+      '</td><td class="num">' + fmt(step.amt) + '</td></tr>'
+    ).join("");
+    return '<table class="itable tall"><thead><tr><th scope="col">Đợt</th><th scope="col">Điều kiện</th>' +
+      '<th scope="col">Thời điểm</th><th scope="col" class="num">' + (d.appliedSchedule ? 'Căn cứ' : 'Tỷ lệ') + '</th><th scope="col" class="num">Số tiền</th></tr></thead>' +
+      '<tbody>' + rows + '</tbody><tfoot><tr><th scope="row" colspan="4">Tổng cộng</th>' +
+      '<td class="num">' + fmt(total) + '</td></tr></tfoot></table>';
+  }
+
+  function contractPlanOptions(d) {
+    return contractMethods[d.method].plans.map((id) =>
+      '<option value="' + id + '"' + (d.plan === id ? " selected" : "") + '>' + contractPlans[id] + '</option>'
+    ).join("");
+  }
+
+  function unitTab4(u, secondary = false) {
+    const d = contractDraft(u);
+    const sale = saleDrafts.get(u.uid);
+    const st = ST[u.status];
+    const activeStage = contractStages.findIndex((stage) => stage.id === d.stage);
+    const input = (key, label, type = "text") =>
+      '<div class="field"><label for="contract-' + key + '">' + label + '</label><input class="inp" id="contract-' + key +
+      '" type="' + type + '" data-contract-field="' + key + '" value="' + esc(d[key]) + '" /></div>';
+    const option = (value, label, selected) =>
+      '<option value="' + esc(value) + '"' + (selected ? " selected" : "") + '>' + esc(label) + '</option>';
+
+    const stageList = contractStages.map((stage, i) => {
+      const current = activeStage === i;
+      const reached = stage.id === d.source || (i < activeStage && d.source !== "ky-quy");
+      return '<li class="' + (current ? "current" : reached ? "complete" : "") + '"' +
+        (current ? ' aria-current="step"' : '') + '><span>' + (i + 1) + '</span><b>' + stage.label + '</b></li>';
     }).join("");
+    const needsSignature = u.status === "AVAILABLE" && !sale?.signedDate;
+    const nextSteps = needsSignature ? (secondary ? "" : '<button class="btn pri" data-act="open-sale">Tiếp tục lập hồ sơ bán căn</button>') :
+      (d.stage === "ky-quy" ? [["dat-coc", "Chuyển sang đặt cọc"], ["hdmb", "Chuyển sang HĐMB"]] :
+      d.stage === "dat-coc" ? [["hdmb", "Lập HĐMB nháp"]] : [])
+      .map(([id, label]) => '<button class="btn ' + (id === "hdmb" ? "pri" : "") +
+        '" data-act="contract-stage" data-stage="' + id + '">' + label + '</button>').join("");
+    const source = contractStages.find((stage) => stage.id === d.source);
+    const primaryDocs = DOCS.slice(0, 3).sort((a, b) => Number(b.id === d.stage) - Number(a.id === d.stage));
+    const docs = [...primaryDocs, ...DOCS.slice(3)].map((doc) =>
+      '<button class="tpl" data-act="contract-document" data-doc="' + doc.id + '"' +
+      (doc.id === d.stage ? ' aria-current="step"' : '') + '>' +
+      '<span class="tpl-ic"><svg class="ic sm"><use href="#i-file"/></svg></span>' +
+      '<span class="tpl-tx"><b>' + doc.t + '</b><span>' + doc.d + '</span></span>' +
+      (d.generated[doc.id] || (doc.id === "ky-quy" && saleDrafts.get(u.uid)?.generated)
+        ? '<span class="tag t-acc">Đã mô phỏng tạo</span>' : '') +
+      '<svg class="ic sm tpl-dl" aria-hidden="true"><use href="#i-chevron-right"/></svg></button>'
+    );
+
+    const quote = sale?.paymentPlan && sale.step >= 3 ?
+      seniqueQuote(seniquePaymentPlans[sale.paymentPlan], u, sale.discountsByPlan?.[sale.paymentPlan]) : null;
+    const checks = S.route.contractReview && d.stage === "dat-coc" && sale?.signedDate
+      ? crmAgent.call("review_deal", { uid: u.uid }).review.slice(0, 3) : [];
     return (
-      '<div class="sec"><div class="sec-h"><span>Lịch thanh toán · ' + u.code + '</span><span class="note">' + TODAY + "</span></div>" +
-      '<div class="kv"><span>Khách hàng</span><b>' + (u.buyer ? esc(u.buyer) : "—") + "</b></div>" +
-      '<div class="kv"><span>Loại căn · diện tích</span><b>' + u.type + " · " + u.area + " m²</b></div>" +
-      '<div class="kv"><span>Tổng giá trị</span><b>' + fmt(p.total) + "</b></div></div>" +
-      '<div class="sec"><div class="sec-h"><span>Tiến độ thanh toán</span>' +
-      '<button class="btn" data-act="toast" data-msg="Đã xuất lịch thanh toán PDF cho căn ' + u.code + '"><svg class="ic sm"><use href="#i-download"/></svg>Xuất PDF</button></div>' +
-      '<div class="mtable"><table class="itable tall"><thead><tr><th>Đợt</th><th>Điều kiện</th><th class="num">Số tiền</th><th>Trạng thái</th></tr></thead><tbody>' + rows + "</tbody></table></div>" +
-      '<div class="hr"></div><div class="kv"><span>Tổng cộng</span><b>' + fmt(p.total) + "</b></div>" +
-      '<div class="note" style="margin-top:6px">Đã bao gồm VAT 8,45% và phí bảo trì 2%. Số tiền theo tiến độ ghi trong HĐMB.</div></div>'
+      '<div class="contract-page">' +
+      '<div class="contract-heading"><h2>Hồ sơ hợp đồng</h2><span class="tag t-lock">Mô phỏng</span></div>' +
+      '<section class="sec contract-flow" aria-labelledby="contract-flow-title">' +
+      '<h3 id="contract-flow-title">Chuyển tiếp giao dịch</h3><ol class="contract-stages">' + stageList + '</ol>' +
+      '<div class="contract-flow-footer"><span class="note">' +
+      (sale?.signedDate ? 'Thỏa thuận ký quỹ đã ký ngày <b>' + esc(dateVN(sale.signedDate)) + '</b>' :
+        source ? 'Chuyển từ ' + source.label.toLowerCase() : 'Căn ' + u.tower + ' · ' + u.code) +
+      '</span><div class="contract-actions">' +
+      (d.stage === "dat-coc" && sale?.signedDate ? '<button type="button" class="btn" data-act="contract-review" aria-expanded="' +
+        Boolean(S.route.contractReview) + '" aria-controls="contract-review">Kiểm tra hồ sơ</button>' : '') +
+      nextSteps + '</div></div><div id="contract-review"' + (!checks.length ? ' hidden' : '') + '>' +
+      (checks.length ? '<ul class="contract-readiness">' + checks.map((check) =>
+        '<li><b>' + esc(check.agent) + '</b><span>' + esc(check.text) + '</span></li>'
+      ).join("") + '</ul>' : '') + '</div></section>' +
+      (quote ? '<div class="contract-quote-bridge"><div><b>Báo giá đã xác nhận trong luồng bán</b><p>' +
+        esc(seniquePaymentPlans[sale.paymentPlan].label) + ' · ' + fmt(quote.total) + '</p></div>' +
+        '<button class="btn" data-act="contract-open-quote">Đối chiếu lịch dự kiến</button></div>' : '') +
+      '<div class="contract-columns">' +
+      '<details class="sec contract-info"' + (d.stage === "hdmb" ? ' open' : '') +
+      '><summary><b>Thông tin HĐMB</b></summary>' +
+      '<div class="fgrid">' + input("number", "Số hợp đồng") +
+      '<div class="field"><label for="contract-status">Trạng thái HĐMB</label><select class="inp" id="contract-status" data-contract-field="status">' +
+      contractStatuses.map((status) => option(status, status, d.status === status)).join("") + '</select></div>' +
+      input("signed", "Ngày ký", "date") + input("effective", "Ngày hiệu lực", "date") + input("expiry", "Thời hạn đến", "date") +
+      '<div class="field"><label for="contract-method">Phương thức thanh toán (PTTT)</label>' +
+      '<select class="inp" id="contract-method" data-contract-field="method">' +
+      Object.entries(contractMethods).map(([key, method]) => option(key, method.label, d.method === key)).join("") + '</select></div>' +
+      '</div></details>' +
+      '<section class="sec contract-docs" aria-labelledby="contract-docs-title"><h3 id="contract-docs-title">Biểu mẫu đã cấu hình</h3>' +
+      '<div class="contract-primary-docs">' + docs.slice(0, 3).join("") + '</div>' +
+      '<details class="contract-extra-docs"><summary>Biểu mẫu khác</summary>' + docs.slice(3).join("") + '</details></section></div>' +
+      '<section class="sec" aria-labelledby="contract-schedule-title">' +
+      '<div class="contract-heading"><h3 id="contract-schedule-title">' +
+      (d.stage === "hdmb" ? 'Lịch thanh toán áp dụng' : 'Xem trước lịch HĐMB') + '</h3>' +
+      (d.appliedSchedule ? '<span class="tag t-av">' + esc(d.appliedSchedule.label) + '</span>' :
+        '<select class="inp contract-plan" id="contract-plan" aria-label="Lịch thanh toán áp dụng" data-contract-field="plan">' +
+        contractPlanOptions(d) + '</select>') + '</div>' +
+      (quote && d.stage === "hdmb" && d.status === "Nháp" && !d.appliedSchedule && !d.openingReceived && !d.receipts.length ?
+        '<button type="button" class="btn" data-act="contract-apply-quote">Áp dụng lịch từ báo giá</button>' : '') +
+      '<div class="mtable" id="contract-schedule">' + contractSchedule(u, d) + '</div></section>' +
+      '<section class="sec transaction ' + st.c + '" aria-labelledby="transaction-title">' +
+      '<h2 id="transaction-title">Trạng thái giao dịch căn hộ</h2>' +
+      '<div class="transaction-status"><span class="tag ' + st.t + '"><i class="status-dot" aria-hidden="true"></i>' + st.l + '</span>' +
+      '<span>Lý do: <b>' + esc(REASON_L[reasonOf(u)] || "—") + '</b></span></div>' +
+      stActs(u) + '</section>' +
+      '<details class="sec contract-extra"><summary>Chi phí và thanh lý</summary>' + contractCosts(u) + '</details></div>'
     );
   }
 
-  function unitTab4(u) {
+  function contractCosts(u) {
     const p = pricing(u);
-    const docs = DOCS.map((d) =>
-      '<button class="tpl" data-act="toast" data-msg="Đã tạo ' + d.t + ' cho căn ' + u.code + '">' +
-      '<span class="tpl-ic"><svg class="ic sm"><use href="#i-file"/></svg></span>' +
-      '<span class="tpl-tx"><b>' + d.t + "</b><span>" + d.d + "</span></span>" +
-      '<span class="tpl-dl iconbtn" title="Tải về"><svg class="ic sm"><use href="#i-download"/></svg></span></button>'
-    ).join("");
+    const paid = report(u).paid;
     return (
-      '<div class="sec"><div class="sec-h"><span>Văn bản bán hàng</span><span class="note">' + DOCS.length + " mẫu</span></div>" + docs + "</div>" +
       '<div class="sec"><div class="sec-h"><span>Lệ phí theo căn</span></div>' +
       '<div class="kv"><span>Lệ phí trước bạ 0,5%</span><b>' + fmt(p.total * 0.005) + "</b></div>" +
       '<div class="kv"><span>Phí công chứng 0,1%</span><b>' + fmt(p.total * 0.001) + "</b></div>" +
@@ -1904,10 +2900,162 @@ body.detail-mode #viewbar{display:none}
       field("Termination type", '<input class="inp" value="Forfeiture Refund" />', true) +
       field("Resell", '<select class="sel"><option>Yes — cho phép bán lại</option><option>No</option></select>', true) +
       "</div>" +
-      '<div class="hr"></div><div class="kv"><span>Đã thanh toán</span><b>' + fmt(report(u).paid) + "</b></div>" +
-      '<div class="kv"><span>Khấu trừ khi thanh lý (10%)</span><b>' + fmt(report(u).paid * 0.1) + "</b></div>" +
-      '<div class="kv total"><span>Số tiền hoàn lại</span><b>' + fmt(report(u).paid * 0.9) + "</b></div></div>"
+      '<div class="hr"></div><div class="kv"><span>Đã thanh toán</span><b>' + fmt(paid) + "</b></div>" +
+      '<div class="kv"><span>Khấu trừ khi thanh lý (10%)</span><b>' + fmt(paid * 0.1) + "</b></div>" +
+      '<div class="kv total"><span>Số tiền hoàn lại</span><b>' + fmt(paid * 0.9) + "</b></div></div>"
     );
+  }
+
+  function advanceContract(u, stage) {
+    const sale = saleDrafts.get(u.uid);
+    if (u.status === "AVAILABLE" && !sale?.signedDate) return;
+    const d = contractDraft(u);
+    const allowed = d.stage === "ky-quy" && stage === "dat-coc" || d.stage !== "hdmb" && stage === "hdmb";
+    if (!allowed) return;
+    d.source = d.stage;
+    d.stage = stage;
+    if (stage === "hdmb") {
+      d.number ||= "HĐMB-" + u.tower + "-" + u.code;
+      d.status = "Nháp";
+    }
+    if (sale?.signedDate) persist();
+    renderContent();
+    toast(stage === "hdmb" ? "Đã chuyển sang HĐMB nháp trong bản mô phỏng" : "Đã chuyển sang đặt cọc trong bản mô phỏng");
+  }
+
+  function applyContractQuote(u) {
+    const contract = contractDraft(u);
+    const sale = saleDrafts.get(u.uid);
+    if (!sale?.signedDate || !sale.paymentPlan || contract.stage !== "hdmb" || contract.status !== "Nháp" ||
+        contract.appliedSchedule || contract.openingReceived || contract.receipts.length) return;
+    const plan = seniquePaymentPlans[sale.paymentPlan];
+    const quote = seniqueQuote(plan, u, sale.discountsByPlan?.[sale.paymentPlan]);
+    contract.appliedSchedule = {
+      label: plan.label, total: quote.total,
+      steps: quote.rows.map(([name, date, basis, amount]) => ({ k: name, w: basis, date, basis, amt: amount }))
+    };
+    if (!persist(true)) {
+      delete contract.appliedSchedule;
+      toast("Chưa lưu được lịch áp dụng. Tải lại nếu dữ liệu vừa đổi ở tab khác.");
+      return;
+    }
+    renderContent();
+    toast("Đã áp dụng báo giá vào lịch thu của HĐMB nháp");
+  }
+
+  function renderContractDocument(u, doc) {
+    const d = contractDraft(u);
+    const sale = doc.id === "ky-quy" ? readyEscrowDraft(u) : null;
+    const template = d.templates[doc.id] || sale?.template;
+    const version = template === "standard" ? "Mẫu chuẩn 2026" : "Mẫu dự án · " + projOf(u).short;
+    const date = (value) => value ? dateVN(value) : "—";
+    let fields = kv("Dự án", esc(projOf(u).name)) +
+      kv("Căn hộ", esc(u.tower + " · " + u.code)) +
+      kv("Khách hàng", esc(customerName(u.buyer) || "Chưa liên kết"));
+    if (doc.id === "dat-coc") fields += kv("Giá trị đặt cọc", fmt(u.deposit));
+    if (doc.id === "ky-quy") fields = saleAgreementFields(u, sale);
+    if (doc.id === "hdmb") {
+      fields += kv("Số HĐMB", esc(d.number || "Chưa cấp số")) + kv("Trạng thái", esc(d.status)) +
+        kv("Ngày ký", date(d.signed)) + kv("Ngày hiệu lực", date(d.effective)) + kv("Thời hạn đến", date(d.expiry)) +
+        kv("Phương thức thanh toán", contractMethods[d.method].label) +
+        kv("Lịch áp dụng", esc(d.appliedSchedule?.label || contractPlans[d.plan])) +
+        kv("Tổng giá trị hợp đồng", fmt(d.appliedSchedule?.total ?? pricing(u).total));
+    }
+    $("#contract-preview-paper").innerHTML = '<span class="note">' + esc(version) + '</span><h3>' + esc(doc.t) + '</h3>' + fields;
+  }
+
+  function openContractDocument(u, doc) {
+    const dialog = $("#contract-preview");
+    const d = contractDraft(u);
+    dialog.dataset.doc = doc.id;
+    dialog.dataset.uid = u.uid;
+    $("#contract-template").innerHTML = '<option value="project">Mẫu dự án · ' + esc(projOf(u).short) +
+      '</option><option value="standard">Mẫu chuẩn 2026</option>';
+    $("#contract-template").value = d.templates[doc.id] || (doc.id === "ky-quy" ? readyEscrowDraft(u)?.template : "") || "project";
+    $("#contract-preview-result").textContent = "";
+    const escrow = doc.id === "ky-quy";
+    $$('[data-act="escrow-pdf-view"], [data-act="escrow-pdf-download"]', dialog).forEach((button) => { button.hidden = !escrow; });
+    $('[data-act="contract-generate"]', dialog).hidden = escrow;
+    renderContractDocument(u, doc);
+    dialog.showModal();
+  }
+
+  let escrowPdfUrl = "";
+  let escrowPdfRequest = 0;
+
+  function clearEscrowPdfView() {
+    $("#escrow-pdf-frame").removeAttribute("src");
+    $("#escrow-pdf-frame").hidden = true;
+    for (const id of ["#escrow-pdf-save", "#escrow-pdf-new-tab"]) {
+      const link = $(id);
+      link.removeAttribute("href");
+      link.hidden = true;
+    }
+    if (escrowPdfUrl) URL.revokeObjectURL(escrowPdfUrl);
+    escrowPdfUrl = "";
+  }
+
+  async function useEscrowPdf(button, preview) {
+    const parent = button.closest("#contract-preview");
+    const u = byUid(parent?.dataset.uid || S.route?.uid);
+    if (!u || (parent && parent.dataset.doc !== "ky-quy")) return;
+    const draft = readyEscrowDraft(u);
+    const template = parent ? $("#contract-template").value : draft?.template || "project";
+    const data = escrowDocumentData(u, draft, template);
+    const name = "thoa-thuan-ky-quy-" + u.tower + "-" + u.code + ".pdf";
+    const dialog = $("#escrow-pdf-dialog");
+    const status = $("#escrow-pdf-status");
+    const request = preview ? ++escrowPdfRequest : 0;
+    if (preview) {
+      clearEscrowPdfView();
+      status.textContent = "Đang tạo bản PDF…";
+      dialog.showModal();
+    }
+    button.disabled = true;
+    try {
+      const blob = await EscrowPDF.create(data);
+      if (draft) {
+        draft.generated = true;
+        contractDraft(u).templates["ky-quy"] = template;
+      }
+      if (parent) {
+        parent.dataset.refresh = "true";
+        $("#contract-preview-result").textContent = "Đã tạo PDF bản mẫu.";
+      } else if (S.route?.sale && S.route.uid === u.uid && draft?.step === 3) {
+        renderContent();
+        if (!preview) $('[data-act="escrow-pdf-download"]', $(".sale-actions"))?.focus({ preventScroll: true });
+      }
+      if (preview) {
+        if (!dialog.open || request !== escrowPdfRequest) return;
+        escrowPdfUrl = URL.createObjectURL(blob);
+        const frame = $("#escrow-pdf-frame");
+        const save = $("#escrow-pdf-save");
+        const open = $("#escrow-pdf-new-tab");
+        frame.src = escrowPdfUrl;
+        save.href = open.href = escrowPdfUrl;
+        save.download = name;
+        frame.hidden = save.hidden = open.hidden = false;
+        status.textContent = "";
+      } else {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = name;
+        document.body.append(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 30000);
+        toast("Đã tạo PDF " + data.number);
+      }
+    } catch (error) {
+      if (preview && dialog.open && request === escrowPdfRequest) {
+        status.textContent = "Không mở được PDF. Hãy đóng cửa sổ và thử lại.";
+      } else if (!preview) {
+        toast("Không tải được PDF ký quỹ. Hãy thử lại.");
+      }
+    } finally {
+      button.disabled = false;
+    }
   }
 
   function unitTabHandover(u) {
@@ -1994,139 +3142,132 @@ body.detail-mode #viewbar{display:none}
   }
 
   function unitTab6(u) {
-    const r = report(u);
-    const sch = schedule(u);
+    const contract = contractDraft(u);
+    const sale = saleDrafts.get(u.uid);
+    const tracking = tracksPayments(u);
+    const sch = tracking ? schedule(u, contract) : [];
+    const r = report(u, sch);
     const events = [
-      { k: "Tạo hồ sơ căn", d: "15/01/2026 · Alex Dương", ok: true },
-      { k: "Ký TTĐC", d: "15/01/2026 · " + (u.buyer ? u.buyer : "—"), ok: r.nPaid >= 1 },
-      { k: "Thu đợt 1", d: "28/01/2026 · Kế toán xác nhận", ok: r.nPaid >= 1 },
-      { k: "Thu đợt 2", d: sch[1].date + " · đáo hạn", ok: r.nPaid >= 2 },
-      { k: "Ký HĐMB", d: u.status === "SOLD" ? "20/02/2026 · hoàn tất" : "chưa thực hiện", ok: u.status === "SOLD" }
-    ];
-    const tl = events.map((e) =>
-      '<div class="tl-row"><span class="tl-dot"' + (e.ok ? ' style="background:#E6F6EB;color:#00824D"' : "") + ">" + (e.ok ? '<svg class="ic"><use href="#i-check"/></svg>' : "") + "</span>" +
-      '<div class="tl-tx"><b' + (e.ok ? "" : ' style="color:var(--fg2);font-weight:400"') + ">" + e.k + "</b><span>" + e.d + "</span></div></div>"
+      ...(sale?.signedDate ? [{ label: "Xác nhận ký quỹ", date: sale.signedDate, detail: dateVN(sale.signedDate) }] : []),
+      ...(contract.signed ? [{ label: "Ký HĐMB", date: contract.signed, detail: dateVN(contract.signed) }] : []),
+      ...(tracking ? contract.receipts.map((receipt) => ({ label: "Ghi nhận thu " + fmt(receipt.amount), date: receipt.date,
+        detail: dateVN(receipt.date) + " · " + receipt.method })) : [])
+    ].sort((a, b) => b.date.localeCompare(a.date));
+    const tl = events.map((event) =>
+      '<div class="tl-row"><span class="tl-dot"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></span>' +
+      '<div class="tl-tx"><b>' + esc(event.label) + '</b><span>' + esc(event.detail) + '</span></div></div>'
     ).join("");
     return (
-      '<div class="sec"><div class="stat2">' +
+      (tracking ? '<div class="sec"><div class="stat2">' +
       '<div class="stat"><span>Đã thu</span><b class="g">' + fmt(r.paid) + "</b></div>" +
       '<div class="stat"><span>Còn lại</span><b>' + fmt(r.total - r.paid) + "</b></div>" +
-      '<div class="stat"><span>Đợt đã thu</span><b>' + r.nPaid + " / " + SCHED.length + "</b></div>" +
-      '<div class="stat"><span>Giá trị căn</span><b>' + fmt(r.total) + "</b></div>" +
+      '<div class="stat"><span>Đợt đã thu</span><b>' + r.nPaid + " / " + sch.filter((item) => item.amt > 0).length + "</b></div>" +
+      '<div class="stat"><span>Tổng phải thu</span><b>' + fmt(r.total) + "</b></div>" +
       "</div></div>" +
       '<div class="sec"><div class="sec-h"><span>Tiến độ thanh toán</span><span class="note mono">' + r.pct + "%</span></div>" +
       '<div class="bar"><i style="width:' + r.pct + '%"></i></div>' +
-      '<div class="barline"><span>' + fmt(r.paid) + "</span><b>" + r.pct + "% / 100%</b></div></div>" +
+      '<div class="barline"><span>' + fmt(r.paid) + "</span><b>" + r.pct + "% / 100%</b></div></div>" :
+      '<div class="sec"><p class="note">Chưa có lịch đang theo dõi thu cho căn này.</p></div>') +
       '<div class="sec"><div class="sec-h"><span>Dòng thời gian</span>' +
       '<button class="btn" data-act="toast" data-msg="Đã xuất báo cáo căn ' + u.code + '"><svg class="ic sm"><use href="#i-download"/></svg>Xuất</button></div>' +
-      '<div class="tl">' + tl + "</div></div>"
+      (tl ? '<div class="tl">' + tl + '</div>' : '<p class="note">Chưa ghi nhận sự kiện giao dịch.</p>') + '</div>'
     );
   }
 
   function unitTab(u, n) {
     if (n === 2) return unitTab2(u);
     if (n === 3) return unitTab3(u);
-    if (n === 4) return unitTab4(u);
+    if (n === 4) {
+      if (u.status === "AVAILABLE" && !saleDrafts.get(u.uid)?.signedDate) {
+        return unitDealAction(u, true) + '<details class="unit-contract-options"><summary>Biểu mẫu và cấu hình hợp đồng</summary>' +
+          unitTab4(u, true) + '</details>';
+      }
+      return unitTab4(u);
+    }
     if (n === 5) return unitTabHandover(u);
     if (n === 6) return unitTabTransfer(u);
-    if (n === 7) return unitTab6(u);
-    return unitTab1(u);
+    return unitTab6(u);
   }
 
   /* ================= detail: helper ================= */
-  function kpi(l, v, cls) {
-    return '<div class="kpi"><span>' + l + "</span><b" + (cls ? ' class="' + cls + '"' : "") + ">" + v + "</b></div>";
-  }
   function kv(l, v, cls) {
     return '<div class="kv"><span>' + l + '</span><b' + (cls ? ' class="' + cls + '"' : "") + ">" + v + "</b></div>";
   }
 
-  function custRows(cu) {
-    const rec = cu.rec || custOf(cu.name, cu);
-    const flds = rec.type === "org" ? F_ORG : F_IND;
-    let html = flds.map((f) => {
-      const v = String(rec[f.k] || "").trim();
-      if (!v) return "";
-      return '<div class="kv w"><span>' + f.l + "</span><b" + (f.mono ? ' class="mono"' : "") + ">" + esc(v) + "</b></div>";
-    }).join("");
-    if (String(rec.note || "").trim()) html += '<div class="kv w"><span>Ghi chú nội bộ</span><b>' + esc(rec.note) + "</b></div>";
-    return html;
-  }
-
   /* ================= detail: unit ================= */
   function detailUnit(u) {
-    const p = pricing(u), r = report(u), c = commission(u), st = ST[u.status];
+    if (S.route.sale) return saleWizard(u);
     const proj = projOf(u), tw = towerOf(u);
-    const cu = u.buyer ? customers().find((x) => x.name === u.buyer) : null;
     const tabN = S.tab === 6 && u.status !== "SOLD" ? 1 : S.tab;
-    const tabs = TABS.filter((t) => t.n !== 6 || u.status === "SOLD").map((t) =>
-      '<button class="tab ' + (tabN === t.n ? "on" : "") + '" data-act="tab" data-tab="' + t.n + '">' + t.l + (t.req ? '<span class="req">*</span>' : "") + "</button>"
-    ).join("");
-
-    const cust = cu
-      ? '<div class="cust2"><span class="ava lg">' + initials(cu.name) + '</span><div class="nm"><b>' + esc(cu.name) + "</b><span>" + (cu.rec && cu.rec.type === "org" ? "Doanh nghiệp" : "Cá nhân") + "</span></div></div>" +
-        custRows(cu)
-      : '<div class="warn">Căn chưa gắn khách hàng. Chuyển sang bước “Khách hàng” để nhập thông tin người mua.</div>' +
-        '<button class="btn wide" style="margin-top:8px" data-act="tab" data-tab="2">Nhập thông tin khách hàng</button>';
+    const status = ST[u.status];
+    const tabButton = (t) => '<button type="button" class="tab ' + (tabN === t.n ? "on" : "") + '" data-act="tab" data-tab="' + t.n +
+      '"' + (tabN === t.n ? ' aria-current="page"' : '') + '>' + t.l + "</button>";
+    const primaryTabs = TABS.slice(0, 3);
+    const secondaryTabs = TABS.slice(3).filter((t) => t.n !== 6 || u.status === "SOLD");
+    const currentSecondary = secondaryTabs.find((t) => t.n === tabN);
 
     return (
       '<div class="detail">' +
       '<div class="d-head">' +
       '<div class="d-top">' +
-      '<button class="iconbtn" data-act="back" title="Quay lại (Esc)"><svg class="ic"><use href="#i-arrow-left"/></svg></button>' +
-      "<span>Dự án</span><svg class=\"ic sep\"><use href=\"#i-chevron-right\"/></svg>" +
-      "<span>" + esc(proj.short) + '</span><svg class="ic sep"><use href="#i-chevron-right"/></svg>' +
-      "<span>" + esc(tw.name) + '</span><svg class="ic sep"><use href="#i-chevron-right"/></svg>' +
-      "<b>Căn " + u.code + "</b>" +
+      '<button type="button" class="customer-back" data-act="back"><svg class="ic sm"><use href="#i-arrow-left"/></svg>' +
+      (S.view === "project" ? "Về sơ đồ căn" : "Quay lại") + '</button>' +
       '<span class="flex1"></span>' +
+      '<button class="btn ghost icon" data-act="agent-for-unit" aria-label="Hỏi trợ lý về căn này" title="Hỏi trợ lý về căn này"><svg class="ic"><use href="#i-agent"/></svg></button>' +
       '<button class="btn ghost icon" data-act="toast" data-msg="Đã sao chép liên kết hồ sơ căn ' + u.code + '" title="Chia sẻ hồ sơ"><svg class="ic sm"><use href="#i-external"/></svg></button>' +
       "</div>" +
       '<div class="d-title">' +
       '<h1 class="mono">Căn ' + u.code + '</h1>' +
+      '<span class="tag ' + status.t + '">' + (u.status === "AVAILABLE" ? "Còn bán" : esc(status.l)) + '</span>' +
       (hasTransfer(u) ? '<span class="tag star-tag" title="Căn đã qua chuyển nhượng"><svg class="ic star"><use href="#i-star"/></svg>Đã chuyển nhượng</span>' : "") +
       "</div>" +
-      '<div class="d-tabs">' + tabs + "</div>" +
+      '<p class="note unit-location">' + esc(proj.short + " · " + tw.name) + '</p>' +
+      '<nav class="unit-tabs" aria-label="Nội dung hồ sơ căn"><div class="d-tabs">' + primaryTabs.map(tabButton).join("") + '</div>' +
+      '<details class="unit-extra-tabs"' + (currentSecondary ? ' open' : '') + '><summary>Thông tin khác' +
+      (currentSecondary ? ' · ' + esc(currentSecondary.l) : '') + '</summary><div class="unit-extra-links">' +
+      secondaryTabs.map(tabButton).join("") + '</div></details></nav>' +
       "</div>" +
-      '<div class="d-body' + (tabN === 1 ? "" : " one") + '">' +
-      '<div class="d-main">' + unitTab(u, tabN) + "</div>" +
-      (tabN === 1 ? '<div class="d-side">' +
-      '<div class="sec"><div class="sec-h"><span>Thông tin căn hộ</span></div>' +
-      kv("Dự án", esc(proj.short)) +
-      kv("Toà", esc(tw.name)) +
-      kv("Tầng", "Tầng " + u.floor) +
-      kv("Loại căn", u.type) +
-      kv("DT thông thuỷ", fmtA(u.area) + " m²") +
-      kv("DT xây dựng", fmtA(builtArea(u)) + " m²") +
-      kv("Hướng", u.dir) +
-      kv("View", u.view) +
-      kv("Đơn giá", fmt(u.ppm) + "/m²", "mono") +
-      kv("Bàn giao", u.handover) +
-      "</div>" +
-      '<div class="sec"><div class="sec-h"><span>Khách hàng</span></div>' + cust + "</div>" +
-      '<div class="sec"><div class="sec-h"><span>Thanh toán</span><span class="note mono">' + r.nPaid + " / " + SCHED.length + "</span></div>" +
-      '<div class="bar"><i style="width:' + r.pct + '%"></i></div>' +
-      '<div class="barline"><span>' + fmt(r.paid) + "</span><b>" + r.pct + "%</b></div></div>" +
-      "</div>" + "" : "") + "</div></div>"
+      (tabN === 1 ? unitOverview(u) :
+        '<div class="d-body one"><div class="d-main">' + unitTab(u, tabN) + '</div></div>') +
+      '</div>'
     );
   }
 
   /* ================= detail: customer ================= */
+  function customerHistory(c) {
+    const history = Array.isArray(c.rec.history) ? c.rec.history : [];
+    const example = !history.length && UNITS_INIT.some((u) => u.buyer === c.name);
+    const displayHistory = example ? [{
+      at: new Date(2026, 10, 19, 9, 15).getTime(),
+      actor: CUSTOMER_ACTOR,
+      action: "Cập nhật thông tin liên hệ",
+      changes: [{ field: "Email", before: "—", after: "khach-hang@example.com" }]
+    }] : history;
+    const rows = displayHistory.slice().reverse().map((entry) =>
+      '<details class="customer-history-entry"><summary><b>' + esc(entry.action) + '</b><span>' +
+      esc(new Date(entry.at).toLocaleString("vi-VN")) + ' · ' + esc(entry.actor) + '</span></summary>' +
+      '<dl>' + (entry.changes || []).map((change) =>
+        '<div><dt>' + esc(change.field) + '</dt><dd>' + esc(change.before || "—") +
+        ' <span aria-label="đổi thành">→</span> ' + esc(change.after || "—") + '</dd></div>'
+      ).join("") + '</dl></details>'
+    ).join("");
+    return '<section class="sec" aria-labelledby="customer-history-title">' +
+      '<header class="customer-section-heading"><h2 id="customer-history-title">Lịch sử thay đổi hồ sơ</h2>' +
+      (example ? '<span class="note">Minh họa</span>' : '') + '</header>' +
+      (rows || '<p class="note">Chưa có thay đổi được ghi nhận.</p>') + '</section>';
+  }
+
   function detailCust(c) {
     const rec = c.rec || custOf(c.name, c);
     const org = rec.type === "org";
-    const tg = TAG[c.tag];
     const trs = [];
     Object.keys(TRANSFER).forEach((uid) => TRANSFER[uid].forEach((r) => {
       if (r.from === c.name || r.to === c.name) trs.push({ uid, r });
     }));
     const held = c.units;
-    const total = held.reduce((a, u) => a + pricing(u).total, 0);
-    const paid = held.reduce((a, u) => a + report(u).paid, 0);
     const sc = countByStatus(held);
     const flds = org ? F_ORG : F_IND;
     const groups = org ? G_ORG : G_IND;
-    const reqN = flds.filter((f) => f.req).length;
-    const doneN = flds.filter((f) => f.req && String(rec[f.k] || "").trim()).length;
 
     const heldCards = held.length
       ? '<div class="cunits">' + held.map((u) =>
@@ -2135,7 +3276,7 @@ body.detail-mode #viewbar{display:none}
           '<span class="tag ' + ST[u.status].t + '">' + ST[u.status].l + "</span>" +
           '<svg class="ic sm"><use href="#i-chevron-right"/></svg></button>'
         ).join("") + "</div>"
-      : '<div class="warn">Khách hàng tiềm năng — chưa sở hữu căn nào.</div>';
+      : '<p class="note">Khách hàng chưa sở hữu căn hộ.</p>';
 
     const trCards = trs.length
       ? '<div class="trs">' + trs.map((x) => {
@@ -2150,66 +3291,49 @@ body.detail-mode #viewbar{display:none}
             '<div class="kv w"><span>Số công chứng</span><b>' + r.notary + "</b></div></div>"
           );
         }).join("") + "</div>"
-      : '<div class="warn">Chưa có giao dịch chuyển nhượng nào liên quan khách hàng này.</div>';
+      : '<p class="note">Chưa có giao dịch chuyển nhượng.</p>';
 
     const dist = ST_KEYS.filter((k) => sc[k]).map((k) => kv(ST[k].l, sc[k] + " căn")).join("");
 
+    const profileGroups = groups.map((group) => {
+      const rows = flds.slice(group.a, group.b).map((field) => {
+        const value = String(rec[field.k] || (field.k === (org ? "taxno" : "idno") ? c.legal : "") || "").trim();
+        if (!value) return "";
+        return '<div' + (field.full ? ' class="full"' : '') + '><dt>' + esc(field.l) + '</dt><dd' +
+          (field.mono ? ' class="mono"' : '') + '>' + esc(value) + '</dd></div>';
+      }).join("");
+      return rows ? '<section class="customer-read-group"><h3>' + esc(group.t) + '</h3><dl>' + rows + '</dl></section>' : "";
+    }).join("");
+    const note = String(rec.note || "").trim();
     const profile =
-      '<div class="sec"><div class="sec-h"><span>' + (org ? "Hồ sơ doanh nghiệp · 17 trường" : "Hồ sơ cá nhân · 15 trường") + "</span>" +
-      '<span class="note mono">' + doneN + "/" + reqN + " bắt buộc</span></div>" +
-      '<form id="cust-form" data-key="' + esc(c.name) + '" data-type="' + rec.type + '" autocomplete="off" style="margin-top:4px">' +
-      groups.map((g) => '<div class="sub-h">' + g.t + "</div>" +
-        '<div class="fgrid">' + flds.slice(g.a, g.b).map((f) => cfField(f, rec[f.k])).join("") + "</div>").join("") +
-      '<div class="sub-h">Ghi chú nội bộ</div>' +
-      '<div class="fgrid"><div class="field full"><label>Nhu cầu, ngân sách, tiến độ liên hệ</label>' +
-      '<textarea class="ta" data-f="note" rows="2" style="width:100%">' + esc(rec.note || "") + "</textarea></div></div>" +
-      "</form>" +
-      '<div class="fhint">Trường có <span class="req">*</span> là bắt buộc để lập báo giá, xuất HĐMB và xác nhận công nợ.</div></div>';
+      '<section class="sec customer-profile" aria-labelledby="customer-profile-title">' +
+      '<h2 id="customer-profile-title">Thông tin hồ sơ</h2>' +
+      profileGroups +
+      (note ? '<section class="customer-read-group"><h3>Ghi chú nội bộ</h3><p>' + esc(note) + '</p></section>' : '') +
+      '</section>';
 
     return (
-      '<div class="detail">' +
-      '<div class="d-head">' +
-      '<div class="d-top">' +
-      '<button class="iconbtn" data-act="back" title="Quay lại (Esc)"><svg class="ic"><use href="#i-arrow-left"/></svg></button>' +
-      '<span>Khách hàng</span><svg class="ic sep"><use href="#i-chevron-right"/></svg>' +
-      "<b>" + esc(c.disp) + "</b>" +
-      '<span class="flex1"></span>' +
-      '<span class="note mono">' + c.id + "</span>" +
-      "</div>" +
-      '<div class="d-title">' +
-      '<span class="ava lg">' + initials(c.disp) + "</span>" +
-      "<h1>" + esc(c.disp) + "</h1>" +
-      "</div>" +
-      '<div class="kpis">' +
-      kpi("Căn hộ sở hữu", held.length + " căn") +
-      kpi("Tổng giá trị HĐ", fmt(total)) +
-      kpi("Đã thanh toán", fmt(paid), "g") +
-      kpi("Còn phải thu", fmt(total - paid)) +
-      "</div>" +
-      "</div>" +
+      '<div class="detail customer-detail">' +
+      '<header class="d-head">' +
+      '<button class="customer-back" data-act="back" title="Quay lại (Esc)"><svg class="ic sm"><use href="#i-arrow-left"/></svg>Tất cả khách hàng</button>' +
+      '<div class="customer-detail-heading">' +
+      '<div class="d-title"><span class="ava lg" aria-hidden="true">' + esc(initials(c.disp)) + '</span>' +
+      '<div><h1>' + esc(c.disp) + '</h1><p class="note">' + esc(c.typeL) + '</p></div></div>' +
+      '<div class="customer-detail-actions">' +
+      '<button class="btn" data-act="customer-message" data-channel="email"><svg class="ic sm"><use href="#i-mail"/></svg>Gửi email</button>' +
+      '<button class="btn" data-act="customer-message" data-channel="sms">Gửi SMS</button>' +
+      '<button class="btn" data-act="toast" data-msg="Đã xuất hồ sơ khách hàng ' + c.id + '"><svg class="ic sm"><use href="#i-download"/></svg>Xuất hồ sơ (PDF)</button>' +
+      '</div></div></header>' +
       '<div class="d-body">' +
       '<div class="d-main">' +
       profile +
-      '<div class="sec"><div class="sec-h"><span>Căn hộ đang sở hữu</span><span class="note mono">' + held.length + " căn</span></div>" + heldCards + "</div>" +
-      '<div class="sec"><div class="sec-h"><span>Lịch sử chuyển nhượng</span><span class="note mono">' + trs.length + " giao dịch</span></div>" + trCards + "</div>" +
-      "</div>" +
-      '<div class="d-side">' +
-      '<div class="sec"><div class="sec-h"><span>Định danh & thanh toán</span></div>' +
-      kv("Loại khách hàng", c.typeL) +
-      kv(org ? "Mã số thuế" : "CCCD / Passport", esc(c.legal || "—"), "mono") +
-      kv("Ngân hàng", esc(rec.bank || "—")) +
-      kv("Số tài khoản", esc(rec.ben_acc || "—"), "mono") +
-      kv("Thụ hưởng", esc(rec.ben_name || "—")) +
-      "</div>" +
-      '<div class="sec"><div class="sec-h"><span>Phân bố căn hộ</span></div>' + (dist || '<div class="warn">Chưa có căn nào.</div>') + "</div>" +
-      '<div class="sec"><div class="sec-h"><span>Nguồn & phụ trách</span></div>' +
-      kv("Mã khách hàng", c.id, "mono") + kv("Nguồn", esc(c.src)) + kv("Phụ trách", esc(c.sale)) + kv("Ngày tạo", esc(c.created), "mono") +
-      "</div>" +
-      '<div class="sec"><div class="sec-h"><span>Hành động</span></div>' +
-      '<button class="btn wide" style="margin-top:6px" data-act="toast" data-msg="Đã xuất hồ sơ khách hàng ' + c.id + '"><svg class="ic sm"><use href="#i-download"/></svg>Xuất hồ sơ (PDF)</button>' +
-      '<button class="btn pri wide" style="margin-top:6px" data-act="save-cust"><svg class="ic sm"><use href="#i-check"/></svg>Lưu hồ sơ</button>' +
-      "</div>" +
-      "</div></div></div>"
+      '<section class="sec" aria-labelledby="customer-transfers-title"><header class="customer-section-heading"><h2 id="customer-transfers-title">Lịch sử chuyển nhượng</h2><span class="note">' + trs.length + ' giao dịch</span></header>' + trCards + '</section>' +
+      '</div>' +
+      '<aside class="d-side" aria-label="Thông tin bổ sung">' +
+      '<section class="sec" aria-labelledby="customer-owned-title"><header class="customer-section-heading"><h2 id="customer-owned-title">Căn hộ đang sở hữu</h2><span class="note">' + held.length + ' căn</span></header>' + heldCards + '</section>' +
+      '<section class="sec"><h2>Phân bố căn hộ</h2>' + (dist || '<p class="note">Chưa có căn hộ.</p>') + '</section>' +
+      customerHistory(c) +
+      '</aside></div></div>'
     );
   }
 
@@ -2222,9 +3346,11 @@ body.detail-mode #viewbar{display:none}
     if (c) c.scrollTop = 0;
   }
   function openUnit(uid, tab) {
-    if (!byUid(uid)) return;
-    S.route = { kind: "unit", uid };
-    S.tab = tab || 1;
+    const unit = byUid(uid);
+    if (!unit) return;
+    const signed = saleDrafts.get(uid)?.signedDate;
+    S.route = { kind: "unit", uid, sale: tab === 0 && unit.status === "AVAILABLE" && !signed };
+    S.tab = tab || (signed ? 4 : 1);
     S.ut = "ind";
     render();
     const c = $("#content");
@@ -2263,12 +3389,216 @@ body.detail-mode #viewbar{display:none}
     if (q) { q.focus(); q.select(); }
   }
 
+  function customerExportRows() {
+    return [["Mã KH", "Tên trên hồ sơ", "Loại", "SĐT", "CCCD / MST", "Email", "Căn hộ", "Trạng thái", "Phụ trách"]].concat(
+      filteredCustomers().map((c) => [c.id, c.disp, c.typeL, c.phone, c.legal, c.email,
+        c.units.map((u) => u.tower + "·" + u.code).join(" "), TAG[c.tag].l, c.sale])
+    );
+  }
+
+  async function exportCustomerWorkbook(template) {
+    const rows = template ? [CustomerData.workbookHeaders] : customerExportRows();
+    const name = template ? "mau-nhap-khach-hang.xlsx" : "danh-sach-khach-hang.xlsx";
+    try {
+      await CustomerData.downloadWorkbook(rows, name);
+      toast("Đã xuất " + name);
+    } catch (error) {
+      toast("Không xuất được tệp Excel. Hãy thử lại.");
+    }
+  }
+
+  function demoCustomerPhone() {
+    const sample = customers().find((c) => c.phone && UNITS_INIT.some((u) => u.buyer === c.name));
+    return sample?.phone || "";
+  }
+
+  function openCustomerMessage(channel) {
+    const c = customers().find((customer) => customer.id === S.route?.id);
+    if (!c) return;
+    const dialog = $("#customer-message");
+    const email = channel === "email";
+    const form = $("#customer-message-form");
+    const recipient = $("#message-recipient");
+    form.reset();
+    form.dataset.channel = email ? "email" : "SMS";
+    $("#customer-message-title").textContent = email ? "Gửi email" : "Gửi SMS";
+    recipient.type = email ? "email" : "tel";
+    recipient.value = email ? c.rec.email || "" : c.phone || "";
+    recipient.placeholder = email ? "Nhập email" : "Nhập số điện thoại";
+    $("#message-subject-field").hidden = !email;
+    $("#message-subject").required = email;
+    $("#message-subject").value = email ? "Cập nhật từ Meraki Land" : "";
+    $("#message-body").value = email
+      ? "Xin chào " + c.disp + ",\n\nMeraki Land xin gửi bạn thông tin cập nhật về căn hộ đã quan tâm."
+      : "Meraki Land xin chào! Chúng tôi sẽ liên hệ để cập nhật thông tin căn hộ bạn quan tâm.";
+    $("#customer-message-result").textContent = "";
+    $("#customer-message-submit").disabled = false;
+    dialog.showModal();
+  }
+
+  let stagedCustomerImport = null;
+  let customerImportRequest = 0;
+
+  function openCustomerImport() {
+    stagedCustomerImport = null;
+    $("#customer-import-file").value = "";
+    $("#customer-import-status").textContent = "";
+    $("#customer-import-preview").innerHTML = "";
+    $("#customer-import-submit").disabled = true;
+    $("#customer-import-submit").textContent = "Nhập khách hàng";
+    $("#customer-import").showModal();
+  }
+
+  function prepareCustomerImport(workbook) {
+    const normalize = CustomerData.normalize;
+    const [header, ...rows] = workbook.rows;
+    const headings = header.map(normalize);
+    const named = ["ten tren ho so", "ten khach hang", "ten", "ho va ten", "ten cong ty", "fullname", "coname"];
+    if (!named.some((label) => headings.includes(label))) {
+      throw new Error("Thiếu cột tên khách hàng. Hãy dùng tệp mẫu hoặc thêm cột Tên trên hồ sơ.");
+    }
+
+    const index = CustomerData.duplicateIndex(customers());
+    const valid = [];
+    const issues = [];
+    rows.forEach((row, i) => {
+      const number = workbook.firstRow + i + 1;
+      const valueFor = (...labels) => {
+        for (const label of labels) {
+          const value = String(row[headings.indexOf(normalize(label))] ?? "").trim();
+          if (value) return value;
+        }
+        return "";
+      };
+      if (!row.some((value) => String(value ?? "").trim())) return;
+      const type = normalize(valueFor("Loại", "Loại khách hàng", "type"));
+      const company = valueFor("Tên công ty", "coname");
+      const tax = valueFor("Giấy ĐKKD số (MST)", "Mã số thuế", "MST", "taxno");
+      const isOrg = type === "org" || type === "doanh nghiep" || (!type && Boolean(company || tax));
+      if (type && !["ind", "ca nhan", "org", "doanh nghiep"].includes(type)) {
+        issues.push({ number, message: "Loại hồ sơ phải là Cá nhân hoặc Doanh nghiệp." });
+        return;
+      }
+      const fields = isOrg ? F_ORG : F_IND;
+      const record = blankCust(isOrg ? "org" : "ind");
+      for (const field of fields) {
+        const value = valueFor(field.k, field.l);
+        if (value) record[field.k] = value;
+      }
+      const nameField = isOrg ? "coname" : "fullname";
+      const name = record[nameField] || valueFor("Tên trên hồ sơ", "Tên khách hàng", "Tên");
+      if (!name) {
+        issues.push({ number, message: "Thiếu tên khách hàng." });
+        return;
+      }
+      record[nameField] = name.toUpperCase();
+      record.phone ||= valueFor("Số điện thoại", "SĐT", "Điện thoại");
+      record.email ||= valueFor("Email", "Email công ty");
+      record.note = valueFor("Ghi chú nội bộ", "Ghi chú", "note");
+      if (isOrg) record.taxno ||= tax || valueFor("CCCD / MST");
+      else record.idno ||= valueFor("CCCD", "Passport", "CCCD / MST");
+      if (record.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(record.email)) {
+        issues.push({ number, message: "Email không hợp lệ." });
+        return;
+      }
+      const duplicates = index.find(record);
+      if (duplicates.length) {
+        issues.push({ number, message: "Trùng " + CustomerData.describeDuplicates(duplicates) + "." });
+        return;
+      }
+      valid.push({ name, record });
+      index.add({ name: "dòng-" + number, disp: name + " (dòng " + number + ")", rec: record });
+    });
+    return { valid, issues };
+  }
+
+  async function previewCustomerImport(file) {
+    const request = ++customerImportRequest;
+    stagedCustomerImport = null;
+    const status = $("#customer-import-status");
+    const preview = $("#customer-import-preview");
+    const button = $("#customer-import-submit");
+    status.textContent = file ? "Đang đọc tệp Excel…" : "";
+    preview.innerHTML = "";
+    button.disabled = true;
+    button.textContent = "Nhập khách hàng";
+    if (!file) return;
+    try {
+      const workbook = await CustomerData.readWorkbook(file);
+      if (request !== customerImportRequest || !$("#customer-import").open) return;
+      stagedCustomerImport = prepareCustomerImport(workbook);
+      showCustomerImportPreview();
+    } catch (error) {
+      if (request === customerImportRequest && $("#customer-import").open) {
+        status.textContent = "Không đọc được tệp. " + (error.message || "Hãy thử lại với tệp mẫu.");
+      }
+    }
+  }
+
+  function showCustomerImportPreview() {
+    const preview = $("#customer-import-preview");
+    const status = $("#customer-import-status");
+    const button = $("#customer-import-submit");
+    const { valid, issues, demo } = stagedCustomerImport;
+    preview.innerHTML = "";
+    button.disabled = !valid.length;
+    button.textContent = "Nhập khách hàng";
+    status.textContent = (demo ? "Dữ liệu minh họa · " : "") + valid.length + " hồ sơ có thể nhập · " + issues.length + " dòng bỏ qua";
+    if (issues.length) {
+      preview.innerHTML += '<ul class="customer-import-errors">' + issues.slice(0, 30).map((issue) =>
+        '<li><b>Dòng ' + issue.number + '</b> ' + esc(issue.message) + '</li>'
+      ).join("") + (issues.length > 30 ? '<li>… và ' + (issues.length - 30) + ' dòng khác.</li>' : "") + '</ul>';
+    }
+    if (valid.length) {
+      preview.innerHTML += '<p><b>Xem trước hồ sơ sẽ nhập</b></p><ul>' + valid.slice(0, 8).map(({ name }) =>
+        '<li>' + esc(name) + '</li>'
+      ).join("") + (valid.length > 8 ? '<li>… và ' + (valid.length - 8) + ' hồ sơ khác.</li>' : "") + '</ul>';
+      button.textContent = (demo ? "Mô phỏng nhập " : "Nhập ") + valid.length + " khách hàng";
+    }
+  }
+
+  function demoCustomerImport() {
+    customerImportRequest++;
+    $("#customer-import-file").value = "";
+    const rows = [
+      CustomerData.workbookHeaders,
+      ["Cá nhân", "Khách hàng mẫu", "", "", "khach-hang-demo@example.com"],
+      ["Cá nhân", "Khách hàng trùng", demoCustomerPhone(), "", "khach-trung@example.com"],
+      ["Cá nhân", "", "", "", "thieu-ten@example.com"]
+    ];
+    stagedCustomerImport = { ...prepareCustomerImport({ rows, firstRow: 1 }), demo: true };
+    showCustomerImportPreview();
+  }
+
+  function commitCustomerImport() {
+    const staged = stagedCustomerImport;
+    if (!staged?.valid.length || !$("#customer-import").open) return;
+    if (staged.demo) {
+      $("#customer-import-status").textContent = "Đã mô phỏng nhập " + staged.valid.length + " khách hàng. Danh sách giữ nguyên.";
+      $("#customer-import-submit").disabled = true;
+      stagedCustomerImport = null;
+      return;
+    }
+    const keys = staged.valid.map(({ record }) => addCustomer(recordCustomerChange(null, record, "Nhập từ Excel"), "Nhập Excel"));
+    if (!persist(true)) {
+      keys.forEach((key) => delete CUST[key]);
+      EXTRA.splice(-keys.length, keys.length);
+      $("#customer-import-status").textContent = "Không lưu được dữ liệu. Hãy kiểm tra dung lượng hoặc tải lại nếu dữ liệu đã đổi ở tab khác.";
+      return;
+    }
+    stagedCustomerImport = null;
+    $("#customer-import").close();
+    S.q = "";
+    render();
+    toast("Đã nhập " + keys.length + " khách hàng" + (staged.issues.length ? " · bỏ qua " + staged.issues.length + " dòng" : ""));
+  }
+
   function exportCSV() {
     let rows, name;
     if (S.view === "project" && !S.route) {
       const p = curProj(), t = curTower();
       rows = [["Dự án", "Toà", "Mã căn", "Tầng", "Loại", "Diện tích (m2)", "Hướng", "View", "Trạng thái", "Khách hàng", "Giá bán (VND)", "Tổng giá trị (VND)"]].concat(
-        towerUnits(p.id, t.id).map((u) => [p.name, t.name, u.code, u.floor, u.type, u.area, u.dir, u.view, ST[u.status].l, u.buyer, pricing(u).base, pricing(u).total])
+        towerUnits(p.id, t.id).map((u) => [p.name, t.name, u.code, u.floor, u.type, u.area, u.dir, u.view, ST[u.status].l, customerName(u.buyer), pricing(u).base, pricing(u).total])
       );
       name = "stacking-plan-" + p.id + "-" + t.id + ".csv";
     } else if (S.route && S.route.kind === "cust") {
@@ -2283,18 +3613,64 @@ body.detail-mode #viewbar{display:none}
       (c ? c.units : []).forEach((u) => rows.push([u.code, projOf(u).name, u.tower, u.type, u.area, ST[u.status].l, pricing(u).total, report(u).paid]));
       name = "ho-so-khach-hang-" + (c ? c.id : "x") + ".csv";
     } else {
-      rows = [["Mã KH", "Tên trên hồ sơ", "Loại", "SĐT", "CCCD / MST", "Email", "Căn hộ", "Trạng thái", "Phụ trách"]].concat(
-        filteredCustomers().map((c) => [c.id, c.disp, c.typeL, c.phone, c.legal, c.email, c.units.map((u) => u.tower + "·" + u.code).join(" "), TAG[c.tag].l, c.sale])
-      );
+      rows = customerExportRows();
       name = "danh-sach-khach-hang.csv";
     }
-    const csv = "\uFEFF" + rows.map((r) => r.map((v) => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"').join(",")).join("\r\n");
+    const csv = "\uFEFF" + rows.map((r) => r.map((value) => {
+      const text = String(value ?? "");
+      const safe = typeof value === "string" && /^[\s\uFEFF]*[=+@-]/.test(text) ? "'" + text : text;
+      return '"' + safe.replace(/"/g, '""') + '"';
+    }).join(",")).join("\r\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
     a.download = name;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
     toast("Đã xuất " + name);
+  }
+
+  const customerIdentityFields = ["phone", "idno", "taxno", "email"];
+
+  function showUnitCustomerDuplicates(form, u, customerKey = u.buyer) {
+    const inputs = customerIdentityFields.map((key) => form.querySelector('[data-f="' + key + '"]')).filter(Boolean);
+    const candidate = Object.fromEntries(inputs.map((input) => [input.dataset.f, input.value]));
+    candidate.type = form.dataset.type;
+    const before = customerKey ? custOf(customerKey, u) : null;
+    const matches = CustomerData.duplicateIndex(customers()).find(candidate, customerKey, before);
+    let first = null;
+    for (const input of inputs) {
+      const field = input.closest(".field");
+      const duplicates = matches.filter((match) => match.fields.includes(input.dataset.f));
+      let message = field.querySelector(".duplicate-field-message");
+      if (duplicates.length) {
+        first ||= input;
+        if (!message) {
+          message = document.createElement("div");
+          message.className = "duplicate-field-message";
+          message.id = input.id + "-duplicate";
+          message.setAttribute("role", "status");
+          field.append(message);
+          input.setAttribute("aria-describedby", message.id);
+          input.setAttribute("aria-invalid", "true");
+          field.classList.add("is-duplicate");
+        }
+        const fieldsKey = JSON.stringify(duplicates.map((match) => match.key));
+        if (message.dataset.keys !== fieldsKey) {
+          message.dataset.keys = fieldsKey;
+          if (form.id === "sale-customer-form") {
+            message.innerHTML = '<p>Đã có hồ sơ với thông tin này.</p>' + duplicates.map((match) =>
+              '<button class="btn" type="button" data-act="link-cust" data-name="' + esc(match.key) + '">Dùng hồ sơ ' +
+              esc(match.name) + '</button>').join("");
+          } else message.textContent = "Trùng với " + duplicates.map((match) => match.name).join(", ") + ".";
+        }
+      } else if (message) {
+        message.remove();
+        input.removeAttribute("aria-describedby");
+        input.removeAttribute("aria-invalid");
+        field.classList.remove("is-duplicate");
+      }
+    }
+    return first;
   }
 
   function saveUnitCustomer(u) {
@@ -2322,21 +3698,35 @@ body.detail-mode #viewbar{display:none}
     const noteEl = form.querySelector('[data-f="note"]');
     vals.note = noteEl ? noteEl.value : "";
     vals.type = org ? "org" : "ind";
+    const oldKey = u.buyer;
+    const before = oldKey ? custOf(oldKey, u) : null;
+    const duplicate = showUnitCustomerDuplicates(form, u);
+    if (duplicate) {
+      duplicate.focus();
+      duplicate.scrollIntoView({ block: "center" });
+      return;
+    }
     if (bad) {
       toast("Còn " + bad + " trường bắt buộc chưa nhập");
       if (first) { first.focus(); try { first.scrollIntoView({ block: "center" }); } catch (e) {} }
       return;
     }
-    const key = org ? vals.coname : vals.fullname;
-    const oldKey = u.buyer;
-    const base = oldKey ? custOf(oldKey) : blankCust(vals.type);
-    CUST[key] = Object.assign({}, base, vals);
-    if (oldKey && oldKey !== key) delete CUST[oldKey];
+    const record = recordCustomerChange(before, { ...(before || blankCust(vals.type)), ...vals }, oldKey ? "Cập nhật hồ sơ" : "Tạo hồ sơ");
+    const oldPhone = u.phone, oldId = u.cccd;
+    const key = oldKey || addCustomer(record, "Nhập trực tiếp");
+    CUST[key] = record;
     u.buyer = key;
     u.phone = vals.phone || "";
     u.cccd = (org ? vals.taxno : vals.idno) || "";
+    if (!persist(true)) {
+      Object.assign(u, { buyer: oldKey, phone: oldPhone, cccd: oldId });
+      if (oldKey) CUST[key] = before;
+      else { delete CUST[key]; EXTRA.pop(); }
+      toast("Không lưu được hồ sơ. Hãy kiểm tra dung lượng hoặc tải lại nếu dữ liệu đã đổi ở tab khác.");
+      return;
+    }
     syncCust();
-    persist(); render();
+    render();
     toast("Đã lưu khách hàng cho căn " + u.code);
   }
 
@@ -2360,62 +3750,6 @@ body.detail-mode #viewbar{display:none}
     toast("Đã gỡ liên kết khách của căn " + u.code);
   }
 
-  function saveCust() {
-    const form = $("#cust-form");
-    if (!form) return;
-    const oldKey = form.dataset.key;
-    const org = form.dataset.type === "org";
-    const flds = org ? F_ORG : F_IND;
-    $$(".field.err", form).forEach((f) => f.classList.remove("err"));
-    const vals = {};
-    let bad = 0, first = null;
-    flds.forEach((f) => {
-      const inp = form.querySelector('[data-f="' + f.k + '"]');
-      let v = inp ? inp.value.trim() : "";
-      if (f.up) v = v.toUpperCase();
-      if (inp) inp.value = v;
-      vals[f.k] = v;
-      if (f.req && !v) {
-        bad++;
-        const box = inp && inp.closest(".field");
-        if (box) box.classList.add("err");
-        if (!first && inp) first = inp;
-      }
-    });
-    const noteEl = form.querySelector('[data-f="note"]');
-    vals.note = noteEl ? noteEl.value : "";
-    vals.type = form.dataset.type;
-    if (bad) {
-      toast("Còn " + bad + " trường bắt buộc chưa nhập");
-      if (first) {
-        first.focus();
-        try { first.scrollIntoView({ block: "center" }); } catch (err) {}
-      }
-      return;
-    }
-    const nextKey = (org ? vals.coname : vals.fullname) || oldKey;
-    if (nextKey !== oldKey) {
-      UNITS.forEach((u) => { if (u.buyer === oldKey) u.buyer = nextKey; });
-      PROSPECTS.forEach((p) => { if (p.name === oldKey) p.name = nextKey; });
-      EXTRA.forEach((p) => { if (p.name === oldKey) p.name = nextKey; });
-      Object.keys(TRANSFER).forEach((uid) => TRANSFER[uid].forEach((r) => {
-        if (r.from === oldKey) r.from = nextKey;
-        if (r.to === oldKey) r.to = nextKey;
-      }));
-    }
-    CUST[nextKey] = Object.assign({}, custOf(oldKey), vals);
-    if (nextKey !== oldKey) delete CUST[oldKey];
-    syncCust();
-    persist();
-    if (S.route && S.route.kind === "cust") {
-      const all = customers();
-      const i = all.findIndex((x) => x.name === nextKey);
-      if (i > -1) S.route = { kind: "cust", id: all[i].id };
-    }
-    render();
-    toast("Đã lưu hồ sơ " + (org ? "doanh nghiệp" : "cá nhân") + " · " + nextKey);
-  }
-
   function setCtype(name, t) {
     const r = custOf(name);
     if (r.type === t) return;
@@ -2423,7 +3757,7 @@ body.detail-mode #viewbar{display:none}
     const next = Object.assign({}, r, { type: t });
     if (t === "org") { if (!next.coname) next.coname = keep || String(name).toUpperCase(); }
     else if (!next.fullname) next.fullname = keep || String(name).toUpperCase();
-    CUST[name] = next;
+    CUST[name] = recordCustomerChange(r, next, "Đổi loại hồ sơ");
     persist();
     renderContent();
     toast("Đã chuyển sang hồ sơ " + (t === "org" ? "doanh nghiệp (17 trường)" : "cá nhân (15 trường)"));
@@ -2435,8 +3769,9 @@ body.detail-mode #viewbar{display:none}
   }
 
   function resetData() {
-    if (!confirm("Khôi phục dữ liệu mẫu? Mọi thay đổi trạng thái trên máy sẽ mất.")) return;
-    try { localStorage.removeItem(LS); } catch (e) {}
+    if (!confirm(DEMO ? "Đưa bản demo về dữ liệu ban đầu? Các thao tác trong lần chạy này sẽ bị xóa." :
+      "Khôi phục dữ liệu mẫu? Mọi thay đổi trạng thái trên máy sẽ mất.")) return;
+    try { localStorage.removeItem(LS); storedSnapshot = null; } catch (e) {}
     UNITS.forEach((u) => {
       const s0 = UNITS_INIT.find((x) => x.uid === u.uid) || {};
       u.status = s0.status || "AVAILABLE";
@@ -2444,10 +3779,374 @@ body.detail-mode #viewbar{display:none}
     });
     Object.keys(CUST).forEach((k) => delete CUST[k]);
     EXTRA.length = 0;
-    S.f = "all"; S.ct = "all"; S.q = ""; S.route = null;
+    contractDrafts.clear();
+    saleDrafts.clear();
+    agentRequest?.abort();
+    Object.assign(agentSession, { result: null, workReview: null, prompt: "", uid: "", pinnedUnit: "", reviewedUnit: "", profile: "coordinator", returnTo: null, drafts: [] });
+    S.f = "all"; S.ct = "all"; S.q = ""; S.unitQuery = ""; S.route = null;
     seedStatusMeta();
+    seedPresentation();
     render();
     toast("Đã khôi phục dữ liệu mẫu");
+  }
+
+  /* ================= agent workspace ================= */
+  const agentSession = { result: null, workReview: null, prompt: "", uid: "", pinnedUnit: "", reviewedUnit: "", profile: "coordinator", returnTo: null, drafts: [] };
+  const localAgentEnabled = Boolean($('meta[name="meraki-local-agent"]'));
+  let agentRequest = null;
+  const agentLabel = (u) => "Căn " + u.code + " · " + projOf(u).short + " · " + towerOf(u).name;
+  const agentSource = (u, tab, label, paymentView) => ({ uid: u.uid, tab, label, paymentView });
+  const agentExpired = (u) => schedule(u).filter((item) => item.overdue)
+    .sort((a, b) => dateISO(a.date).localeCompare(dateISO(b.date)));
+
+  function agentPaymentRows({ uid, project } = {}) {
+    return UNITS.filter((u) => (u.buyer || uid === u.uid) && tracksPayments(u) &&
+      (!uid || u.uid === uid) && (!project || project === u.proj)).flatMap((u) => {
+      const items = agentExpired(u);
+      if (!items.length) return [];
+      return [{ uid: u.uid, label: agentLabel(u), due: items[0].date,
+        amount: items.reduce((sum, item) => sum + item.remaining, 0), count: items.length }];
+    }).sort((a, b) => dateISO(a.due).localeCompare(dateISO(b.due)) || b.amount - a.amount);
+  }
+
+  const crmAgent = createCrmAgent({
+    findUnits: ({ code, project, tower }) => UNITS.filter((u) =>
+      u.code === code && (!project || u.proj === project) && (!tower || u.tower === tower))
+      .map((u) => ({ uid: u.uid, label: agentLabel(u) })),
+    overduePayments: (scope) => {
+      const u = byUid(scope.uid);
+      if (u && !tracksPayments(u)) return { status: "Chưa đến bước", text: "Chưa có lịch thu đang theo dõi." };
+      const rows = agentPaymentRows(scope);
+      const sum = rows.reduce((total, item) => total + item.amount, 0);
+      return { text: rows.length ? rows.length + " căn có khoản quá hạn · Tổng còn phải thu " + fmt(sum) + "." :
+        "CRM chưa ghi nhận khoản quá hạn trong phạm vi này.", rows,
+        status: rows.length ? "Cần xử lý" : "Đã kiểm tra",
+        source: u && agentSource(u, 3, "Mở lịch thu", "collection") };
+    },
+    inspectCustomer: ({ uid }) => {
+      const u = byUid(uid);
+      if (!u) return { status: "Cần kiểm tra", text: "Không tìm thấy căn." };
+      const sale = saleDrafts.get(uid);
+      const key = sale?.customerKey || u.buyer;
+      const customer = sale ? sale.contacts[sale.type] : key ? custOf(key, u) : null;
+      const fields = customer?.type === "org" ? F_ORG : F_IND;
+      const missing = fields.filter((field) => (sale || !customer || field.req) && !String(customer?.[field.k] || "").trim());
+      const duplicates = customer ? CustomerData.duplicateIndex(customers()).find(customer, key, key ? custOf(key, u) : null) : [];
+      return { status: missing.length || duplicates.length ? "Cần xử lý" : "Đủ thông tin",
+        text: !customer ? "Chưa có hồ sơ khách hàng." : missing.length || duplicates.length ?
+          [missing.length && "Thiếu " + missing.length + " trường", duplicates.length && duplicates.length + " hồ sơ có dữ liệu trùng"].filter(Boolean).join(" · ") + "." :
+          "Đủ trường bắt buộc. Không phát hiện dữ liệu trùng.",
+        facts: missing.length && customer ? [missing.map((field) => field.l).join(", ")] : [],
+        source: u.status === "AVAILABLE" && !sale?.signedDate ?
+          { ...agentSource(u, 0, "Mở hồ sơ khách hàng"), step: 1 } : agentSource(u, 2, "Mở hồ sơ khách hàng") };
+    },
+    inspectQuote: ({ uid }) => {
+      const u = byUid(uid);
+      if (!u) return { status: "Cần kiểm tra", text: "Không tìm thấy căn." };
+      const sale = saleDrafts.get(uid);
+      if (!sale?.paymentPlan || sale.step < 3) return { status: "Chưa chốt",
+        text: "Chưa xác nhận báo giá và lịch dự kiến trong luồng bán căn.",
+        source: agentSource(u, 3, "Mở báo giá dự kiến", "quote") };
+      const selected = seniquePaymentPlans[sale.paymentPlan];
+      const quote = seniqueQuote(selected, u, sale.discountsByPlan?.[sale.paymentPlan]);
+      return { status: "Đã xác nhận dự kiến", text: selected.label + " · " + fmt(quote.total),
+        source: agentSource(u, 3, "Mở lịch dự kiến", "quote") };
+    },
+    inspectContract: ({ uid }) => {
+      const u = byUid(uid);
+      if (!u) return { status: "Cần kiểm tra", text: "Không tìm thấy căn." };
+      const sale = saleDrafts.get(uid);
+      const contract = contractDraft(u);
+      if (contract.stage === "hdmb") return { status: contract.status,
+        text: contract.number ? "HĐMB " + contract.number + (contract.signed ? " · Ký " + dateVN(contract.signed) : " · Chưa nhập ngày ký") : "Chưa cấp số HĐMB.",
+        source: agentSource(u, 4, "Mở HĐMB") };
+      if (sale?.signedDate) return { status: "Chờ đặt cọc", text: "Đã xác nhận ngày ký quỹ " + dateVN(sale.signedDate) + ".",
+        source: agentSource(u, 4, "Mở hồ sơ đặt cọc") };
+      return { status: "Chưa xác nhận ký", text: sale?.step === 4 ? "Hồ sơ đã tới bước xác nhận ngày ký quỹ." :
+        contract.stage === "dat-coc" ? "Giao dịch đang ở bước đặt cọc." : "Chưa tới bước xác nhận ngày ký quỹ.",
+        source: agentSource(u, sale?.step === 4 ? 0 : 4, "Kiểm tra hợp đồng") };
+    },
+    dealProgress: ({ uid }) => {
+      const u = byUid(uid);
+      if (!u) return { text: "Không tìm thấy hồ sơ căn." };
+      if (u.status === "UNRELEASED") return { text: agentLabel(u) + " chưa mở bán.",
+        source: agentSource(u, 1, "Xem thông tin căn") };
+      const sale = saleDrafts.get(uid);
+      const draft = contractDraft(u);
+      if (u.status === "AVAILABLE" && !sale?.signedDate) {
+        const steps = ["Hoàn tất hồ sơ khách hàng", "Xác nhận lịch thanh toán", "Nhập thông tin giao dịch", "Xác nhận ngày ký thỏa thuận"];
+        return { text: agentLabel(u) + ". Việc tiếp theo: " + steps[(sale?.step || 1) - 1] + ".",
+          source: agentSource(u, 0, "Mở luồng bán căn") };
+      }
+      const stage = contractStages.find((item) => item.id === draft.stage).label;
+      return { text: agentLabel(u) + ". " + ST[u.status].l + " · " + stage + " · " + draft.status + ".",
+        facts: [
+          u.buyer ? "Đã liên kết hồ sơ khách hàng." : "Chưa liên kết hồ sơ khách hàng trong CRM.",
+          draft.stage === "hdmb" ? "Số HĐMB " + (draft.number || "chưa cấp") + "." :
+            "Giao dịch đang ở giai đoạn " + stage.toLowerCase() + "."
+        ],
+        source: agentSource(u, 4, "Mở HĐMB & mẫu") };
+    },
+    compareQuotes: ({ uid }) => {
+      const u = byUid(uid);
+      if (uid && !u) return { text: "Không tìm thấy căn để so sánh báo giá." };
+      const sale = u && saleDrafts.get(uid);
+      const standard = seniqueQuote(seniquePaymentPlans.standard, u, sale?.discountsByPlan?.standard);
+      const special = seniqueQuote(seniquePaymentPlans.special, u, sale?.discountsByPlan?.special);
+      return { text: u ? agentLabel(u) + " · Báo giá dự kiến theo chính sách mẫu Senique." : "So sánh báo giá mẫu Senique cho căn S2.29.03.",
+        facts: [
+          "Tiêu chuẩn · Tổng " + fmt(standard.total) + " · Trước bàn giao " + fmt(standard.beforeHandover),
+          "Đặc biệt 30/70 · Tổng " + fmt(special.total) + " · Trước bàn giao " + fmt(special.beforeHandover)
+        ], source: u && agentSource(u, 3, "Mở báo giá của căn", "quote"),
+        planUnit: u?.status === "AVAILABLE" && !sale?.signedDate ? u.uid : "" };
+    },
+    previewReminder: ({ uid }) => {
+      const u = byUid(uid);
+      if (!u?.buyer) return { text: "Căn này chưa liên kết khách hàng. Hãy kiểm tra hồ sơ trước khi soạn nhắc thu.",
+        source: u && agentSource(u, 2, "Mở hồ sơ khách hàng của căn") };
+      if (!tracksPayments(u)) return { text: "Căn này chưa có giao dịch đang theo dõi thu.",
+        source: agentSource(u, 1, "Xem thông tin căn") };
+      const item = agentExpired(u)[0];
+      if (!item) return { text: "Căn này chưa có khoản quá hạn để soạn nhắc thu.", source: agentSource(u, 3, "Mở lịch thanh toán", "collection") };
+      const source = agentSource(u, 3, "Kiểm tra lịch thanh toán", "collection");
+      return { text: agentLabel(u) + " · " + item.k + " còn " + fmt(item.remaining) + ", hạn " + item.date + ".",
+        source, proposal: { uid, buyer: u.buyer, key: item.k, amount: item.remaining, due: item.date,
+          body: "Kính gửi Quý khách, Meraki Land xin nhắc khoản thanh toán " + item.k.toLowerCase() +
+            " của căn " + u.code + " tại " + projOf(u).short + " còn " + fmt(item.remaining) +
+            ", hạn thanh toán " + item.date + ". Nếu Quý khách đã thanh toán, vui lòng liên hệ để đối chiếu. Xin cảm ơn." } };
+    }
+  });
+
+  function saveAgentReminder(proposal, body) {
+    const u = byUid(proposal.uid);
+    const current = u && agentExpired(u).find((item) => item.k === proposal.key);
+    if (!current || current.remaining !== proposal.amount || current.date !== proposal.due || u.buyer !== proposal.buyer ||
+        !tracksPayments(u)) return "Khoản thu đã thay đổi. Hãy tạo lại bản nháp từ lịch mới.";
+    if (currentReminderDraft(u, current)) return "Khoản thu này đã có bản nháp được xác nhận.";
+    const before = agentSession.drafts;
+    agentSession.drafts = [{ ...proposal, body, label: agentLabel(u), actor: CUSTOMER_ACTOR },
+      ...before.filter((item) => item.uid !== proposal.uid || item.key !== proposal.key || item.buyer !== proposal.buyer)];
+    if (!persist(true)) {
+      agentSession.drafts = before;
+      return "Chưa lưu được bản nháp. Tải lại nếu dữ liệu vừa đổi ở tab khác.";
+    }
+    return "";
+  }
+
+  function currentReminderDraft(u, item) {
+    return item && agentSession.drafts.find((draft) => draft.uid === u.uid && draft.buyer === u.buyer &&
+      draft.key === item.k && draft.amount === item.remaining && draft.due === item.date);
+  }
+
+  function workAction(action, uid, label, style = "", attributes = "") {
+    return '<button type="button" class="btn ' + style + '" data-act="' + action + '" data-uid="' + esc(uid) +
+      '"' + attributes + '>' + label + '</button>';
+  }
+
+  function unitSearchResults(query) {
+    const code = query.trim().toUpperCase();
+    if (!code) return "";
+    const results = UNITS.filter((unit) => unit.code.startsWith(code))
+      .sort((a, b) => Number(b.status === "AVAILABLE") - Number(a.status === "AVAILABLE")).slice(0, 8);
+    if (!results.length) return '<p class="work-search-note" role="status">Không tìm thấy căn theo mã đã nhập.</p>';
+    return '<ul class="work-search-results">' + results.map((u) =>
+      '<li><button type="button" class="work-search-result" data-act="unit" data-uid="' + esc(u.uid) + '">' +
+      '<span><b>' + esc(agentLabel(u)) + '</b><small>' + esc(u.type) + ' · ' + fmtA(u.area) + ' m² · ' +
+      fmt(pricing(u).base) + ' trước VAT và phí</small></span>' +
+      '<span class="tag ' + ST[u.status].t + '">' + (u.status === "AVAILABLE" ? "Còn bán" : esc(ST[u.status].l)) +
+      '</span></button></li>').join("") + '</ul>';
+  }
+
+  function viewWork() {
+    const due = agentPaymentRows();
+    const drafts = Array.from(saleDrafts).flatMap(([uid, draft]) => {
+      const unit = byUid(uid);
+      if (!unit) return [];
+      const label = agentLabel(unit);
+      const buyer = saleCustomerName(draft);
+      if (!draft.signedDate && unit.status === "AVAILABLE" && saleInProgress(draft)) {
+        const steps = ["Hoàn tất thông tin khách hàng", "Xác nhận lịch thanh toán", "Hoàn tất thông tin giao dịch", "Kiểm tra thỏa thuận và xác nhận ngày ký"];
+        const stages = ["Hồ sơ khách hàng", "Báo giá", "Thông tin giao dịch", "Chờ ký quỹ"];
+        return [{ uid, label, buyer, job: steps[draft.step - 1], stage: stages[draft.step - 1], tab: 0 }];
+      }
+      if (!draft.signedDate) return [];
+      const contract = contractDraft(unit);
+      if (contract.stage === "dat-coc") return [{ uid, label, buyer, job: "Tiếp tục hồ sơ đặt cọc", stage: "Đặt cọc", tab: 4 }];
+      if (contract.stage === "hdmb" && contract.status === "Nháp") {
+        return [{ uid, label, buyer, job: contract.appliedSchedule ? "Rà soát và hoàn thiện HĐMB nháp" : "Đối chiếu lịch thanh toán cho HĐMB", stage: "HĐMB nháp", tab: 4 }];
+      }
+      return [];
+    });
+    const review = agentSession.workReview;
+    const dueRows = due.map((row) => {
+      const unit = byUid(row.uid);
+      const first = agentExpired(unit)[0];
+      const saved = currentReminderDraft(unit, first);
+      const isOpen = review?.uid === row.uid;
+      const openedDraft = isOpen && (review.saved || review.result?.proposal);
+      const stale = openedDraft && (openedDraft.key !== first?.k || openedDraft.due !== first.date ||
+        openedDraft.amount !== first.remaining || openedDraft.buyer !== unit.buyer);
+      return '<li><div class="work-row"><div class="work-detail"><b>' + esc(row.label) + '</b><p>' + row.count +
+        ' khoản quá hạn <span aria-hidden="true">·</span> Hạn lâu nhất ' + esc(row.due) + '</p></div>' +
+        '<div class="work-amount"><strong>' + fmt(row.amount) + '</strong><span>' +
+        (saved ? 'Đã lưu bản nháp' : 'Còn phải thu quá hạn') + '</span></div>' +
+        '<div class="work-actions">' +
+        workAction("work-open", row.uid, "Xem lịch thu", "ghost", ' data-tab="3" data-payment-view="collection" aria-label="' +
+          esc("Xem lịch thu " + row.label) + '"') +
+        workAction("work-reminder", row.uid, saved ? "Xem bản nháp" : "Xem lời nhắc", "",
+          ' aria-expanded="' + isOpen + '" aria-controls="work-reminder-' + esc(row.uid) + '" aria-label="' +
+          esc((saved ? "Xem bản nháp " : "Xem lời nhắc ") + row.label) + '"') +
+        '</div></div><div id="work-reminder-' + esc(row.uid) + '"' + (isOpen ? '' : ' hidden') + '>' +
+        (isOpen ? '<div class="work-reminder"><div class="work-reminder-title"><h3>Bản nháp nhắc thanh toán</h3>' +
+          workAction("work-close-reminder", row.uid, "Thu gọn", "ghost") + '</div>' +
+          (stale ? '<p class="work-saved-body" tabindex="-1" role="status">Lịch thu đã thay đổi.</p>' +
+            workAction("work-refresh-reminder", row.uid, "Cập nhật lời nhắc", "pri") :
+            review.saved ? '<p class="work-saved-body" tabindex="-1">' + esc(review.saved.body) + '</p><p class="note">Đã lưu · ' +
+            esc(review.saved.actor) + '</p>' : agentResult(review.result)) + '</div>' : '') + '</div></li>';
+    }).join("");
+    const draftRows = drafts.sort((a, b) => b.tab - a.tab || a.label.localeCompare(b.label)).map((item) =>
+      '<li class="work-row"><div class="work-detail"><b>' + esc(item.buyer || item.label) +
+      '</b><p>' + (item.buyer ? esc(item.label) + ' · ' : '') + esc(item.job) + '</p></div>' +
+      '<span class="tag t-lock">' + esc(item.stage) + '</span><div class="work-actions">' +
+      workAction("work-open", item.uid, "Tiếp tục hồ sơ", "pri", ' data-tab="' + item.tab + '"') + '</div></li>').join("");
+    return '<div class="work-page"><header class="work-header"><div><h1>Giao dịch</h1>' +
+      (DEMO ? '<p>Dữ liệu minh họa · ' + TODAY + '</p>' : '') + '</div>' +
+      '<button type="button" class="btn" data-act="nav" data-view="project">Mở sơ đồ căn</button></header>' +
+      '<section class="work-unit-search" aria-labelledby="work-search-title"><h2 id="work-search-title">Tìm căn hộ</h2>' +
+      '<div class="work-search-field"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg>' +
+      '<input id="work-unit-query" class="inp" type="search" placeholder="' + (DEMO ? "Nhập mã căn, ví dụ 1001" : "Tìm theo mã căn") +
+      '" aria-label="Tìm theo mã căn" autocomplete="off" maxlength="12" value="' + esc(S.unitQuery) + '" aria-controls="work-unit-results"></div>' +
+      '<div id="work-unit-results" aria-live="polite">' + unitSearchResults(S.unitQuery) + '</div></section>' +
+      '<section class="work-section" aria-labelledby="work-drafts-title"><h2 id="work-drafts-title">Giao dịch đang làm</h2>' +
+      (drafts.length ? '<ul class="work-list">' + draftRows + '</ul>' : '<p class="work-empty">Giao dịch bạn bắt đầu sẽ xuất hiện tại đây.</p>') + '</section>' +
+      (due.length ? '<section class="work-section" aria-labelledby="work-due-title"><h2 id="work-due-title">Khoản thu quá hạn</h2>' +
+        '<ul class="work-list">' + dueRows + '</ul></section>' : '') + '</div>';
+  }
+
+  function agentLink(source) {
+    return '<button type="button" class="btn" data-act="agent-source" data-uid="' + esc(source.uid) +
+      '" data-tab="' + source.tab + '" data-step="' + (source.step || "") + '" data-payment-view="' +
+      (source.paymentView || "") + '">' + esc(source.label) + '</button>';
+  }
+
+  function agentRows(rows) {
+    return '<ul class="agent-rows">' + rows.map((row) =>
+      '<li><div><b>' + esc(row.label) + '</b><span>' + row.count + ' khoản · Hạn lâu nhất ' + row.due +
+      '</span></div><strong>' + fmt(row.amount) + '</strong>' +
+      '<button type="button" class="btn" data-act="agent-remind" data-uid="' + esc(row.uid) +
+      '" aria-label="' + esc("Soạn nhắc thu " + row.label) + '">Soạn nhắc</button></li>'
+    ).join("") + '</ul>';
+  }
+
+  function agentResult(result) {
+    if (!result) return "";
+    return '<section class="agent-result" tabindex="-1" id="agent-result" aria-label="Kết quả trợ lý">' +
+      '<p>' + esc(result.text) + '</p>' +
+      (result.status ? '<span class="tag t-lock">' + esc(result.status) + '</span>' : '') +
+      (result.model ? '<p class="agent-provenance">Qwen · công cụ CRM</p>' : '') +
+      (result.fallback ? '<p class="agent-provenance">Dùng chế độ mô phỏng. LM Studio chưa trả được công cụ.</p>' : '') +
+      (result.facts ? '<ul>' + result.facts.map((fact) => '<li>' + esc(fact) + '</li>').join("") + '</ul>' : '') +
+      (result.review ? '<ol class="agent-review">' + result.review.map((item) =>
+        '<li><div class="agent-review-heading"><b>Agent ' + esc(item.agent) + '</b><span class="tag ' +
+        (item.status === "Cần xử lý" ? 't-tx' : 't-lock') + '">' + esc(item.status || "Đã kiểm tra") + '</span></div>' +
+        '<p>' + esc(item.text) + '</p>' + (item.facts?.length ? '<p class="note">' + esc(item.facts.join(" · ")) + '</p>' : '') +
+        '<div class="agent-review-actions">' + (item.source ? agentLink(item.source) : '') +
+        (item.rows?.length ? '<button type="button" class="btn pri" data-act="agent-remind" data-uid="' +
+          esc(item.rows[0].uid) + '">Bàn giao soạn nhắc thu</button>' : '') + '</div></li>'
+      ).join("") + '</ol>' : '') +
+      (result.choices ? '<div class="agent-choices">' + result.choices.map((item) =>
+        '<button type="button" class="btn" data-act="agent-choice" data-uid="' + esc(item.uid) + '">' +
+        esc(item.label) + '</button>').join("") + '</div>' : '') +
+      (result.rows?.length ? agentRows(result.rows) : '') +
+      (result.proposal ? '<form id="agent-draft-form"><label for="agent-draft-body">Xem lại lời nhắc</label>' +
+        '<textarea class="ta" id="agent-draft-body" rows="4" maxlength="2000" required>' + esc(result.proposal.body) + '</textarea>' +
+        '<p id="agent-draft-error" role="alert"></p>' +
+        '<button type="submit" class="btn pri">Xác nhận lưu nháp</button></form>' : '') +
+      (result.source ? '<div class="agent-source">' + agentLink(result.source) + '</div>' : '') +
+      (result.planUnit ? '<div class="agent-choices" role="group" aria-label="Chọn phương án trong luồng bán">' +
+        Object.entries(seniquePaymentPlans).map(([id, plan]) =>
+          '<button type="button" class="btn" data-act="agent-apply-plan" data-uid="' + esc(result.planUnit) +
+          '" data-plan="' + id + '">Dùng ' + esc(plan.label) + '</button>').join("") + '</div>' : '') + '</section>';
+  }
+
+  function viewAgent() {
+    const pinned = byUid(agentSession.pinnedUnit);
+    const due = agentPaymentRows(pinned ? { uid: pinned.uid } : {});
+    const showcase = {
+      coordinator: ["Bước tiếp theo của giao dịch", "Kiểm tra hồ sơ"],
+      customer: ["Kiểm tra trường còn thiếu hoặc trùng", "Rà hồ sơ khách hàng"],
+      pricing: ["So sánh chiết khấu và dòng tiền", "So sánh báo giá"],
+      contracts: ["Kiểm tra ngày ký và bước hợp đồng", "Rà hợp đồng"],
+      collections: ["Kiểm tra các khoản thu quá hạn", "Xem công nợ"]
+    }[agentSession.profile];
+    const demo = pinned || byUid("orchard:SD:0802");
+    return '<div class="agent-workspace"><header class="agent-header"><div><h1>Hỏi CRM</h1>' +
+      '<p>' + (pinned ? esc(agentLabel(pinned)) : 'Chọn hồ sơ cần rà soát và xử lý các việc Agent bàn giao.') +
+      '</p></div><span class="tag t-lock">' +
+      (localAgentEnabled ? 'AI cục bộ' : 'Mô phỏng') + '</span></header>' +
+      '<div class="agent-workflow"><div><h2>Rà soát một giao dịch</h2><p>' + esc(agentLabel(demo)) + '</p></div>' +
+      '<button type="button" class="btn pri" data-act="agent-review" data-uid="' + esc(demo.uid) +
+      '"><svg class="ic sm" aria-hidden="true"><use href="#i-agent"/></svg>Rà soát với 4 Agent</button></div>' +
+      '<div class="agent-grid"><section class="agent-card" aria-labelledby="agent-task-heading"><h2 id="agent-task-heading">Bạn muốn xử lý việc gì?</h2>' +
+      (pinned ? '<div class="agent-context"><span>' + esc(agentLabel(pinned)) + '</span><div class="agent-choices">' +
+        (agentSession.returnTo ? '<button type="button" class="btn" data-act="agent-return">Quay lại hồ sơ</button>' : '') +
+        '<button type="button" class="btn ghost" data-act="agent-unpin">Bỏ chọn căn</button></div></div>' : '') +
+      '<div class="agent-profiles" role="group" aria-label="Chọn Agent">' + crmAgent.listProfiles().map((profile) =>
+        '<button type="button" class="btn" data-act="agent-profile" data-profile="' + profile.id +
+        '" aria-pressed="' + (agentSession.profile === profile.id) + '" title="' + esc(profile.job) + '">' + esc(profile.label) + '</button>'
+      ).join("") + '</div>' +
+      '<form id="agent-task-form"><input id="agent-task" class="inp" maxlength="300" autocomplete="off" required' +
+      ' aria-label="Yêu cầu trợ lý" placeholder="Soạn nhắc thu căn 0802 tòa SD The Orchard">' +
+      '<button type="submit" class="btn pri">Thực hiện<svg class="ic sm" aria-hidden="true"><use href="#i-arrow-up"/></svg></button></form>' +
+      '<div class="agent-choices"><button type="button" class="btn" data-act="agent-prompt" data-prompt="' +
+        esc(showcase[0] + (pinned ? "" : " căn 0802 tòa SD The Orchard")) + '">' + esc(showcase[1]) + '</button></div>' +
+      (agentSession.prompt ? '<p class="agent-request">' + esc(agentSession.prompt) + '</p>' : '') +
+      agentResult(agentSession.result) +
+      (agentSession.reviewedUnit && !agentSession.result?.review ? '<div class="agent-source"><button type="button" class="btn" data-act="agent-review" data-uid="' +
+        esc(agentSession.reviewedUnit) + '">Quay lại lượt rà soát</button></div>' : '') + '</section>' +
+      '<aside class="agent-side"><section class="agent-card"><h2>Việc cần xử lý</h2>' +
+      '<p class="note">Lịch thu mẫu đến ' + TODAY + '</p>' +
+      (due.length ? agentRows(due.slice(0, 3)) : '<p class="note">Chưa có khoản quá hạn.</p>') + '</section>' +
+      '<section class="agent-card"><h2>Bản nháp đã xác nhận</h2>' +
+      (agentSession.drafts.length ? '<ul class="agent-archive">' + agentSession.drafts.map((item) =>
+        '<li><details><summary>' + esc(item.label + " · " + item.key) + '</summary><p>' + esc(item.body) +
+        '</p><small>' + esc(item.actor) + ' · Đã lưu nháp</small></details></li>').join("") + '</ul>' :
+        '<p class="note">Bản nháp được lưu tại đây sau khi bạn xác nhận.</p>') + '</section></aside></div></div>';
+  }
+
+  function showAgentResult(result) {
+    agentSession.result = result;
+    agentSession.uid = result.proposal?.uid || result.source?.uid || agentSession.uid;
+    if (S.view !== "agent" || S.route) return;
+    renderContent();
+    $("#agent-result")?.focus();
+  }
+
+  async function runAgentPrompt(prompt) {
+    if (!prompt.trim()) return;
+    agentSession.prompt = prompt.trim();
+    const profile = agentSession.profile;
+    const simulate = () => crmAgent.interpret(prompt.trim(), agentSession.uid, agentSession.pinnedUnit, profile);
+    if (!localAgentEnabled) { showAgentResult(simulate()); return; }
+    agentRequest?.abort();
+    const request = new AbortController();
+    agentRequest = request;
+    showAgentResult({ text: "Đang đọc dữ liệu giao dịch…" });
+    try {
+      const result = await crmAgent.runWithModel(prompt.trim(), agentSession.pinnedUnit || agentSession.uid, async (messages, profile) => {
+        const response = await fetch("/api/agent-plan", {
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages, profile }),
+          signal: request.signal
+        });
+        if (!response.ok) throw new Error("LM Studio chưa sẵn sàng.");
+        return (await response.json()).message;
+      }, profile);
+      if (!request.signal.aborted) showAgentResult({ ...result, model: true });
+    } catch {
+      if (!request.signal.aborted) showAgentResult({ ...simulate(), fallback: true });
+    } finally {
+      if (agentRequest === request) agentRequest = null;
+    }
   }
 
   /* ================= render ================= */
@@ -2464,7 +4163,7 @@ body.detail-mode #viewbar{display:none}
       if (c) { box.innerHTML = detailCust(c); box.scrollTop = y; return; }
       S.route = null;
     }
-    box.innerHTML = S.view === "project" ? viewProject() : viewCustomers();
+    box.innerHTML = S.view === "work" ? viewWork() : S.view === "agent" ? viewAgent() : S.view === "project" ? viewProject() : viewCustomers();
     const el = $("#vbcount");
     if (el) el.textContent = "· " + filteredCustomers().length + " người";
     box.scrollTop = y;
@@ -2493,6 +4192,93 @@ body.detail-mode #viewbar{display:none}
       return;
     }
     if (a === "nav") { S.view = el.dataset.view; S.f = "all"; S.ct = "all"; S.q = ""; S.route = null; S.menu = ""; render(); return; }
+    if (a === "agent-for-unit" || a === "agent-unpin") {
+      agentRequest?.abort();
+      const uid = a === "agent-for-unit" ? S.route.uid : "";
+      const returnTo = uid ? { route: { ...S.route }, view: S.view, tab: S.tab, scroll: $("#content").scrollTop } : null;
+      Object.assign(agentSession, { result: null, prompt: "", uid, pinnedUnit: uid, returnTo, profile: "coordinator" });
+      S.view = "agent";
+      S.route = null;
+      render();
+      $("#content").scrollTop = 0;
+      $("#agent-task").focus();
+      return;
+    }
+    if (a === "agent-return" && agentSession.returnTo) {
+      agentRequest?.abort();
+      const { route, view, tab, scroll } = agentSession.returnTo;
+      Object.assign(S, { route: { ...route }, view, tab });
+      render();
+      $("#content").scrollTop = scroll;
+      return;
+    }
+    if (a === "agent-profile") {
+      agentRequest?.abort();
+      agentSession.profile = el.dataset.profile;
+      agentSession.result = null;
+      agentSession.prompt = "";
+      renderContent();
+      $('[data-act="agent-profile"][aria-pressed="true"]')?.focus();
+      return;
+    }
+    if (a === "agent-review") {
+      agentRequest?.abort();
+      agentSession.profile = "coordinator";
+      agentSession.uid = agentSession.reviewedUnit = el.dataset.uid;
+      agentSession.prompt = agentLabel(byUid(el.dataset.uid));
+      showAgentResult(crmAgent.call("review_deal", { uid: el.dataset.uid }));
+      return;
+    }
+    if (a === "agent-prompt") { runAgentPrompt(el.dataset.prompt); return; }
+    if (a === "agent-remind" || a === "agent-choice") {
+      agentRequest?.abort();
+      const uid = el.dataset.uid;
+      const action = a === "agent-remind" ? "preview_reminder" : agentSession.result.action;
+      if (a === "agent-remind") {
+        agentSession.profile = "collections";
+        agentSession.prompt = "Soạn nhắc thu · " + agentLabel(byUid(uid));
+      }
+      agentSession.uid = uid;
+      showAgentResult(crmAgent.call(action, { uid }, agentSession.profile));
+      return;
+    }
+    if (a === "work-reminder" || a === "work-close-reminder" || a === "work-refresh-reminder") {
+      const unit = byUid(el.dataset.uid);
+      if (!unit) return;
+      if (a === "work-close-reminder" || (a === "work-reminder" && agentSession.workReview?.uid === unit.uid)) {
+        agentSession.workReview = null;
+        renderContent();
+        $$('[data-act="work-reminder"]').find((button) => button.dataset.uid === unit.uid)?.focus();
+      } else {
+        const saved = currentReminderDraft(unit, agentExpired(unit)[0]);
+        agentSession.workReview = { uid: unit.uid, saved,
+          result: saved ? null : crmAgent.call("preview_reminder", { uid: unit.uid }, "collections") };
+        renderContent();
+        ($("#agent-result") || $(".work-saved-body"))?.focus();
+      }
+      return;
+    }
+    if (a === "agent-source" || a === "work-open") {
+      const uid = el.dataset.uid;
+      openUnit(uid, el.dataset.tab === undefined || el.dataset.tab === "" ? undefined : Number(el.dataset.tab));
+      if (el.dataset.step === "1" && S.route.sale) showSaleStep(byUid(uid), 1);
+      if (el.dataset.paymentView) {
+        S.route.paymentView = el.dataset.paymentView;
+        renderContent();
+      }
+      return;
+    }
+    if (a === "agent-apply-plan") {
+      const u = byUid(el.dataset.uid);
+      const plan = el.dataset.plan;
+      if (u?.status !== "AVAILABLE" || saleDrafts.get(u.uid)?.signedDate ||
+          agentSession.result?.planUnit !== u.uid || !Object.hasOwn(seniquePaymentPlans, plan)) return;
+      const draft = saleDraft(u);
+      draft.paymentPlan = plan;
+      if (draft.step > 2) draft.step = 2;
+      openUnit(u.uid, 0);
+      return;
+    }
     if (a === "pid") {
       S.pid = el.dataset.pid;
       S.tid = (PROJECTS.find((x) => x.id === S.pid) || PROJECTS[0]).towers[0].id;
@@ -2509,15 +4295,170 @@ body.detail-mode #viewbar{display:none}
     }
     if (a === "sort") { S.sort = S.sort === "desc" ? "asc" : "desc"; render(); return; }
     if (a === "csv") { exportCSV(); return; }
+    if (a === "customer-xlsx") { exportCustomerWorkbook(false); return; }
+    if (a === "customer-template") { exportCustomerWorkbook(true); return; }
+    if (a === "import-customers") { openCustomerImport(); return; }
+    if (a === "commit-customers") { commitCustomerImport(); return; }
+    if (a === "preview-demo-import") { demoCustomerImport(); return; }
+    if (a === "customer-message") { openCustomerMessage(el.dataset.channel); return; }
+    if (a === "escrow-pdf-view" || a === "escrow-pdf-download") {
+      useEscrowPdf(el, a === "escrow-pdf-view");
+      return;
+    }
+    if (a === "open-sale" || a.startsWith("sale-")) {
+      const unit = byUid(S.route?.uid);
+      if (!unit || unit.status !== "AVAILABLE") return;
+      const draft = saleDraft(unit);
+      if (a === "open-sale") {
+        if (draft.signedDate) { openUnit(unit.uid, 4); return; }
+        S.route.sale = true;
+        showSaleStep(unit, draft.step);
+        return;
+      }
+      if (!S.route.sale) return;
+      if (a === "sale-exit") {
+        if (saleInProgress(draft) && !persist(true)) {
+          toast("Chưa lưu được hồ sơ. Hãy kiểm tra dữ liệu ở tab khác trước khi thoát.");
+          return;
+        }
+        S.route.sale = false;
+        delete S.route.reviewEdit;
+        S.tab = 1;
+        renderContent();
+        $("#content").scrollTop = 0;
+        $(".unit-next [data-act='open-sale']")?.focus({ preventScroll: true });
+        return;
+      }
+      if (a === "sale-edit-step" && draft.step === 4) {
+        const step = Number(el.dataset.step);
+        if (step >= 1 && step < 4) {
+          S.route.reviewEdit = true;
+          showSaleStep(unit, step);
+        }
+        return;
+      }
+      if (a === "sale-demo-customer" && DEMO && draft.step === 1 && !saleInProgress(draft)) {
+        draft.type = "ind";
+        draft.contacts.ind = presentationCustomer();
+        persist(true);
+        renderContent();
+        $("#sale-customer-form [data-f='fullname']")?.focus({ preventScroll: true });
+      }
+      if (a === "sale-previous" && draft.step > 1) {
+        delete S.route.reviewEdit;
+        showSaleStep(unit, draft.step - 1);
+      }
+      if (a === "sale-customer-type") {
+        draft.type = el.dataset.type;
+        draft.generated = false;
+        renderContent();
+        $('[data-act="sale-customer-type"][aria-pressed="true"]')?.focus({ preventScroll: true });
+      }
+      if (a === "sale-clear-customer") {
+        draft.customerKey = "";
+        draft.contacts[draft.type] = blankCust(draft.type);
+        draft.generated = false;
+        renderContent();
+        $("#uc-search")?.focus({ preventScroll: true });
+      }
+      return;
+    }
+    if (a === "payment-agent" || a === "payment-agent-request") {
+      if (a === "payment-agent") S.route.paymentAgent = !S.route.paymentAgent;
+      else S.route.paymentAgentResult = true;
+      renderContent();
+      $(a === "payment-agent" ? ".payment-agent-toggle" : "#payment-agent-result")?.focus({ preventScroll: true });
+      return;
+    }
+    if (a === "payment-view" || a === "quote-plan") {
+      const view = a === "payment-view";
+      const value = view ? el.dataset.view : el.dataset.plan;
+      if (!view && S.route.sale) {
+        S.route.saleCompareOpen = $("#sale-plan-comparison")?.open;
+        saleDraft(byUid(S.route.uid)).paymentPlan = value;
+      }
+      else S.route[view ? "paymentView" : "quotePlan"] = value;
+      if (view) S.route.paymentAgentResult = false;
+      renderContent();
+      $('[data-act="' + a + '"][aria-pressed="true"]')?.focus({ preventScroll: true });
+      return;
+    }
+    if (a === "payment-receipt" || a === "payment-preview") {
+      const unit = byUid(S.route?.uid);
+      if (!unit) return;
+      if (a === "payment-receipt") openPaymentReceipt(unit);
+      else openPaymentDocument(unit, el.dataset.document);
+      return;
+    }
+    if (a === "payment-half") {
+      const unit = byUid($("#payment-receipt").dataset.uid);
+      const next = unit && schedule(unit).find((item) => item.remaining > 0);
+      if (next) $("#receipt-amount").value = Math.max(1, Math.floor(next.remaining / 2));
+      return;
+    }
+    if (a === "payment-export-demo") {
+      $("#payment-preview-result").textContent = "Đã mô phỏng xuất PDF. Bạn đang xem bản mẫu trên màn hình.";
+      return;
+    }
+    if (a === "contract-open-quote") {
+      S.route.paymentView = "quote";
+      delete S.route.quotePlan;
+      S.tab = 3;
+      renderContent();
+      $("#content").scrollTop = 0;
+      return;
+    }
+    if (a === "contract-apply-quote") {
+      const u = byUid(S.route?.uid);
+      if (u) applyContractQuote(u);
+      return;
+    }
+    if (a === "contract-review") {
+      S.route.contractReview = !S.route.contractReview;
+      renderContent();
+      $('[data-act="contract-review"]')?.focus({ preventScroll: true });
+      return;
+    }
+    if (a === "contract-stage" || a === "contract-document") {
+      const unit = byUid(S.route?.uid);
+      if (!unit) return;
+      if (a === "contract-stage") advanceContract(unit, el.dataset.stage);
+      else openContractDocument(unit, DOCS.find((doc) => doc.id === el.dataset.doc));
+      return;
+    }
+    if (a === "contract-generate") {
+      const dialog = $("#contract-preview");
+      const unit = byUid(dialog.dataset.uid);
+      if (!unit) return;
+      const filename = dialog.dataset.doc + "-" + unit.tower + "-" + unit.code + ".docx";
+      contractDraft(unit).generated[dialog.dataset.doc] = filename;
+      $("#contract-preview-result").textContent = "Đã mô phỏng tạo tệp " + filename + ".";
+      dialog.dataset.refresh = "true";
+      return;
+    }
     if (a === "unit") { openUnit(el.dataset.uid); return; }
     if (a === "cust") { openCust(el.dataset.id); return; }
     if (a === "back") { back(); return; }
     if (a === "tab") { S.tab = Number(el.dataset.tab); renderContent(); return; }
     if (a === "trans") { applyTrans(el.dataset.uid, el.dataset.k); return; }
     if (a === "save-unit") { saveUnitCustomer(byUid(el.dataset.uid)); return; }
+    if (a === "link-cust") {
+      if (S.route?.sale) {
+        const unit = byUid(S.route.uid);
+        const customer = customers().find((c) => c.name === el.dataset.name);
+        if (!unit || !customer) return;
+        const draft = saleDraft(unit);
+        prefillSaleCustomer(draft, customer.name, customer.rec);
+        persist(true);
+        renderContent();
+        $("#sale-customer-form .inp")?.focus({ preventScroll: true });
+      } else {
+        linkUnitCust(S.route?.uid, el.dataset.name);
+      }
+      return;
+    }
     if (a === "unlink-cust") { unlinkUnitCust(el.dataset.uid); return; }
     if (a === "utype") { S.ut = el.dataset.t; renderContent(); return; }
-    if (a === "save-cust") { saveCust(); return; }
     if (a === "ctype") { setCtype(el.dataset.name, el.dataset.t); return; }
     if (a === "cfilter") { S.ct = el.dataset.t; renderContent(); return; }
     if (a === "cust-name") { openCustByName(el.dataset.name); return; }
@@ -2525,16 +4466,161 @@ body.detail-mode #viewbar{display:none}
     if (a === "toast") { toast(el.dataset.msg || "OK"); return; }
   });
 
+  function updateContractField(input) {
+    const key = input.dataset.contractField;
+    if (!key) return;
+    const unit = byUid(S.route?.uid);
+    if (!unit) return;
+    const draft = contractDraft(unit);
+    if (draft[key] === input.value) return;
+    draft[key] = input.value;
+    if (key === "method") {
+      draft.plan = contractMethods[draft.method].plans[0];
+      const plan = $("#contract-plan");
+      if (plan) plan.innerHTML = contractPlanOptions(draft);
+    }
+    if (key === "method" || key === "plan" || key === "signed") {
+      $("#contract-schedule").innerHTML = contractSchedule(unit, draft);
+    }
+  }
+
+  function updateSaleField(input) {
+    if (!S.route?.sale) return;
+    const contact = input.form?.id === "sale-customer-form" && input.dataset.f;
+    const key = input.dataset.saleField;
+    if (!contact && !key) return;
+    const unit = byUid(S.route.uid);
+    const draft = saleDraft(unit);
+    const values = contact ? draft.contacts[draft.type] : draft;
+    const name = contact || key;
+    if (values[name] === input.value) return;
+    values[name] = input.value;
+    if (name !== "signingDate") draft.generated = false;
+    if (contact && customerIdentityFields.includes(name)) showUnitCustomerDuplicates(input.form, unit, draft.customerKey);
+    if (key === "amount") $("#sale-amount-formatted").textContent = input.value ? fmt(Number(input.value)) : "";
+    if (key === "template") {
+      renderContent();
+      $("#sale-template")?.focus({ preventScroll: true });
+    }
+  }
+
   document.addEventListener("input", (e) => {
+    if (e.target.id === "work-unit-query") {
+      S.unitQuery = e.target.value;
+      $("#work-unit-results").innerHTML = unitSearchResults(S.unitQuery);
+      return;
+    }
+    if (e.target.id === "agent-draft-body") {
+      const result = S.view === "work" ? agentSession.workReview.result : agentSession.result;
+      result.proposal.body = e.target.value;
+      return;
+    }
+    if (e.target.hasAttribute("data-quote-discount") && S.route?.sale) {
+      const unit = byUid(S.route.uid);
+      updateSaleDiscounts(e.target.form, unit, saleDraft(unit));
+      return;
+    }
     if (e.target.id === "q") { S.q = e.target.value; renderContent(); }
+    if (e.target.id === "uc-search") renderUnitCustomerMatches(e.target);
+    if (customerIdentityFields.includes(e.target.dataset.f) && e.target.form?.id === "uc-form") {
+      const unit = byUid(S.route?.uid);
+      if (unit) showUnitCustomerDuplicates(e.target.form, unit);
+    }
+    updateContractField(e.target);
+    if (e.target.id !== "sale-template") updateSaleField(e.target);
+  });
+  document.addEventListener("change", (e) => {
+    updateContractField(e.target);
+    updateSaleField(e.target);
+    if (S.route?.sale && e.target.form?.id?.startsWith("sale-")) persist(true);
+    if (e.target.dataset.contractField && saleDrafts.get(S.route?.uid)?.signedDate && !persist(true)) {
+      toast("Chưa lưu được thay đổi. Tải lại nếu dữ liệu vừa đổi ở tab khác.");
+    }
+  });
+  document.addEventListener("submit", (e) => {
+    if (e.target.id === "agent-task-form") {
+      e.preventDefault();
+      runAgentPrompt($("#agent-task").value);
+      return;
+    }
+    if (e.target.id === "agent-draft-form") {
+      e.preventDefault();
+      const inWork = S.view === "work";
+      const result = inWork ? agentSession.workReview.result : agentSession.result;
+      const proposal = result.proposal;
+      const body = $("#agent-draft-body").value.trim();
+      const error = body ? saveAgentReminder(proposal, body) : "Nhập nội dung nhắc thanh toán.";
+      if (error) $("#agent-draft-error").textContent = error;
+      else if (inWork) {
+        agentSession.workReview = { uid: proposal.uid, saved: agentSession.drafts[0], result: null };
+        renderContent();
+        $(".work-saved-body")?.focus();
+        toast("Đã lưu bản nháp nhắc thanh toán");
+      } else showAgentResult({ text: "Đã lưu bản nháp · " + agentLabel(byUid(proposal.uid)) + ".", source: result.source });
+      return;
+    }
+    if (!S.route?.sale || !["sale-customer-form", "sale-payment-form", "sale-transaction-form", "sale-sign-form"].includes(e.target.id)) return;
+    e.preventDefault();
+    const unit = byUid(S.route.uid);
+    if (unit) submitSaleStep(e.target, unit);
   });
 
-  document.addEventListener("change", (e) => {
-    if (e.target.id === "uc-pick") { linkUnitCust(S.route && S.route.uid, e.target.value); }
+  $("#contract-template").addEventListener("change", (e) => {
+    const dialog = $("#contract-preview");
+    const unit = byUid(dialog.dataset.uid);
+    const doc = DOCS.find((item) => item.id === dialog.dataset.doc);
+    if (!unit || !doc) return;
+    contractDraft(unit).templates[doc.id] = e.target.value;
+    $("#contract-preview-result").textContent = "";
+    renderContractDocument(unit, doc);
+  });
+  $("#contract-preview").addEventListener("close", (e) => {
+    const dialog = e.currentTarget;
+    if (!dialog.dataset.refresh) return;
+    delete dialog.dataset.refresh;
+    renderContent();
+    $('[data-act="contract-document"][data-doc="' + dialog.dataset.doc + '"]')?.focus({ preventScroll: true });
+  });
+  $("#escrow-pdf-dialog").addEventListener("close", (e) => {
+    if (e.currentTarget.open) return;
+    escrowPdfRequest++;
+    clearEscrowPdfView();
+  });
+
+  $("#customer-message-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    $("#customer-message-result").textContent = "Đã mô phỏng gửi " + e.currentTarget.dataset.channel + " tới " + $("#message-recipient").value + ".";
+    $("#customer-message-submit").disabled = true;
+  });
+  $("#payment-receipt-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    recordPaymentReceipt();
+  });
+
+  $("#customer-import-file").addEventListener("change", (e) => {
+    previewCustomerImport(e.target.files[0]);
+  });
+  $("#customer-import").addEventListener("close", () => {
+    customerImportRequest++;
+    stagedCustomerImport = null;
   });
 
   document.addEventListener("keydown", (e) => {
+    if ($("dialog[open]")) return;
+    const lookup = e.target.closest(".unit-customer-lookup");
+    if (lookup && e.key === "ArrowDown" && e.target.id === "uc-search") {
+      const first = lookup.querySelector("#uc-matches:not([hidden]) button");
+      if (first) { e.preventDefault(); first.focus(); }
+    }
     if (e.key !== "Escape") return;
+    if (lookup && !$("#uc-matches").hidden) {
+      const input = $("#uc-search");
+      e.preventDefault();
+      input.value = "";
+      renderUnitCustomerMatches(input);
+      input.focus();
+      return;
+    }
     if (S.menu) { S.menu = ""; renderContent(); return; }
     if (S.route) { e.preventDefault(); back(); }
   });
@@ -2593,19 +4679,21 @@ body.detail-mode #viewbar{display:none}
     let drag = null;
 
     document.addEventListener("pointerdown", (e) => {
-      if (e.button !== 0) return;
+      if (e.button !== 0 || e.pointerType !== "mouse") return;
       const el = e.target.closest(SEL);
       if (!can(el)) return;
       if (e.target.closest("button,a,input,select,textarea") && !e.target.closest(".chip,.tab")) return;
       drag = { el, x: e.clientX, left: el.scrollLeft, moved: false, id: e.pointerId };
-      el.classList.add("dragging");
-      el.setPointerCapture && el.setPointerCapture(e.pointerId);
     });
 
     document.addEventListener("pointermove", (e) => {
-      if (!drag) return;
+      if (!drag || e.pointerId !== drag.id) return;
       const dx = e.clientX - drag.x;
-      if (Math.abs(dx) > 4) {
+      if (drag.moved || Math.abs(dx) > 4) {
+        if (!drag.moved) {
+          drag.el.classList.add("dragging");
+          drag.el.setPointerCapture?.(e.pointerId);
+        }
         drag.moved = true;
         drag.el.scrollLeft = drag.left - dx;
         drag.el.dataset.dragged = "1";
@@ -2643,6 +4731,7 @@ body.detail-mode #viewbar{display:none}
   /* ================= boot ================= */
   bindHScroll();
   restore();
+  seedPresentation();
   syncCust();
   render();
 })();
