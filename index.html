@@ -866,6 +866,16 @@ body.detail-mode #viewbar{display:none}
     <button class="btn pri" data-act="payment-export-demo">Mô phỏng xuất PDF</button></footer>
 </dialog>
 
+<dialog class="customer-dialog wa-l3-dialog" id="wa-l3" aria-labelledby="wa-l3-title">
+  <header><h2 id="wa-l3-title">Cần bạn quyết định</h2>
+    <form method="dialog"><button class="iconbtn" aria-label="Đóng"><svg class="ic"><use href="#i-x"/></svg></button></form>
+  </header>
+  <p><span class="tag t-sold">Mức 3 · Luôn hỏi</span> Việc tài chính: Agent không tự thực hiện. Quyết định được ghi vào Nhật ký và không hoàn tác.</p>
+  <ul id="wa-l3-facts"></ul>
+  <footer><form method="dialog"><button class="btn">Để sau</button></form>
+    <button class="btn pri" data-act="wa-l3-confirm" id="wa-l3-confirm">Xác nhận</button></footer>
+</dialog>
+
 <style>
 /* bổ sung cho shell (giữ toàn bộ token ở khối style chính) */
 /* kéo ngang: chuột kéo được, bánh xe cũng cuộn */
@@ -3226,7 +3236,7 @@ body.detail-mode #viewbar{display:none}
       '<details class="unit-extra-tabs"' + (currentSecondary ? ' open' : '') + '><summary>Thông tin khác' +
       (currentSecondary ? ' · ' + esc(currentSecondary.l) : '') + '</summary><div class="unit-extra-links">' +
       secondaryTabs.map(tabButton).join("") + '</div></details></nav>' +
-      "</div>" +
+      "</div>" + unitAgentCard(u) +
       (tabN === 1 ? unitOverview(u) :
         '<div class="d-body one"><div class="d-main">' + unitTab(u, tabN) + '</div></div>') +
       '</div>'
@@ -3783,6 +3793,7 @@ body.detail-mode #viewbar{display:none}
     saleDrafts.clear();
     agentRequest?.abort();
     Object.assign(agentSession, { result: null, workReview: null, prompt: "", uid: "", pinnedUnit: "", reviewedUnit: "", profile: "coordinator", returnTo: null, drafts: [] });
+    waReset();
     S.f = "all"; S.ct = "all"; S.q = ""; S.unitQuery = ""; S.route = null;
     seedStatusMeta();
     seedPresentation();
@@ -3957,8 +3968,419 @@ body.detail-mode #viewbar{display:none}
       '</span></button></li>').join("") + '</ul>';
   }
 
+  /* ================= agent giao dịch: luật → hộp việc → việc tại hồ sơ → nhật ký ================= *
+   * Lớp 1 (luật): WA_RULES sinh "việc" từ dữ liệu giao dịch, mỗi luật có mức tự động 1/2/3.
+   * Lớp 2 (hộp việc): gom mọi việc vào một hàng đợi, xếp theo Quá hạn > Hôm nay > Tuần này.
+   * Lớp 3 (tại hồ sơ): thẻ "Nên làm tiếp theo" trong hồ sơ căn, cùng hành động.
+   * Mọi hành động (của Agent hoặc người dùng) ghi vào nhật ký; hành động không phải tiền hoàn tác được 24 giờ. */
+  const WA_LS = LS + "-work-agent";
+  const DAY_MS = 86400000;
+  const WA_UNDO_MS = DAY_MS;
+  const WA_INBOX_LIMIT = 7;
+  const WA_MANAGER = "Quản lý dự án";
+  const WA_LEVEL = {
+    1: { l: "Tự động", c: "t-av", d: "Agent tự làm, không hỏi. Ghi nhật ký, hoàn tác được.", ex: "Gắn cờ, tạo task nhắc, báo quản lý" },
+    2: { l: "1 click xác nhận", c: "t-tx", d: "Agent soạn sẵn, người dùng bấm xác nhận mới thực hiện.", ex: "Nhắc khách, yêu cầu bổ sung hồ sơ" },
+    3: { l: "Luôn hỏi", c: "t-sold", d: "Agent không bao giờ tự làm. Luôn hỏi, luôn ghi nhật ký, không hoàn tác.", ex: "Huỷ giao dịch, hoàn tiền, đổi số tiền" }
+  };
+  const WA_BUCKETS = [["overdue", "Quá hạn"], ["today", "Hôm nay"], ["week", "Tuần này"]];
+  const WA_STATE_L = { open: "Đang mở", snoozed: "Đang hoãn", done: "Đã xử lý", reminded: "Đã nhắc" };
+  const waState = { rules: {}, tasks: {}, seen: {}, audit: [] };
+  const waUI = { tab: "inbox", all: false, confirm: "", logRule: "" };
+  let waLast = [];
+
+  const waTodayMs = () => new Date(dateISO(TODAY) + "T00:00:00").getTime();
+  const waDaysSince = (ms) => Math.max(0, Math.floor((waTodayMs() - ms) / DAY_MS));
+  const waDaysTo = (vn) => {
+    const iso = dateISO(vn);
+    return iso ? Math.round((new Date(iso + "T00:00:00").getTime() - waTodayMs()) / DAY_MS) : null;
+  };
+  const waDate = (ms) => { const d = new Date(ms); return pad2(d.getDate()) + "/" + pad2(d.getMonth() + 1) + "/" + d.getFullYear(); };
+  const waLastLog = (u) => (u.log || []).reduce((max, entry) => Math.max(max, entry.at), 0);
+  const waEnabled = (rule) => waState.rules[rule.id] !== false;
+  const waOwner = (rule) => rule.owner === "manager" ? WA_MANAGER : CUSTOMER_ACTOR;
+  const waPaid = (d) => d.openingReceived + d.receipts.reduce((sum, receipt) => sum + receipt.amount, 0);
+
+  const WA_RULES = [
+    { id: "r1", n: 1, when: "Quá hạn thanh toán > 0 ngày", then: "Nhắc khách + tạo task cho sale", level: 2, owner: "sale",
+      scan: () => agentPaymentRows().map((row) => {
+        const u = byUid(row.uid);
+        const first = agentExpired(u)[0];
+        const late = -waDaysTo(row.due);
+        return { id: "r1:" + u.uid + ":" + first.k, uid: u.uid, title: "Quá hạn thu " + late + " ngày",
+          meta: [customerName(u.buyer), fmt(row.amount), row.count + " khoản quá hạn"],
+          why: first.k + " hạn " + first.date + " còn " + fmt(first.remaining) + " chưa thu.",
+          bucket: "overdue", score: 300 + late, primary: "remind",
+          open: { tab: 3, view: "collection", label: "Xem lịch thu" } };
+      }) },
+    { id: "r2", n: 2, when: "Đến hạn thu ≤ 3 ngày", then: "Tạo task nhắc trước cho sale", level: 1, owner: "sale",
+      auto: "Tạo task nhắc trước cho sale", autoShort: "tạo task nhắc",
+      scan: () => UNITS.filter((u) => u.buyer && tracksPayments(u)).flatMap((u) => {
+        const item = schedule(u).find((step) => {
+          const days = step.remaining > 0 && !step.overdue ? waDaysTo(step.date) : null;
+          return days !== null && days >= 0 && days <= 3;
+        });
+        if (!item) return [];
+        const days = waDaysTo(item.date);
+        return [{ id: "r2:" + u.uid + ":" + item.k, uid: u.uid, title: days ? "Đến hạn thu sau " + days + " ngày" : "Đến hạn thu hôm nay",
+          meta: [customerName(u.buyer), fmt(item.remaining), item.k],
+          why: item.k + " hạn " + item.date + ". Nhắc trước giúp tránh quá hạn.",
+          bucket: days <= 1 ? "today" : "week", score: 200 - days, open: { tab: 3, view: "collection", label: "Xem lịch thu" } }];
+      }) },
+    { id: "r3", n: 3, when: "Đã ký quỹ nhưng chưa có lịch thanh toán", then: "Gắn cờ + yêu cầu lập lịch", level: 1, owner: "sale",
+      auto: "Gắn cờ “Thiếu lịch thanh toán”", autoShort: "gắn cờ",
+      scan: () => Array.from(saleDrafts).filter(([uid, draft]) => draft.signedDate && byUid(uid) &&
+        !contractDrafts.get(uid)?.appliedSchedule).map(([uid, draft]) => ({
+        id: "r3:" + uid, uid, title: "Chưa có lịch thanh toán",
+        meta: [saleCustomerName(draft), "Ký quỹ " + dateVN(draft.signedDate)],
+        why: "Đã ký quỹ nhưng chưa áp dụng lịch thu vào hợp đồng nên CRM chưa theo dõi được công nợ.",
+        bucket: "today", score: 180, open: { tab: 4, label: "Lập lịch thanh toán" } })) },
+    { id: "r4", n: 4, when: "Kẹt ở bước Ký quỹ > 7 ngày", then: "Báo quản lý + gắn cờ đỏ", level: 1, owner: "manager",
+      auto: "Báo quản lý dự án + gắn cờ đỏ", autoShort: "báo quản lý",
+      scan: () => UNITS.filter((u) => u.status === "IN_TRANSACTION" && contractDraft(u).stage === "ky-quy").flatMap((u) => {
+        const since = waLastLog(u);
+        const days = since ? waDaysSince(since) : 0;
+        if (days <= 7) return [];
+        return [{ id: "r4:" + u.uid, uid: u.uid, title: "Ký quỹ treo " + days + " ngày",
+          meta: [customerName(u.buyer) || "Chưa liên kết khách", REASON_L[reasonOf(u)]],
+          why: "Ở trạng thái " + REASON_L[reasonOf(u)] + " từ " + waDate(since) + ", vượt ngưỡng 7 ngày.",
+          bucket: days > 30 ? "today" : "week", score: 100 + Math.min(days, 90), open: { tab: 4, label: "Mở hồ sơ ký quỹ" } }];
+      }) },
+    { id: "r5", n: 5, when: "Thiếu CCCD/MST hoặc SĐT khách", then: "Chặn xuất hợp đồng, yêu cầu bổ sung", level: 2, owner: "sale",
+      scan: () => UNITS.filter((u) => u.buyer && (u.status === "IN_TRANSACTION" || u.status === "SOLD")).flatMap((u) => {
+        const rec = custOf(u.buyer, u);
+        const org = rec.type === "org";
+        const missing = [!String(rec.phone || "").trim() && "SĐT",
+          !String((org ? rec.taxno : rec.idno) || "").trim() && (org ? "MST" : "CCCD")].filter(Boolean);
+        if (!missing.length) return [];
+        return [{ id: "r5:" + u.uid + ":" + missing.join("-"), uid: u.uid, title: "Thiếu " + missing.join(", ") + " của khách",
+          meta: [customerName(u.buyer), "Đang chặn xuất hợp đồng"],
+          why: "Hợp đồng cần đủ " + (org ? "MST" : "CCCD") + " và SĐT của bên mua.",
+          bucket: "today", score: 170, primary: "confirm",
+          confirm: { label: "Yêu cầu khách", title: "Yêu cầu khách bổ sung hồ sơ", cta: "Gửi yêu cầu", done: "Gửi yêu cầu bổ sung " + missing.join(", "),
+            body: "Kính gửi Quý khách, để hoàn tất hồ sơ căn " + u.code + " tại " + projOf(u).short + ", Meraki Land cần Quý khách bổ sung: " +
+              missing.join(", ") + ". Xin cảm ơn." },
+          open: { tab: 2, label: "Mở hồ sơ khách" } }];
+      }) },
+    { id: "r6", n: 6, when: "Căn chưa bán tồn > 45 ngày", then: "Gợi ý mở bán / rà soát giá cho quản lý", level: 1, owner: "manager",
+      auto: "Gửi gợi ý rà soát giá cho quản lý", autoShort: "gửi gợi ý",
+      scan: () => {
+        const groups = new Map();
+        UNITS.filter((u) => u.status === "AVAILABLE" && waLastLog(u)).forEach((u) => {
+          const days = waDaysSince(waLastLog(u));
+          if (days <= 45) return;
+          const key = u.proj + ":" + u.tower;
+          const g = groups.get(key) || { u, n: 0, max: 0 };
+          g.n += 1; g.max = Math.max(g.max, days);
+          groups.set(key, g);
+        });
+        return Array.from(groups, ([key, g]) => ({
+          id: "r6:" + key, label: projOf(g.u).short + " · " + towerOf(g.u).name, title: g.n + " căn tồn > 45 ngày",
+          meta: ["Lâu nhất " + g.max + " ngày"], why: "Gộp theo tòa để chống nhiễu: 1 việc thay cho " + g.n + " cảnh báo riêng lẻ.",
+          bucket: "week", score: 40 + Math.min(g.n, 50), tower: { pid: g.u.proj, tid: g.u.tower } }));
+      } },
+    { id: "r7", n: 7, when: "Giao dịch đã huỷ còn khoản đã thu", then: "Đối soát hoàn tiền với kế toán", level: 3, owner: "manager",
+      scan: () => UNITS.filter((u) => u.status === "AVAILABLE" &&
+        (u.log || []).some((entry) => entry.from === "IN_TRANSACTION" && entry.to === "AVAILABLE")).flatMap((u) => {
+        const paid = waPaid(contractDraft(u));
+        if (!paid) return [];
+        const cancel = (u.log || []).filter((entry) => entry.from === "IN_TRANSACTION" && entry.to === "AVAILABLE").pop();
+        return [{ id: "r7:" + u.uid + ":" + cancel.at, uid: u.uid, title: "Huỷ giao dịch còn " + fmt(paid) + " đã thu",
+          meta: ["Huỷ " + waDate(cancel.at), "Bởi " + cancel.by], why: "Khoản đã thu chưa được đối soát hoàn tiền sau khi huỷ.",
+          bucket: "today", score: 250, primary: "l3",
+          l3: { title: "Đối soát hoàn tiền căn " + u.code, cta: "Chuyển kế toán đối soát",
+            facts: ["Số đã thu: " + fmt(paid), "Huỷ ngày " + waDate(cancel.at) + " bởi " + cancel.by,
+              "Agent không tự hoàn tiền hay sửa số tiền. Kế toán đối soát và thực hiện."] },
+          open: { tab: 3, view: "collection", label: "Xem lịch thu" } }];
+      }) },
+    { id: "r8", n: 8, when: "Hồ sơ khách có thay đổi chưa xác nhận", then: "Yêu cầu người phụ trách xác nhận", level: 2, owner: "sale",
+      scan: () => Object.entries(CUST).flatMap(([key, rec]) => {
+        const history = Array.isArray(rec.history) ? rec.history : [];
+        const last = history[history.length - 1];
+        const edits = (last?.changes || []).filter((change) => change.before);
+        if (!edits.length) return [];
+        const unit = UNITS.find((u) => u.buyer === key);
+        return [{ id: "r8:" + key + ":" + last.at, uid: unit?.uid || "", cust: key, label: customerName(key),
+          title: edits.length + " thay đổi hồ sơ chưa xác nhận", meta: [last.action, last.actor, dtime(last.at)],
+          why: "Đã sửa " + edits.slice(0, 3).map((change) => change.field).join(", ") + (edits.length > 3 ? "…" : "") + ".",
+          bucket: "today", score: 120, primary: "confirm",
+          confirm: { label: "Xác nhận thay đổi", title: "Xác nhận thay đổi hồ sơ", cta: "Xác nhận đúng", done: "Xác nhận " + edits.length + " thay đổi hồ sơ",
+            body: edits.map((change) => change.field + ": " + change.before + " → " + (change.after || "(trống)")).join("\n") } }];
+      }) }
+  ];
+
+  function waLoad() {
+    try {
+      const d = JSON.parse(localStorage.getItem(WA_LS) || "null");
+      if (!d) return;
+      ["rules", "tasks", "seen"].forEach((k) => { if (d[k] && typeof d[k] === "object") waState[k] = d[k]; });
+      if (Array.isArray(d.audit)) waState.audit = d.audit.filter((entry) => entry && entry.id && entry.at);
+    } catch (e) {}
+  }
+  function waSave() {
+    try { localStorage.setItem(WA_LS, JSON.stringify(waState)); } catch (e) {}
+  }
+  function waReset() {
+    Object.assign(waState, { rules: {}, tasks: {}, seen: {}, audit: [] });
+    Object.assign(waUI, { tab: "inbox", all: false, confirm: "", logRule: "" });
+    try { localStorage.removeItem(WA_LS); } catch (e) {}
+  }
+  function waLog(entry) {
+    waState.audit.unshift({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7), at: Date.now(), undone: false, ...entry });
+    waState.audit.length = Math.min(waState.audit.length, 300);
+  }
+  function waStatus(task) {
+    const s = waState.tasks[task.id];
+    if (!s) return "open";
+    if (s.state === "snoozed" && s.until <= Date.now()) return "open";
+    return s.state;
+  }
+  const waLive = (task) => waStatus(task) === "open" || waStatus(task) === "reminded";
+  const waOrder = (task) => WA_BUCKETS.findIndex(([id]) => id === task.bucket);
+  const waSort = (a, b) => waOrder(a) - waOrder(b) || (waStatus(a) === "reminded") - (waStatus(b) === "reminded") || b.score - a.score;
+  const waFind = (id) => waLast.find((task) => task.id === id);
+
+  /* Chạy luật: việc mới của luật mức 1 được Agent tự xử lý; việc mất nguyên nhân thì tự đóng. */
+  function waTick() {
+    const tasks = WA_RULES.filter(waEnabled).flatMap((rule) => rule.scan().map((task) => ({
+      ...task, rule, label: task.label || (task.uid ? agentLabel(byUid(task.uid)) : "") })));
+    const ids = new Set(tasks.map((task) => task.id));
+    const now = Date.now();
+    let changed = false;
+    tasks.forEach((task) => {
+      if (waState.seen[task.id]) return;
+      changed = true;
+      waState.seen[task.id] = { rule: task.rule.id, at: now, label: task.label, auto: task.rule.level === 1 };
+      if (task.rule.level === 1) waLog({ actor: "Agent", rule: task.rule.id, task: task.id, ref: task.label,
+        action: task.rule.auto + " · " + task.title, before: "Chưa có", after: "Đã " + task.rule.autoShort, undo: { type: "auto", task: task.id } });
+    });
+    Object.entries(waState.seen).forEach(([id, seen]) => {
+      if (ids.has(id) || waState.rules[seen.rule] === false) return;
+      if (waState.tasks[id]?.state !== "done") waLog({ actor: "Agent", rule: seen.rule, task: id, ref: seen.label,
+        action: "Tự đóng việc vì nguyên nhân đã hết", before: WA_STATE_L[waState.tasks[id]?.state || "open"], after: "Đã đóng", undo: null,
+        noUndo: "Dữ liệu đã đúng" });
+      delete waState.seen[id];
+      delete waState.tasks[id];
+      changed = true;
+    });
+    if (changed) waSave();
+    return tasks;
+  }
+
+  function waSetTask(task, next, action) {
+    const prev = waState.tasks[task.id] ? { ...waState.tasks[task.id] } : null;
+    if (next) waState.tasks[task.id] = next; else delete waState.tasks[task.id];
+    waLog({ actor: CUSTOMER_ACTOR, rule: task.rule.id, task: task.id, ref: task.label, action,
+      before: WA_STATE_L[prev?.state || "open"], after: WA_STATE_L[next?.state || "open"], undo: { type: "state", task: task.id, prev } });
+    waSave();
+  }
+  function waAfterReminder(proposal) {
+    const u = byUid(proposal.uid);
+    const id = "r1:" + proposal.uid + ":" + proposal.key;
+    waState.tasks[id] = { state: "reminded", at: Date.now() };
+    waLog({ actor: CUSTOMER_ACTOR, rule: "r1", task: id, ref: u ? agentLabel(u) : proposal.uid,
+      action: "Xác nhận nhắc thanh toán " + proposal.key + " · " + fmt(proposal.amount), before: "Đang mở", after: "Đã nhắc",
+      undo: { type: "draft", task: id, uid: proposal.uid, key: proposal.key } });
+    waSave();
+  }
+  function waToggleRule(id) {
+    const rule = WA_RULES.find((item) => item.id === id);
+    if (!rule) return;
+    const prev = waEnabled(rule);
+    waState.rules[id] = !prev;
+    waLog({ actor: CUSTOMER_ACTOR, rule: id, ref: "Tự động hoá", action: (prev ? "Tắt" : "Bật") + " luật “" + rule.when + "”",
+      before: prev ? "Bật" : "Tắt", after: prev ? "Tắt" : "Bật", undo: { type: "rule", rule: id, prev } });
+    waSave();
+  }
+  function waUndo(id) {
+    const entry = waState.audit.find((item) => item.id === id);
+    if (!entry || entry.undone || !entry.undo || Date.now() - entry.at > WA_UNDO_MS) return false;
+    const undo = entry.undo;
+    if (undo.type === "auto" && waState.seen[undo.task]) waState.seen[undo.task].auto = false;
+    if (undo.type === "state") { if (undo.prev) waState.tasks[undo.task] = undo.prev; else delete waState.tasks[undo.task]; }
+    if (undo.type === "rule") waState.rules[undo.rule] = undo.prev;
+    if (undo.type === "draft") {
+      agentSession.drafts = agentSession.drafts.filter((draft) => draft.uid !== undo.uid || draft.key !== undo.key);
+      if (agentSession.workReview?.uid === undo.uid) agentSession.workReview = null;
+      delete waState.tasks[undo.task];
+      persist();
+    }
+    entry.undone = true;
+    waLog({ actor: CUSTOMER_ACTOR, rule: entry.rule, task: entry.task, ref: entry.ref, action: "Hoàn tác: " + entry.action,
+      before: entry.after, after: entry.before, undo: null, noUndo: "Bản ghi hoàn tác" });
+    waSave();
+    return true;
+  }
+
+  function waButton(action, task, label, style = "", attributes = "") {
+    return '<button type="button" class="btn ' + style + '" data-act="' + action + '" data-task="' + esc(task.id) + '"' + attributes + '>' + label + '</button>';
+  }
+
+  function reminderPanel(unit) {
+    const review = agentSession.workReview;
+    const isOpen = review?.uid === unit.uid;
+    let body = "";
+    if (isOpen) {
+      const first = agentExpired(unit)[0];
+      const openedDraft = review.saved || review.result?.proposal;
+      const stale = openedDraft && (openedDraft.key !== first?.k || openedDraft.due !== first.date ||
+        openedDraft.amount !== first.remaining || openedDraft.buyer !== unit.buyer);
+      body = '<div class="work-reminder"><div class="work-reminder-title"><h3>Nhắc thanh toán · mức 2, cần bạn xác nhận</h3>' +
+        workAction("work-close-reminder", unit.uid, "Thu gọn", "ghost") + '</div>' +
+        (stale ? '<p class="work-saved-body" tabindex="-1" role="status">Lịch thu đã thay đổi.</p>' +
+          workAction("work-refresh-reminder", unit.uid, "Cập nhật lời nhắc", "pri") :
+          review.saved ? '<p class="work-saved-body" tabindex="-1">' + esc(review.saved.body) + '</p><p class="note">Đã xác nhận · ' +
+          esc(review.saved.actor) + ' · hoàn tác được trong Nhật ký 24 giờ</p>' : agentResult(review.result)) + '</div>';
+    }
+    return '<div id="work-reminder-' + esc(unit.uid) + '"' + (isOpen ? '' : ' hidden') + '>' + body + '</div>';
+  }
+
+  function waConfirmPanel(task) {
+    if (waUI.confirm !== task.id) return "";
+    return '<div class="work-reminder wa-confirm" id="wa-confirm-panel"><div class="work-reminder-title"><h3>' + esc(task.confirm.title) +
+      ' · mức 2</h3>' + waButton("wa-confirm-cancel", task, "Huỷ", "ghost") + '</div>' +
+      '<p class="work-saved-body" tabindex="-1">' + esc(task.confirm.body) + '</p>' +
+      '<p class="note">Agent chỉ thực hiện sau khi bạn xác nhận. Hoàn tác được trong Nhật ký 24 giờ.</p>' +
+      '<div class="wa-confirm-actions">' + waButton("wa-confirm", task, esc(task.confirm.cta), "pri") + '</div></div>';
+  }
+
+  function waActions(task, inUnit) {
+    const u = task.uid && byUid(task.uid);
+    const out = [];
+    if (task.primary === "remind" && u) {
+      const saved = currentReminderDraft(u, agentExpired(u)[0]);
+      const isOpen = agentSession.workReview?.uid === u.uid;
+      out.push(workAction("work-reminder", u.uid, saved ? "Xem lời nhắc đã lưu" : "Nhắc khách", saved ? "" : "pri",
+        ' aria-expanded="' + isOpen + '" aria-controls="work-reminder-' + esc(u.uid) + '"'));
+    } else if (task.primary === "confirm") {
+      out.push(waButton("wa-confirm-open", task, esc(task.confirm.label), "pri", ' aria-expanded="' + (waUI.confirm === task.id) + '"'));
+    } else if (task.primary === "l3") {
+      out.push(waButton("wa-l3-open", task, "Đối soát hoàn tiền…", "pri"));
+    }
+    if (task.open && u && !(inUnit && S.tab === task.open.tab)) {
+      out.push(workAction("work-open", u.uid, task.open.label, task.primary ? "" : "pri", ' data-tab="' + task.open.tab + '"' +
+        (task.open.view ? ' data-payment-view="' + task.open.view + '"' : '')));
+    }
+    if (task.tower) out.push('<button type="button" class="btn pri" data-act="wa-tower" data-pid="' + esc(task.tower.pid) +
+      '" data-tid="' + esc(task.tower.tid) + '">Mở sơ đồ tòa</button>');
+    if (task.cust && !inUnit) out.push('<button type="button" class="btn" data-act="wa-cust" data-name="' + esc(task.cust) + '">Mở hồ sơ khách</button>');
+    out.push(waButton("wa-snooze", task, "Hoãn 1 ngày", "ghost"));
+    out.push(waButton("wa-done", task, "Đã xử lý", "ghost"));
+    if (!inUnit) out.push('<button type="button" class="btn ghost wa-mute" data-act="wa-rule-toggle" data-rule="' + task.rule.id +
+      '" title="Tắt luật #' + task.rule.n + ' trong Tự động hoá">Tắt loại này</button>');
+    return out.join("");
+  }
+
+  function waTaskItem(task, inUnit = false) {
+    const status = waStatus(task);
+    const seen = waState.seen[task.id];
+    const level = WA_LEVEL[task.rule.level];
+    const u = task.uid && byUid(task.uid);
+    const tags = ['<span class="tag ' + level.c + '" title="' + esc(level.d) + '">' + level.l + '</span>'];
+    if (status === "reminded") tags.push('<span class="tag t-lock">Đã nhắc</span>');
+    if (seen?.auto && task.rule.autoShort) tags.push('<span class="tag t-lock" title="' + esc(task.rule.auto) + '">Agent đã ' + esc(task.rule.autoShort) + '</span>');
+    if (task.bucket === "overdue" && status === "open" && seen && Date.now() - seen.at > DAY_MS) tags.push('<span class="tag t-sold">Đã leo thang quản lý</span>');
+    return '<li class="wa-task b-' + task.bucket + '"><div class="wa-task-row"><span class="wa-dot" aria-hidden="true"></span>' +
+      '<div class="wa-task-text">' + (inUnit ? '' : '<b>' + esc(task.label) + '</b>') +
+      '<p class="wa-task-title">' + esc(task.title) + '</p>' +
+      '<p class="wa-task-meta">' + task.meta.filter(Boolean).map(esc).join(' <span aria-hidden="true">·</span> ') + '</p>' +
+      '<p class="wa-why"><b>Vì sao:</b> ' + esc(task.why) + ' <span>Luật #' + task.rule.n + ' · Phụ trách: ' + esc(waOwner(task.rule)) + '</span></p></div>' +
+      '<div class="wa-tags">' + tags.join("") + '</div></div>' +
+      '<div class="work-actions wa-actions">' + waActions(task, inUnit) + '</div>' +
+      (task.primary === "remind" && u ? reminderPanel(u) : '') + (task.confirm ? waConfirmPanel(task) : '') + '</li>';
+  }
+
+  function waInbox(tasks) {
+    const live = tasks.filter(waLive).sort(waSort);
+    const snoozed = tasks.filter((task) => waStatus(task) === "snoozed").length;
+    const today = waDate(Date.now());
+    const auto = waState.audit.filter((entry) => entry.actor === "Agent" && !entry.undone && waDate(entry.at) === today).length;
+    const shown = waUI.all ? live : live.slice(0, WA_INBOX_LIMIT);
+    const counts = WA_BUCKETS.map(([id, label]) => [id, label, live.filter((task) => task.bucket === id).length]);
+    const groups = WA_BUCKETS.map(([id, label]) => {
+      const items = shown.filter((task) => task.bucket === id);
+      return items.length ? '<li class="wa-bucket b-' + id + '"><h3>' + label + '<span>' + counts.find((c) => c[0] === id)[2] + '</span></h3></li>' +
+        items.map((task) => waTaskItem(task)).join("") : "";
+    }).join("");
+    return '<section class="work-section wa-inbox" aria-labelledby="wa-inbox-title">' +
+      '<div class="wa-digest"><div><h2 id="wa-inbox-title">Hộp việc</h2><p>' +
+      (live.length ? live.length + ' việc cần người xử lý' : 'Không còn việc cần xử lý') + '</p></div>' +
+      '<ul class="wa-digest-counts">' + counts.map(([id, label, n]) =>
+        '<li class="b-' + id + '"><span class="wa-dot" aria-hidden="true"></span>' + label + ' <b>' + n + '</b></li>').join("") + '</ul>' +
+      '<p class="wa-digest-auto">Agent đã tự xử lý <b>' + auto + '</b> việc hôm nay' +
+      (snoozed ? ' · <b>' + snoozed + '</b> việc đang hoãn' : '') +
+      ' <button type="button" class="btn ghost" data-act="wa-tab" data-watab="log">Xem nhật ký</button></p></div>' +
+      (live.length ? '<ul class="wa-list">' + groups + '</ul>' +
+        (live.length > WA_INBOX_LIMIT ? '<div class="wa-more"><span class="note">' +
+          (waUI.all ? 'Đang hiện tất cả ' + live.length + ' việc.' : 'Chỉ hiện ' + WA_INBOX_LIMIT + ' việc ưu tiên nhất để tránh nhiễu.') + '</span>' +
+          '<button type="button" class="btn" data-act="wa-all">' + (waUI.all ? 'Thu gọn' : 'Xem tất cả ' + live.length + ' việc') + '</button></div>' : '')
+        : '<p class="work-empty">Agent sẽ báo khi dữ liệu giao dịch phát sinh việc mới.</p>') + '</section>';
+  }
+
+  function unitAgentCard(u) {
+    const tasks = waLast.filter((task) => task.uid === u.uid && waLive(task)).sort(waSort).slice(0, 3);
+    if (!tasks.length) return "";
+    return '<section class="wa-nba" aria-labelledby="wa-nba-title"><header><h2 id="wa-nba-title">' +
+      '<svg class="ic sm" aria-hidden="true"><use href="#i-agent"/></svg>Nên làm tiếp theo</h2>' +
+      '<span class="note">Agent · ' + tasks.length + ' việc từ luật đang bật</span></header>' +
+      '<ul class="wa-list">' + tasks.map((task) => waTaskItem(task, true)).join("") + '</ul></section>';
+  }
+
+  function waRulesView(tasks) {
+    const levels = '<section class="wa-levels" aria-label="Ba mức quyền của Agent">' + [1, 2, 3].map((n) =>
+      '<div class="wa-level"><span class="tag ' + WA_LEVEL[n].c + '">Mức ' + n + ' · ' + WA_LEVEL[n].l + '</span><p>' + WA_LEVEL[n].d +
+      '</p><p class="note">' + WA_LEVEL[n].ex + '</p></div>').join("") + '</section>';
+    const rules = WA_RULES.map((rule) => {
+      const on = waEnabled(rule);
+      const matches = on ? tasks.filter((task) => task.rule === rule).length : rule.scan().length;
+      const runs = waState.audit.filter((entry) => entry.rule === rule.id).length;
+      return '<li class="wa-rule' + (on ? '' : ' off') + '"><button type="button" class="wa-switch" role="switch" aria-checked="' + on +
+        '" data-act="wa-rule-toggle" data-rule="' + rule.id + '" aria-label="' + (on ? 'Tắt' : 'Bật') + ' luật #' + rule.n + '"><span></span></button>' +
+        '<div class="wa-rule-text"><b>#' + rule.n + ' · Nếu ' + esc(rule.when.charAt(0).toLowerCase() + rule.when.slice(1)) + '</b>' +
+        '<p>→ ' + esc(rule.then) + (rule.auto ? ' <span class="note">(Agent tự: ' + esc(rule.auto.toLowerCase()) + ')</span>' : '') + '</p>' +
+        '<p class="note">' + (on ? 'Đang khớp ' + matches + ' việc' : 'Đang tắt · sẽ khớp ' + matches + ' việc nếu bật') +
+        ' · ' + runs + ' dòng nhật ký · Phụ trách: ' + esc(waOwner(rule)) + '</p></div>' +
+        '<div class="wa-rule-side"><span class="tag ' + WA_LEVEL[rule.level].c + '">Mức ' + rule.level + ' · ' + WA_LEVEL[rule.level].l + '</span>' +
+        (runs ? '<button type="button" class="btn ghost" data-act="wa-log-rule" data-rule="' + rule.id + '">Xem nhật ký</button>' : '') + '</div></li>';
+    }).join("");
+    const noise = ["Hộp việc chỉ hiện " + WA_INBOX_LIMIT + " việc ưu tiên nhất; phần còn lại gộp vào “Xem tất cả”.",
+      "Không báo lại cùng một việc khi dữ liệu chưa đổi: mỗi việc có mã theo nguyên nhân.",
+      "Việc đã hoãn im lặng đến hết hạn hoãn rồi mới hiện lại.",
+      "Việc tự đóng khi nguyên nhân hết (khách đã đóng tiền, hồ sơ đã đủ).",
+      "Mọi việc trong Hộp việc đều có “Đã xử lý” và “Tắt loại này”."];
+    return '<section class="work-section" aria-labelledby="wa-rules-title"><div class="wa-section-head"><h2 id="wa-rules-title">Tự động hoá</h2>' +
+      '<p class="note">Nguyên tắc: Agent được tự làm việc nhắc nhở, không được tự làm việc tài chính.</p></div>' + levels +
+      '<ul class="wa-rules">' + rules + '</ul></section>' +
+      '<section class="work-section" aria-labelledby="wa-noise-title"><h2 id="wa-noise-title">Chống nhiễu</h2><ul class="wa-noise">' +
+      noise.map((item) => '<li><svg class="ic sm" aria-hidden="true"><use href="#i-check"/></svg>' + esc(item) + '</li>').join("") + '</ul></section>';
+  }
+
+  function waLogView() {
+    const now = Date.now();
+    const used = WA_RULES.filter((rule) => waState.audit.some((entry) => entry.rule === rule.id));
+    const entries = waState.audit.filter((entry) => !waUI.logRule || entry.rule === waUI.logRule);
+    const chips = '<div class="wa-chips" role="group" aria-label="Lọc theo luật">' +
+      '<button type="button" class="btn" data-act="wa-log-rule" data-rule="" aria-pressed="' + !waUI.logRule + '">Tất cả · ' + waState.audit.length + '</button>' +
+      used.map((rule) => '<button type="button" class="btn" data-act="wa-log-rule" data-rule="' + rule.id + '" aria-pressed="' +
+        (waUI.logRule === rule.id) + '">Luật #' + rule.n + ' · ' + waState.audit.filter((entry) => entry.rule === rule.id).length + '</button>').join("") + '</div>';
+    const rows = entries.slice(0, 120).map((entry) => {
+      const rule = WA_RULES.find((item) => item.id === entry.rule);
+      const undo = entry.undone ? '<span class="note">Đã hoàn tác</span>' :
+        !entry.undo ? '<span class="note" title="' + esc(entry.noUndo || "") + '">' + esc(entry.noUndo || "Không hoàn tác") + '</span>' :
+        now - entry.at > WA_UNDO_MS ? '<span class="note">Hết hạn hoàn tác</span>' :
+        '<button type="button" class="btn" data-act="wa-undo" data-id="' + esc(entry.id) + '">Hoàn tác</button>';
+      return '<li class="wa-log-row' + (entry.undone ? ' undone' : '') + '"><time>' + esc(dtime(entry.at)) + '</time>' +
+        '<span class="tag ' + (entry.actor === "Agent" ? 't-av' : 't-lock') + '">' + esc(entry.actor) + '</span>' +
+        '<div class="wa-log-text"><b>' + esc(entry.action) + '</b><p class="note">' + esc(entry.ref || "") +
+        (rule ? ' · Luật #' + rule.n + ' · Mức ' + rule.level : '') + ' · ' + esc(entry.before) + ' → ' + esc(entry.after) + '</p></div>' +
+        '<div class="wa-log-undo">' + undo + '</div></li>';
+    }).join("");
+    return '<section class="work-section" aria-labelledby="wa-log-title"><div class="wa-section-head"><h2 id="wa-log-title">Nhật ký Agent</h2>' +
+      '<p class="note">Ai · khi nào · làm gì · trước → sau. Hoàn tác được 24 giờ với hành động không phải tiền.</p></div>' + chips +
+      (rows ? '<ul class="wa-log">' + rows + '</ul>' : '<p class="work-empty">Chưa có hành động nào.</p>') + '</section>';
+  }
+
   function viewWork() {
-    const due = agentPaymentRows();
     const drafts = Array.from(saleDrafts).flatMap(([uid, draft]) => {
       const unit = byUid(uid);
       if (!unit) return [];
@@ -3977,50 +4399,32 @@ body.detail-mode #viewbar{display:none}
       }
       return [];
     });
-    const review = agentSession.workReview;
-    const dueRows = due.map((row) => {
-      const unit = byUid(row.uid);
-      const first = agentExpired(unit)[0];
-      const saved = currentReminderDraft(unit, first);
-      const isOpen = review?.uid === row.uid;
-      const openedDraft = isOpen && (review.saved || review.result?.proposal);
-      const stale = openedDraft && (openedDraft.key !== first?.k || openedDraft.due !== first.date ||
-        openedDraft.amount !== first.remaining || openedDraft.buyer !== unit.buyer);
-      return '<li><div class="work-row"><div class="work-detail"><b>' + esc(row.label) + '</b><p>' + row.count +
-        ' khoản quá hạn <span aria-hidden="true">·</span> Hạn lâu nhất ' + esc(row.due) + '</p></div>' +
-        '<div class="work-amount"><strong>' + fmt(row.amount) + '</strong><span>' +
-        (saved ? 'Đã lưu bản nháp' : 'Còn phải thu quá hạn') + '</span></div>' +
-        '<div class="work-actions">' +
-        workAction("work-open", row.uid, "Xem lịch thu", "ghost", ' data-tab="3" data-payment-view="collection" aria-label="' +
-          esc("Xem lịch thu " + row.label) + '"') +
-        workAction("work-reminder", row.uid, saved ? "Xem bản nháp" : "Xem lời nhắc", "",
-          ' aria-expanded="' + isOpen + '" aria-controls="work-reminder-' + esc(row.uid) + '" aria-label="' +
-          esc((saved ? "Xem bản nháp " : "Xem lời nhắc ") + row.label) + '"') +
-        '</div></div><div id="work-reminder-' + esc(row.uid) + '"' + (isOpen ? '' : ' hidden') + '>' +
-        (isOpen ? '<div class="work-reminder"><div class="work-reminder-title"><h3>Bản nháp nhắc thanh toán</h3>' +
-          workAction("work-close-reminder", row.uid, "Thu gọn", "ghost") + '</div>' +
-          (stale ? '<p class="work-saved-body" tabindex="-1" role="status">Lịch thu đã thay đổi.</p>' +
-            workAction("work-refresh-reminder", row.uid, "Cập nhật lời nhắc", "pri") :
-            review.saved ? '<p class="work-saved-body" tabindex="-1">' + esc(review.saved.body) + '</p><p class="note">Đã lưu · ' +
-            esc(review.saved.actor) + '</p>' : agentResult(review.result)) + '</div>' : '') + '</div></li>';
-    }).join("");
     const draftRows = drafts.sort((a, b) => b.tab - a.tab || a.label.localeCompare(b.label)).map((item) =>
       '<li class="work-row"><div class="work-detail"><b>' + esc(item.buyer || item.label) +
       '</b><p>' + (item.buyer ? esc(item.label) + ' · ' : '') + esc(item.job) + '</p></div>' +
       '<span class="tag t-lock">' + esc(item.stage) + '</span><div class="work-actions">' +
       workAction("work-open", item.uid, "Tiếp tục hồ sơ", "pri", ' data-tab="' + item.tab + '"') + '</div></li>').join("");
-    return '<div class="work-page"><header class="work-header"><div><h1>Giao dịch</h1>' +
-      (DEMO ? '<p>Dữ liệu minh họa · ' + TODAY + '</p>' : '') + '</div>' +
+    const tasks = waLast;
+    const live = tasks.filter(waLive);
+    const tabs = [["inbox", "Hộp việc", live.length], ["rules", "Tự động hoá", WA_RULES.filter(waEnabled).length + "/" + WA_RULES.length],
+      ["log", "Nhật ký", waState.audit.length]];
+    const head = '<div class="work-page"><header class="work-header"><div><h1>Giao dịch</h1>' +
+      '<p>Agent giao dịch · ' + WA_RULES.filter(waEnabled).length + ' luật đang bật · tự nhắc việc, không tự làm việc tài chính' +
+      (DEMO ? ' · Dữ liệu minh họa ' + TODAY : '') + '</p></div>' +
       '<button type="button" class="btn" data-act="nav" data-view="project">Mở sơ đồ căn</button></header>' +
+      '<nav class="wa-tabs" aria-label="Agent giao dịch">' + tabs.map(([id, label, count]) =>
+        '<button type="button" class="wa-tab" data-act="wa-tab" data-watab="' + id + '" aria-current="' +
+        (waUI.tab === id ? "page" : "false") + '">' + label + '<span class="wa-count">' + count + '</span></button>').join("") + '</nav>';
+    if (waUI.tab === "rules") return head + waRulesView(tasks) + '</div>';
+    if (waUI.tab === "log") return head + waLogView() + '</div>';
+    return head + waInbox(tasks) +
       '<section class="work-unit-search" aria-labelledby="work-search-title"><h2 id="work-search-title">Tìm căn hộ</h2>' +
       '<div class="work-search-field"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg>' +
       '<input id="work-unit-query" class="inp" type="search" placeholder="' + (DEMO ? "Nhập mã căn, ví dụ 1001" : "Tìm theo mã căn") +
       '" aria-label="Tìm theo mã căn" autocomplete="off" maxlength="12" value="' + esc(S.unitQuery) + '" aria-controls="work-unit-results"></div>' +
       '<div id="work-unit-results" aria-live="polite">' + unitSearchResults(S.unitQuery) + '</div></section>' +
       '<section class="work-section" aria-labelledby="work-drafts-title"><h2 id="work-drafts-title">Giao dịch đang làm</h2>' +
-      (drafts.length ? '<ul class="work-list">' + draftRows + '</ul>' : '<p class="work-empty">Giao dịch bạn bắt đầu sẽ xuất hiện tại đây.</p>') + '</section>' +
-      (due.length ? '<section class="work-section" aria-labelledby="work-due-title"><h2 id="work-due-title">Khoản thu quá hạn</h2>' +
-        '<ul class="work-list">' + dueRows + '</ul></section>' : '') + '</div>';
+      (drafts.length ? '<ul class="work-list">' + draftRows + '</ul>' : '<p class="work-empty">Giao dịch bạn bắt đầu sẽ xuất hiện tại đây.</p>') + '</section></div>';
   }
 
   function agentLink(source) {
@@ -4154,6 +4558,7 @@ body.detail-mode #viewbar{display:none}
     const box = $("#content");
     const y = box.scrollTop;
     const r = S.route;
+    waLast = waTick();
     if (r && r.kind === "unit") {
       const u = byUid(r.uid);
       if (u) { box.innerHTML = detailUnit(u); box.scrollTop = y; return; }
@@ -4192,6 +4597,81 @@ body.detail-mode #viewbar{display:none}
       return;
     }
     if (a === "nav") { S.view = el.dataset.view; S.f = "all"; S.ct = "all"; S.q = ""; S.route = null; S.menu = ""; render(); return; }
+    if (a.startsWith("wa-")) {
+      const task = el.dataset.task ? waFind(el.dataset.task) : null;
+      if (a === "wa-tab") { waUI.tab = el.dataset.watab; waUI.confirm = ""; S.route = null; S.view = "work"; render(); $(".wa-tab[aria-current='page']")?.focus(); return; }
+      if (a === "wa-all") { waUI.all = !waUI.all; renderContent(); $('[data-act="wa-all"]')?.focus(); return; }
+      if (a === "wa-log-rule") { waUI.logRule = el.dataset.rule; waUI.tab = "log"; renderContent(); $('[data-act="wa-log-rule"][aria-pressed="true"]')?.focus(); return; }
+      if (a === "wa-rule-toggle") {
+        const rule = WA_RULES.find((item) => item.id === el.dataset.rule);
+        waToggleRule(el.dataset.rule);
+        renderContent();
+        toast((waState.rules[el.dataset.rule] === false ? "Đã tắt" : "Đã bật") + " luật #" + rule.n + " · hoàn tác trong Nhật ký");
+        $('.wa-switch[data-rule="' + el.dataset.rule + '"]')?.focus();
+        return;
+      }
+      if (a === "wa-undo") {
+        if (waUndo(el.dataset.id)) toast("Đã hoàn tác");
+        renderContent();
+        return;
+      }
+      if (a === "wa-tower") {
+        Object.assign(S, { view: "project", pid: el.dataset.pid, tid: el.dataset.tid, f: "AVAILABLE", route: null, menu: "" });
+        render();
+        return;
+      }
+      if (a === "wa-cust") { openCustByName(el.dataset.name); return; }
+      if (a === "wa-l3-confirm") {
+        const dialog = $("#wa-l3");
+        const pending = waFind(dialog.dataset.task);
+        dialog.close();
+        if (!pending) return;
+        waState.tasks[pending.id] = { state: "done", at: Date.now() };
+        waLog({ actor: CUSTOMER_ACTOR, rule: pending.rule.id, task: pending.id, ref: pending.label, action: pending.l3.cta,
+          before: "Đang mở", after: "Đã chuyển kế toán", undo: null, noUndo: "Tài chính · không hoàn tác" });
+        waSave();
+        renderContent();
+        toast("Đã chuyển kế toán đối soát · ghi vào Nhật ký");
+        return;
+      }
+      if (!task) { renderContent(); return; }
+      if (a === "wa-snooze") {
+        waSetTask(task, { state: "snoozed", until: Date.now() + DAY_MS, at: Date.now() }, "Hoãn 1 ngày · " + task.title);
+        renderContent();
+        toast("Đã hoãn đến " + dtime(Date.now() + DAY_MS) + " · hoàn tác trong Nhật ký");
+        return;
+      }
+      if (a === "wa-done") {
+        waSetTask(task, { state: "done", at: Date.now() }, "Đánh dấu đã xử lý · " + task.title);
+        if (agentSession.workReview?.uid === task.uid) agentSession.workReview = null;
+        if (waUI.confirm === task.id) waUI.confirm = "";
+        renderContent();
+        toast("Đã xử lý · hoàn tác trong Nhật ký");
+        return;
+      }
+      if (a === "wa-confirm-open" || a === "wa-confirm-cancel") {
+        waUI.confirm = a === "wa-confirm-open" && waUI.confirm !== task.id ? task.id : "";
+        renderContent();
+        (waUI.confirm ? $("#wa-confirm-panel .work-saved-body") : $('[data-act="wa-confirm-open"][data-task="' + task.id + '"]'))?.focus();
+        return;
+      }
+      if (a === "wa-confirm") {
+        waUI.confirm = "";
+        waSetTask(task, { state: task.rule.id === "r8" ? "done" : "reminded", at: Date.now() }, task.confirm.done);
+        renderContent();
+        toast(task.confirm.done + " · hoàn tác trong Nhật ký");
+        return;
+      }
+      if (a === "wa-l3-open") {
+        const dialog = $("#wa-l3");
+        dialog.dataset.task = task.id;
+        $("#wa-l3-title").textContent = task.l3.title;
+        $("#wa-l3-facts").innerHTML = task.l3.facts.map((fact) => '<li>' + esc(fact) + '</li>').join("");
+        $("#wa-l3-confirm").textContent = task.l3.cta;
+        dialog.showModal();
+        return;
+      }
+    }
     if (a === "agent-for-unit" || a === "agent-unpin") {
       agentRequest?.abort();
       const uid = a === "agent-for-unit" ? S.route.uid : "";
@@ -4511,7 +4991,7 @@ body.detail-mode #viewbar{display:none}
       return;
     }
     if (e.target.id === "agent-draft-body") {
-      const result = S.view === "work" ? agentSession.workReview.result : agentSession.result;
+      const result = S.view !== "agent" ? agentSession.workReview.result : agentSession.result;
       result.proposal.body = e.target.value;
       return;
     }
@@ -4545,17 +5025,18 @@ body.detail-mode #viewbar{display:none}
     }
     if (e.target.id === "agent-draft-form") {
       e.preventDefault();
-      const inWork = S.view === "work";
+      const inWork = S.view !== "agent";
       const result = inWork ? agentSession.workReview.result : agentSession.result;
       const proposal = result.proposal;
       const body = $("#agent-draft-body").value.trim();
       const error = body ? saveAgentReminder(proposal, body) : "Nhập nội dung nhắc thanh toán.";
-      if (error) $("#agent-draft-error").textContent = error;
-      else if (inWork) {
+      if (error) { $("#agent-draft-error").textContent = error; return; }
+      waAfterReminder(proposal);
+      if (inWork) {
         agentSession.workReview = { uid: proposal.uid, saved: agentSession.drafts[0], result: null };
         renderContent();
         $(".work-saved-body")?.focus();
-        toast("Đã lưu bản nháp nhắc thanh toán");
+        toast("Đã xác nhận nhắc thanh toán · ghi vào Nhật ký");
       } else showAgentResult({ text: "Đã lưu bản nháp · " + agentLabel(byUid(proposal.uid)) + ".", source: result.source });
       return;
     }
@@ -4731,6 +5212,7 @@ body.detail-mode #viewbar{display:none}
   /* ================= boot ================= */
   bindHScroll();
   restore();
+  waLoad();
   seedPresentation();
   syncCust();
   render();
