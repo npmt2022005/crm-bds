@@ -739,11 +739,6 @@ body.detail-mode #viewbar{display:none}
       <span>Khách hàng</span>
       <span class="nav-count" id="cnt-cust" title="Tổng số khách hàng"></span>
     </button>
-    <button class="nav-item" data-act="nav" data-view="vault" aria-label="Kho File Scan">
-      <svg class="ic"><use href="#i-file"/></svg>
-      <span>Kho File Scan</span>
-      <span class="nav-count" id="cnt-vault" title="Hồ sơ đã số hóa"></span>
-    </button>
   </nav>
 
   <div class="sb-foot">
@@ -845,6 +840,20 @@ body.detail-mode #viewbar{display:none}
   <footer class="escrow-pdf-footer">
     <a class="btn" id="hdmb-pdf-new-tab" target="_blank" rel="noopener" hidden>Mở trong tab mới</a>
     <a class="btn pri" id="hdmb-pdf-save" download hidden><svg class="ic sm"><use href="#i-download"/></svg>Tải PDF HĐMB</a>
+  </footer>
+</dialog>
+<dialog class="customer-dialog" id="vietqr-dialog" aria-labelledby="vietqr-dialog-title" style="max-width:440px;border-radius:10px;padding:0;overflow:hidden;border:1px solid #dce5e5;box-shadow:0 8px 30px rgba(0,0,0,0.15);">
+  <header style="padding:14px 18px;border-bottom:1px solid #dce5e5;display:flex;justify-content:space-between;align-items:center;background:#fff;">
+    <h2 id="vietqr-dialog-title" style="font-size:15px;margin:0;font-weight:700;display:flex;align-items:center;gap:6px;color:#172c33;">
+      <svg class="ic sm" style="color:#2563eb;" aria-hidden="true"><use href="#i-wallet"/></svg>
+      Thông báo thanh toán VietQR
+    </h2>
+    <form method="dialog"><button class="iconbtn" aria-label="Đóng"><svg class="ic"><use href="#i-x"/></svg></button></form>
+  </header>
+  <div style="padding:16px 20px;" id="vietqr-content"></div>
+  <footer style="padding:12px 18px;border-top:1px solid #dce5e5;display:flex;justify-content:flex-end;gap:8px;background:#f8fafb;">
+    <form method="dialog"><button class="btn" type="submit">Đóng</button></form>
+    <button class="btn pri" type="button" id="vietqr-copy-btn"><svg class="ic sm" aria-hidden="true"><use href="#i-check"/></svg> Sao chép nội dung CK</button>
   </footer>
 </dialog>
 <dialog class="customer-dialog escrow-pdf-dialog" id="escrow-pdf-dialog" aria-labelledby="escrow-pdf-title">
@@ -1900,7 +1909,6 @@ body.detail-mode #viewbar{display:none}
       }
     }
     $("#crumb").innerHTML = S.view === "work" ? "<b>Giao dịch</b>" : S.view === "agent" ? "<b>Hỏi CRM</b>" :
-      S.view === "vault" ? "<b>Kho File Scan (Document Vault)</b>" :
       S.view === "project"
         ? '<span>Dự án</span><svg class="ic"><use href="#i-chevron-right"/></svg><b>' + esc(curProj().short) + " · " + esc(curTower().name) + "</b>"
         : '<span>Khách hàng</span><svg class="ic"><use href="#i-chevron-right"/></svg><b>Tất cả khách hàng</b>';
@@ -1909,9 +1917,7 @@ body.detail-mode #viewbar{display:none}
   function renderNav() {
     $("#cnt-units").textContent = UNITS.length + " căn";
     $("#cnt-cust").textContent = customers().length;
-    const cntVault = $("#cnt-vault");
-    if (cntVault) cntVault.textContent = (typeof scanVault !== "undefined" ? scanVault.size : 0) + " file";
-    $('[data-act="filter-toggle"]').hidden = ["agent", "work", "vault"].includes(S.view);
+    $('[data-act="filter-toggle"]').hidden = ["agent", "work"].includes(S.view);
     $(".top-agent").setAttribute("aria-current", S.view === "agent" ? "page" : "false");
     $$(".sb-nav .nav-item").forEach((b) => {
       if (b.dataset.act === "nav") {
@@ -2079,74 +2085,6 @@ body.detail-mode #viewbar{display:none}
       '<div class="customer-list">' + table +
       '<div class="viewnote"><span>Hiển thị <span class="mono">' + list.length + "</span> / " + all.length + " khách hàng</span>" +
       '<span class="saved"><svg class="ic"><use href="#i-check"/></svg>Lưu tự động trên máy</span></div></div>'
-    );
-  }
-
-  /* ================= view: Document Vault ================= */
-  function viewVault() {
-    const p = curProj();
-    const t = curTower();
-    const allUnits = towerUnits(p.id, t.id);
-    const bookedUnits = allUnits.filter((u) => u.status !== "AVAILABLE");
-    const verifiedScans = bookedUnits.filter((u) => scanVault.has(u.uid));
-    const pendingScans = bookedUnits.filter((u) => !scanVault.has(u.uid));
-    const ratio = bookedUnits.length ? Math.round((verifiedScans.length / bookedUnits.length) * 100) : 0;
-
-    const filter = S.vaultFilter || "all";
-    const list = filter === "verified" ? verifiedScans : filter === "pending" ? pendingScans : bookedUnits;
-
-    const rows = list.map((u) => {
-      const sc = scanVault.get(u.uid);
-      const cd = contractDraft(u);
-      return (
-        '<tr>' +
-        '<td><b>Căn ' + esc(u.code) + '</b> <span class="note">Tầng ' + u.floor + ' · ' + esc(u.type) + '</span></td>' +
-        '<td><b>' + esc(customerName(u.buyer) || 'Chưa liên kết') + '</b></td>' +
-        '<td><span class="tag ' + ST[u.status].t + '">' + esc(ST[u.status].l) + '</span></td>' +
-        '<td>' + (cd.signed ? esc(dateVN(cd.signed)) : '<span class="note">Chưa ký</span>') + '</td>' +
-        '<td>' + (sc ?
-          '<span class="tag-verified">✓ Đã lưu file scan</span><div class="note" style="font-size:11px;margin-top:2px;">' + esc(sc.name) + ' (' + esc(sc.size) + ')</div>' :
-          '<span class="tag-pending">⚠ Thiếu bản scan mộc đỏ</span>') +
-        '</td>' +
-        '<td><div style="display:flex;gap:6px;">' +
-        '<button class="btn" style="padding:4px 8px;font-size:11.5px;" data-act="unit" data-uid="' + u.uid + '">Xem căn</button>' +
-        (sc ? '<button class="btn" style="padding:4px 8px;font-size:11.5px;" onclick="alert(\'Đang mở file scan ' + esc(sc.name) + '\')">Xem Scan</button>' :
-          '<button class="btn pri" style="padding:4px 8px;font-size:11.5px;" onclick="simulateScanUpload(\'' + u.uid + '\')">Nạp scan</button>') +
-        '</div></td>' +
-        '</tr>'
-      );
-    }).join("");
-
-    return (
-      '<div class="vault-page">' +
-      '<header class="vault-header"><div>' +
-      '<h1><svg class="ic"><use href="#i-file"/></svg> Kho Lưu Trữ File Scan HĐMB & Ký Quỹ (Document Vault)</h1>' +
-      '<p>Phân hệ số hóa, lưu trữ và đối soát pháp lý hồ sơ HĐMB đã có chữ ký sống & con dấu mộc đỏ Chủ đầu tư.</p></div>' +
-      '<button class="btn" data-act="nav" data-view="project">Về sơ đồ căn</button></header>' +
-
-      '<div class="vault-stats">' +
-      '<div class="v-stat"><span>Tổng căn đã giao dịch</span><b>' + bookedUnits.length + '</b></div>' +
-      '<div class="v-stat verified"><span>Đã lưu file scan mộc đỏ</span><b>' + verifiedScans.length + '</b></div>' +
-      '<div class="v-stat pending"><span>Chờ nộp file scan</span><b>' + pendingScans.length + '</b></div>' +
-      '<div class="v-stat"><span>Tỷ lệ số hóa pháp lý</span><b>' + ratio + '%</b></div></div>' +
-
-      '<div class="vault-dropzone" onclick="$(\'#batch-scan-input\').click()">' +
-      '<div class="dz-icon">📂</div>' +
-      '<div class="dz-title">Kéo thả hàng loạt file scan HĐMB (PDF / Ảnh) vào đây</div>' +
-      '<div class="dz-desc">AI Agent tự động OCR đọc mã căn trong tên file hoặc trang bìa để phân loại vào đúng hồ sơ căn hộ</div>' +
-      '<div class="dz-tags"><span class="dz-tag">✓ Tự động đối soát mộc đỏ</span><span class="dz-tag">✓ Gán tự động vào kho căn</span><span class="dz-tag">✓ Tải lên 50 file trong 1 giây</span></div>' +
-      '<div style="margin-top:12px;"><button class="btn pri" type="button" style="font-size:12px;" onclick="event.stopPropagation(); simulateBatchDrop()">Giả lập AI nạp 5 file scan cùng lúc</button></div>' +
-      '<input type="file" id="batch-scan-input" multiple accept=".pdf,.png,.jpg,.jpeg" hidden onchange="handleBatchScanUpload(this)" /></div>' +
-
-      '<div class="vault-filter-bar"><div class="vault-tabs">' +
-      '<button class="vault-tab ' + (filter === "all" ? "on" : "") + '" data-act="vault-filter" data-vf="all">Tất cả (' + bookedUnits.length + ')</button>' +
-      '<button class="vault-tab ' + (filter === "verified" ? "on" : "") + '" data-act="vault-filter" data-vf="verified">Đã có scan mộc đỏ (' + verifiedScans.length + ')</button>' +
-      '<button class="vault-tab ' + (filter === "pending" ? "on" : "") + '" data-act="vault-filter" data-vf="pending">Chờ nộp scan (' + pendingScans.length + ')</button>' +
-      '</div><div class="note">Đang xem: ' + esc(p.name) + ' · ' + esc(t.name) + '</div></div>' +
-
-      '<table class="vault-table"><thead><tr>' +
-      '<th>Mã căn</th><th>Khách hàng</th><th>Trạng thái căn</th><th>Ngày ký HĐMB</th><th>Tình trạng File Scan</th><th>Thao tác</th>' +
-      '</tr></thead><tbody>' + (rows || '<tr><td colspan="6" style="text-align:center;padding:24px;color:#536b72;">Chưa có căn hộ nào phù hợp với bộ lọc.</td></tr>') + '</tbody></table></div>'
     );
   }
 
@@ -3279,7 +3217,7 @@ body.detail-mode #viewbar{display:none}
 
   async function useHdmbPdf(button, preview) {
     const parent = button.closest("#contract-preview");
-    const u = byUid(parent?.dataset.uid || S.route?.uid);
+    const u = byUid(button.dataset.uid || parent?.dataset.uid || S.route?.uid);
     if (!u) return;
     const d = contractDraft(u);
     const buyer = custOf(u.buyer, u) || {
@@ -4326,463 +4264,350 @@ body.detail-mode #viewbar{display:none}
       '</span></button></li>').join("") + '</ul>';
   }
 
-  /* ================= agent giao dịch: luật → hộp việc → việc tại hồ sơ → nhật ký ================= *
-   * Lớp 1 (luật): WA_RULES sinh "việc" từ dữ liệu giao dịch, mỗi luật có mức tự động 1/2/3.
-   * Lớp 2 (hộp việc): gom mọi việc vào một hàng đợi, xếp theo Quá hạn > Hôm nay > Tuần này.
-   * Lớp 3 (tại hồ sơ): thẻ "Nên làm tiếp theo" trong hồ sơ căn, cùng hành động.
-   * Mọi hành động (của Agent hoặc người dùng) ghi vào nhật ký; hành động không phải tiền hoàn tác được 24 giờ. */
-  const WA_LS = LS + "-work-agent";
-  const DAY_MS = 86400000;
-  const WA_UNDO_MS = DAY_MS;
-  const WA_INBOX_LIMIT = 7;
-  const WA_MANAGER = "Quản lý dự án";
-  const WA_LEVEL = {
-    1: { l: "Tự động", c: "t-av", d: "Agent tự làm, không hỏi. Ghi nhật ký, hoàn tác được.", ex: "Gắn cờ, tạo task nhắc, báo quản lý" },
-    2: { l: "1 click xác nhận", c: "t-tx", d: "Agent soạn sẵn, người dùng bấm xác nhận mới thực hiện.", ex: "Nhắc khách, yêu cầu bổ sung hồ sơ" },
-    3: { l: "Luôn hỏi", c: "t-sold", d: "Agent không bao giờ tự làm. Luôn hỏi, luôn ghi nhật ký, không hoàn tác.", ex: "Huỷ giao dịch, hoàn tiền, đổi số tiền" }
+  /* ================= TRUNG TÂM GIÁM SÁT GIAO DỊCH & PHÁP LÝ AI (TRANSACTION AI AGENT) =================
+   * 1. Tự động kiểm soát tiến độ & xuất HĐMB chính thức kèm Phụ lục 01 (Lịch thanh toán chuẩn).
+   * 2. Quản lý Document Vault & thu thập bản scan HĐMB có mộc đỏ hợp lệ của Chủ đầu tư.
+   * 3. Giám sát thời hạn giữ chỗ 48h (Canh giữ chỗ: Gia hạn 24h hoặc Tự động giải phóng căn).
+   * 4. Tạo thông báo thanh toán và mã VietQR chuẩn NAPAS theo tiến độ.
+   * Đã loại bỏ hoàn toàn hệ thống luật cứng cũ (WA_RULES); thay bằng AI Agent vận hành trực tiếp trong Tab Giao dịch. */
+
+  const AGENT_TX_LS = LS + "-agent-tx";
+  const agentTxState = {
+    filter: "all", // all | need-hdmb | missing-scan | hold-48h | digitized
+    searchQuery: "",
+    holdTimes: {
+      "orchard:SD:0304": { expiresAt: Date.now() + 14 * 3600 * 1000 + 25 * 60 * 1000, extended: false },
+      "global:G2:0304":  { expiresAt: Date.now() + 28 * 3600 * 1000, extended: false },
+      "orchard:SA:0204": { expiresAt: Date.now() + 6 * 3600 * 1000 + 40 * 60 * 1000, extended: false }
+    }
   };
-  const WA_BUCKETS = [["overdue", "Quá hạn"], ["today", "Hôm nay"], ["week", "Tuần này"]];
-  const WA_STATE_L = { open: "Đang mở", snoozed: "Đang hoãn", done: "Đã xử lý", reminded: "Đã nhắc" };
+
+  function formatHoldRemaining(expiresAt) {
+    const diff = expiresAt - Date.now();
+    if (diff <= 0) return "Đã hết hạn 48h";
+    const h = Math.floor(diff / (3600 * 1000));
+    const m = Math.floor((diff % (3600 * 1000)) / (60 * 1000));
+    return (h > 0 ? h + " giờ " : "") + m + " phút";
+  }
+
+  // Safe stubs for old agent functions if referenced elsewhere
+  let waLast = [];
   const waState = { rules: {}, tasks: {}, seen: {}, audit: [] };
   const waUI = { tab: "inbox", all: false, confirm: "", logRule: "" };
-  let waLast = [];
+  function waTick() { return []; }
+  function waSave() {}
+  function waReset() {}
+  function waLoad() {}
+  function waAfterReminder(proposal) {}
+  function waFind(id) { return null; }
 
-  const waTodayMs = () => new Date(dateISO(TODAY) + "T00:00:00").getTime();
-  const waDaysSince = (ms) => Math.max(0, Math.floor((waTodayMs() - ms) / DAY_MS));
-  const waDaysTo = (vn) => {
-    const iso = dateISO(vn);
-    return iso ? Math.round((new Date(iso + "T00:00:00").getTime() - waTodayMs()) / DAY_MS) : null;
-  };
-  const waDate = (ms) => { const d = new Date(ms); return pad2(d.getDate()) + "/" + pad2(d.getMonth() + 1) + "/" + d.getFullYear(); };
-  const waLastLog = (u) => (u.log || []).reduce((max, entry) => Math.max(max, entry.at), 0);
-  const waEnabled = (rule) => waState.rules[rule.id] !== false;
-  const waOwner = (rule) => rule.owner === "manager" ? WA_MANAGER : CUSTOMER_ACTOR;
-  const waPaid = (d) => d.openingReceived + d.receipts.reduce((sum, receipt) => sum + receipt.amount, 0);
-
-  const WA_RULES = [
-    { id: "r1", n: 1, when: "Quá hạn thanh toán > 0 ngày", then: "Nhắc khách + tạo task cho sale", level: 2, owner: "sale",
-      scan: () => agentPaymentRows().map((row) => {
-        const u = byUid(row.uid);
-        const first = agentExpired(u)[0];
-        const late = -waDaysTo(row.due);
-        return { id: "r1:" + u.uid + ":" + first.k, uid: u.uid, title: "Quá hạn thu " + late + " ngày",
-          meta: [customerName(u.buyer), fmt(row.amount), row.count + " khoản quá hạn"],
-          why: first.k + " hạn " + first.date + " còn " + fmt(first.remaining) + " chưa thu.",
-          bucket: "overdue", score: 300 + late, primary: "remind",
-          open: { tab: 3, view: "collection", label: "Xem lịch thu" } };
-      }) },
-    { id: "r2", n: 2, when: "Đến hạn thu ≤ 3 ngày", then: "Tạo task nhắc trước cho sale", level: 1, owner: "sale",
-      auto: "Tạo task nhắc trước cho sale", autoShort: "tạo task nhắc",
-      scan: () => UNITS.filter((u) => u.buyer && tracksPayments(u)).flatMap((u) => {
-        const item = schedule(u).find((step) => {
-          const days = step.remaining > 0 && !step.overdue ? waDaysTo(step.date) : null;
-          return days !== null && days >= 0 && days <= 3;
-        });
-        if (!item) return [];
-        const days = waDaysTo(item.date);
-        return [{ id: "r2:" + u.uid + ":" + item.k, uid: u.uid, title: days ? "Đến hạn thu sau " + days + " ngày" : "Đến hạn thu hôm nay",
-          meta: [customerName(u.buyer), fmt(item.remaining), item.k],
-          why: item.k + " hạn " + item.date + ". Nhắc trước giúp tránh quá hạn.",
-          bucket: days <= 1 ? "today" : "week", score: 200 - days, open: { tab: 3, view: "collection", label: "Xem lịch thu" } }];
-      }) },
-    { id: "r3", n: 3, when: "Đã ký quỹ nhưng chưa có lịch thanh toán", then: "Gắn cờ + yêu cầu lập lịch", level: 1, owner: "sale",
-      auto: "Gắn cờ “Thiếu lịch thanh toán”", autoShort: "gắn cờ",
-      scan: () => Array.from(saleDrafts).filter(([uid, draft]) => draft.signedDate && byUid(uid) &&
-        !contractDrafts.get(uid)?.appliedSchedule).map(([uid, draft]) => ({
-        id: "r3:" + uid, uid, title: "Chưa có lịch thanh toán",
-        meta: [saleCustomerName(draft), "Ký quỹ " + dateVN(draft.signedDate)],
-        why: "Đã ký quỹ nhưng chưa áp dụng lịch thu vào hợp đồng nên CRM chưa theo dõi được công nợ.",
-        bucket: "today", score: 180, open: { tab: 4, label: "Lập lịch thanh toán" } })) },
-    { id: "r4", n: 4, when: "Kẹt ở bước Ký quỹ > 7 ngày", then: "Báo quản lý + gắn cờ đỏ", level: 1, owner: "manager",
-      auto: "Báo quản lý dự án + gắn cờ đỏ", autoShort: "báo quản lý",
-      scan: () => UNITS.filter((u) => u.status === "IN_TRANSACTION" && contractDraft(u).stage === "ky-quy").flatMap((u) => {
-        const since = waLastLog(u);
-        const days = since ? waDaysSince(since) : 0;
-        if (days <= 7) return [];
-        return [{ id: "r4:" + u.uid, uid: u.uid, title: "Ký quỹ treo " + days + " ngày",
-          meta: [customerName(u.buyer) || "Chưa liên kết khách", REASON_L[reasonOf(u)]],
-          why: "Ở trạng thái " + REASON_L[reasonOf(u)] + " từ " + waDate(since) + ", vượt ngưỡng 7 ngày.",
-          bucket: days > 30 ? "today" : "week", score: 100 + Math.min(days, 90), open: { tab: 4, label: "Mở hồ sơ ký quỹ" } }];
-      }) },
-    { id: "r5", n: 5, when: "Thiếu CCCD/MST hoặc SĐT khách", then: "Chặn xuất hợp đồng, yêu cầu bổ sung", level: 2, owner: "sale",
-      scan: () => UNITS.filter((u) => u.buyer && (u.status === "IN_TRANSACTION" || u.status === "SOLD")).flatMap((u) => {
-        const rec = custOf(u.buyer, u);
-        const org = rec.type === "org";
-        const missing = [!String(rec.phone || "").trim() && "SĐT",
-          !String((org ? rec.taxno : rec.idno) || "").trim() && (org ? "MST" : "CCCD")].filter(Boolean);
-        if (!missing.length) return [];
-        return [{ id: "r5:" + u.uid + ":" + missing.join("-"), uid: u.uid, title: "Thiếu " + missing.join(", ") + " của khách",
-          meta: [customerName(u.buyer), "Đang chặn xuất hợp đồng"],
-          why: "Hợp đồng cần đủ " + (org ? "MST" : "CCCD") + " và SĐT của bên mua.",
-          bucket: "today", score: 170, primary: "confirm",
-          confirm: { label: "Yêu cầu khách", title: "Yêu cầu khách bổ sung hồ sơ", cta: "Gửi yêu cầu", done: "Gửi yêu cầu bổ sung " + missing.join(", "),
-            body: "Kính gửi Quý khách, để hoàn tất hồ sơ căn " + u.code + " tại " + projOf(u).short + ", Meraki Land cần Quý khách bổ sung: " +
-              missing.join(", ") + ". Xin cảm ơn." },
-          open: { tab: 2, label: "Mở hồ sơ khách" } }];
-      }) },
-    { id: "r6", n: 6, when: "Căn chưa bán tồn > 45 ngày", then: "Gợi ý mở bán / rà soát giá cho quản lý", level: 1, owner: "manager",
-      auto: "Gửi gợi ý rà soát giá cho quản lý", autoShort: "gửi gợi ý",
-      scan: () => {
-        const groups = new Map();
-        UNITS.filter((u) => u.status === "AVAILABLE" && waLastLog(u)).forEach((u) => {
-          const days = waDaysSince(waLastLog(u));
-          if (days <= 45) return;
-          const key = u.proj + ":" + u.tower;
-          const g = groups.get(key) || { u, n: 0, max: 0 };
-          g.n += 1; g.max = Math.max(g.max, days);
-          groups.set(key, g);
-        });
-        return Array.from(groups, ([key, g]) => ({
-          id: "r6:" + key, label: projOf(g.u).short + " · " + towerOf(g.u).name, title: g.n + " căn tồn > 45 ngày",
-          meta: ["Lâu nhất " + g.max + " ngày"], why: "Gộp theo tòa để chống nhiễu: 1 việc thay cho " + g.n + " cảnh báo riêng lẻ.",
-          bucket: "week", score: 40 + Math.min(g.n, 50), tower: { pid: g.u.proj, tid: g.u.tower } }));
-      } },
-    { id: "r7", n: 7, when: "Giao dịch đã huỷ còn khoản đã thu", then: "Đối soát hoàn tiền với kế toán", level: 3, owner: "manager",
-      scan: () => UNITS.filter((u) => u.status === "AVAILABLE" &&
-        (u.log || []).some((entry) => entry.from === "IN_TRANSACTION" && entry.to === "AVAILABLE")).flatMap((u) => {
-        const paid = waPaid(contractDraft(u));
-        if (!paid) return [];
-        const cancel = (u.log || []).filter((entry) => entry.from === "IN_TRANSACTION" && entry.to === "AVAILABLE").pop();
-        return [{ id: "r7:" + u.uid + ":" + cancel.at, uid: u.uid, title: "Huỷ giao dịch còn " + fmt(paid) + " đã thu",
-          meta: ["Huỷ " + waDate(cancel.at), "Bởi " + cancel.by], why: "Khoản đã thu chưa được đối soát hoàn tiền sau khi huỷ.",
-          bucket: "today", score: 250, primary: "l3",
-          l3: { title: "Đối soát hoàn tiền căn " + u.code, cta: "Chuyển kế toán đối soát",
-            facts: ["Số đã thu: " + fmt(paid), "Huỷ ngày " + waDate(cancel.at) + " bởi " + cancel.by,
-              "Agent không tự hoàn tiền hay sửa số tiền. Kế toán đối soát và thực hiện."] },
-          open: { tab: 3, view: "collection", label: "Xem lịch thu" } }];
-      }) },
-    { id: "r8", n: 8, when: "Hồ sơ khách có thay đổi chưa xác nhận", then: "Yêu cầu người phụ trách xác nhận", level: 2, owner: "sale",
-      scan: () => Object.entries(CUST).flatMap(([key, rec]) => {
-        const history = Array.isArray(rec.history) ? rec.history : [];
-        const last = history[history.length - 1];
-        const edits = (last?.changes || []).filter((change) => change.before);
-        if (!edits.length) return [];
-        const unit = UNITS.find((u) => u.buyer === key);
-        return [{ id: "r8:" + key + ":" + last.at, uid: unit?.uid || "", cust: key, label: customerName(key),
-          title: edits.length + " thay đổi hồ sơ chưa xác nhận", meta: [last.action, last.actor, dtime(last.at)],
-          why: "Đã sửa " + edits.slice(0, 3).map((change) => change.field).join(", ") + (edits.length > 3 ? "…" : "") + ".",
-          bucket: "today", score: 120, primary: "confirm",
-          confirm: { label: "Xác nhận thay đổi", title: "Xác nhận thay đổi hồ sơ", cta: "Xác nhận đúng", done: "Xác nhận " + edits.length + " thay đổi hồ sơ",
-            body: edits.map((change) => change.field + ": " + change.before + " → " + (change.after || "(trống)")).join("\n") } }];
-      }) }
-  ];
-
-  function waLoad() {
-    try {
-      const d = JSON.parse(localStorage.getItem(WA_LS) || "null");
-      if (!d) return;
-      ["rules", "tasks", "seen"].forEach((k) => { if (d[k] && typeof d[k] === "object") waState[k] = d[k]; });
-      if (Array.isArray(d.audit)) waState.audit = d.audit.filter((entry) => entry && entry.id && entry.at);
-    } catch (e) {}
-  }
-  function waSave() {
-    try { localStorage.setItem(WA_LS, JSON.stringify(waState)); } catch (e) {}
-  }
-  function waReset() {
-    Object.assign(waState, { rules: {}, tasks: {}, seen: {}, audit: [] });
-    Object.assign(waUI, { tab: "inbox", all: false, confirm: "", logRule: "" });
-    try { localStorage.removeItem(WA_LS); } catch (e) {}
-  }
-  function waLog(entry) {
-    waState.audit.unshift({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7), at: Date.now(), undone: false, ...entry });
-    waState.audit.length = Math.min(waState.audit.length, 300);
-  }
-  function waStatus(task) {
-    const s = waState.tasks[task.id];
-    if (!s) return "open";
-    if (s.state === "snoozed" && s.until <= Date.now()) return "open";
-    return s.state;
-  }
-  const waLive = (task) => waStatus(task) === "open" || waStatus(task) === "reminded";
-  const waOrder = (task) => WA_BUCKETS.findIndex(([id]) => id === task.bucket);
-  const waSort = (a, b) => waOrder(a) - waOrder(b) || (waStatus(a) === "reminded") - (waStatus(b) === "reminded") || b.score - a.score;
-  const waFind = (id) => waLast.find((task) => task.id === id);
-
-  /* Chạy luật: việc mới của luật mức 1 được Agent tự xử lý; việc mất nguyên nhân thì tự đóng. */
-  function waTick() {
-    const tasks = WA_RULES.filter(waEnabled).flatMap((rule) => rule.scan().map((task) => ({
-      ...task, rule, label: task.label || (task.uid ? agentLabel(byUid(task.uid)) : "") })));
-    const ids = new Set(tasks.map((task) => task.id));
-    const now = Date.now();
-    let changed = false;
-    tasks.forEach((task) => {
-      if (waState.seen[task.id]) return;
-      changed = true;
-      waState.seen[task.id] = { rule: task.rule.id, at: now, label: task.label, auto: task.rule.level === 1 };
-      if (task.rule.level === 1) waLog({ actor: "Agent", rule: task.rule.id, task: task.id, ref: task.label,
-        action: task.rule.auto + " · " + task.title, before: "Chưa có", after: "Đã " + task.rule.autoShort, undo: { type: "auto", task: task.id } });
-    });
-    Object.entries(waState.seen).forEach(([id, seen]) => {
-      if (ids.has(id) || waState.rules[seen.rule] === false) return;
-      if (waState.tasks[id]?.state !== "done") waLog({ actor: "Agent", rule: seen.rule, task: id, ref: seen.label,
-        action: "Tự đóng việc vì nguyên nhân đã hết", before: WA_STATE_L[waState.tasks[id]?.state || "open"], after: "Đã đóng", undo: null,
-        noUndo: "Dữ liệu đã đúng" });
-      delete waState.seen[id];
-      delete waState.tasks[id];
-      changed = true;
-    });
-    if (changed) waSave();
-    return tasks;
-  }
-
-  function waSetTask(task, next, action) {
-    const prev = waState.tasks[task.id] ? { ...waState.tasks[task.id] } : null;
-    if (next) waState.tasks[task.id] = next; else delete waState.tasks[task.id];
-    waLog({ actor: CUSTOMER_ACTOR, rule: task.rule.id, task: task.id, ref: task.label, action,
-      before: WA_STATE_L[prev?.state || "open"], after: WA_STATE_L[next?.state || "open"], undo: { type: "state", task: task.id, prev } });
-    waSave();
-  }
-  function waAfterReminder(proposal) {
-    const u = byUid(proposal.uid);
-    const id = "r1:" + proposal.uid + ":" + proposal.key;
-    waState.tasks[id] = { state: "reminded", at: Date.now() };
-    waLog({ actor: CUSTOMER_ACTOR, rule: "r1", task: id, ref: u ? agentLabel(u) : proposal.uid,
-      action: "Xác nhận nhắc thanh toán " + proposal.key + " · " + fmt(proposal.amount), before: "Đang mở", after: "Đã nhắc",
-      undo: { type: "draft", task: id, uid: proposal.uid, key: proposal.key } });
-    waSave();
-  }
-  function waToggleRule(id) {
-    const rule = WA_RULES.find((item) => item.id === id);
-    if (!rule) return;
-    const prev = waEnabled(rule);
-    waState.rules[id] = !prev;
-    waLog({ actor: CUSTOMER_ACTOR, rule: id, ref: "Tự động hoá", action: (prev ? "Tắt" : "Bật") + " luật “" + rule.when + "”",
-      before: prev ? "Bật" : "Tắt", after: prev ? "Tắt" : "Bật", undo: { type: "rule", rule: id, prev } });
-    waSave();
-  }
-  function waUndo(id) {
-    const entry = waState.audit.find((item) => item.id === id);
-    if (!entry || entry.undone || !entry.undo || Date.now() - entry.at > WA_UNDO_MS) return false;
-    const undo = entry.undo;
-    if (undo.type === "auto" && waState.seen[undo.task]) waState.seen[undo.task].auto = false;
-    if (undo.type === "state") { if (undo.prev) waState.tasks[undo.task] = undo.prev; else delete waState.tasks[undo.task]; }
-    if (undo.type === "rule") waState.rules[undo.rule] = undo.prev;
-    if (undo.type === "draft") {
-      agentSession.drafts = agentSession.drafts.filter((draft) => draft.uid !== undo.uid || draft.key !== undo.key);
-      if (agentSession.workReview?.uid === undo.uid) agentSession.workReview = null;
-      delete waState.tasks[undo.task];
-      persist();
-    }
-    entry.undone = true;
-    waLog({ actor: CUSTOMER_ACTOR, rule: entry.rule, task: entry.task, ref: entry.ref, action: "Hoàn tác: " + entry.action,
-      before: entry.after, after: entry.before, undo: null, noUndo: "Bản ghi hoàn tác" });
-    waSave();
-    return true;
-  }
-
-  function waButton(action, task, label, style = "", attributes = "") {
-    return '<button type="button" class="btn ' + style + '" data-act="' + action + '" data-task="' + esc(task.id) + '"' + attributes + '>' + label + '</button>';
-  }
-
-  function reminderPanel(unit) {
-    const review = agentSession.workReview;
-    const isOpen = review?.uid === unit.uid;
-    let body = "";
-    if (isOpen) {
-      const first = agentExpired(unit)[0];
-      const openedDraft = review.saved || review.result?.proposal;
-      const stale = openedDraft && (openedDraft.key !== first?.k || openedDraft.due !== first.date ||
-        openedDraft.amount !== first.remaining || openedDraft.buyer !== unit.buyer);
-      body = '<div class="work-reminder"><div class="work-reminder-title"><h3>Nhắc thanh toán · mức 2, cần bạn xác nhận</h3>' +
-        workAction("work-close-reminder", unit.uid, "Thu gọn", "ghost") + '</div>' +
-        (stale ? '<p class="work-saved-body" tabindex="-1" role="status">Lịch thu đã thay đổi.</p>' +
-          workAction("work-refresh-reminder", unit.uid, "Cập nhật lời nhắc", "pri") :
-          review.saved ? '<p class="work-saved-body" tabindex="-1">' + esc(review.saved.body) + '</p><p class="note">Đã xác nhận · ' +
-          esc(review.saved.actor) + ' · hoàn tác được trong Nhật ký 24 giờ</p>' : agentResult(review.result)) + '</div>';
-    }
-    return '<div id="work-reminder-' + esc(unit.uid) + '"' + (isOpen ? '' : ' hidden') + '>' + body + '</div>';
-  }
-
-  function waConfirmPanel(task) {
-    if (waUI.confirm !== task.id) return "";
-    return '<div class="work-reminder wa-confirm" id="wa-confirm-panel"><div class="work-reminder-title"><h3>' + esc(task.confirm.title) +
-      ' · mức 2</h3>' + waButton("wa-confirm-cancel", task, "Huỷ", "ghost") + '</div>' +
-      '<p class="work-saved-body" tabindex="-1">' + esc(task.confirm.body) + '</p>' +
-      '<p class="note">Agent chỉ thực hiện sau khi bạn xác nhận. Hoàn tác được trong Nhật ký 24 giờ.</p>' +
-      '<div class="wa-confirm-actions">' + waButton("wa-confirm", task, esc(task.confirm.cta), "pri") + '</div></div>';
-  }
-
-  function waActions(task, inUnit) {
-    const u = task.uid && byUid(task.uid);
-    const out = [];
-    if (task.primary === "remind" && u) {
-      const saved = currentReminderDraft(u, agentExpired(u)[0]);
-      const isOpen = agentSession.workReview?.uid === u.uid;
-      out.push(workAction("work-reminder", u.uid, saved ? "Xem lời nhắc đã lưu" : "Nhắc khách", saved ? "" : "pri",
-        ' aria-expanded="' + isOpen + '" aria-controls="work-reminder-' + esc(u.uid) + '"'));
-    } else if (task.primary === "confirm") {
-      out.push(waButton("wa-confirm-open", task, esc(task.confirm.label), "pri", ' aria-expanded="' + (waUI.confirm === task.id) + '"'));
-    } else if (task.primary === "l3") {
-      out.push(waButton("wa-l3-open", task, "Đối soát hoàn tiền…", "pri"));
-    }
-    if (task.open && u && !(inUnit && S.tab === task.open.tab)) {
-      out.push(workAction("work-open", u.uid, task.open.label, task.primary ? "" : "pri", ' data-tab="' + task.open.tab + '"' +
-        (task.open.view ? ' data-payment-view="' + task.open.view + '"' : '')));
-    }
-    if (task.tower) out.push('<button type="button" class="btn pri" data-act="wa-tower" data-pid="' + esc(task.tower.pid) +
-      '" data-tid="' + esc(task.tower.tid) + '">Mở sơ đồ tòa</button>');
-    if (task.cust && !inUnit) out.push('<button type="button" class="btn" data-act="wa-cust" data-name="' + esc(task.cust) + '">Mở hồ sơ khách</button>');
-    out.push(waButton("wa-snooze", task, "Hoãn 1 ngày", "ghost"));
-    out.push(waButton("wa-done", task, "Đã xử lý", "ghost"));
-    if (!inUnit) out.push('<button type="button" class="btn ghost wa-mute" data-act="wa-rule-toggle" data-rule="' + task.rule.id +
-      '" title="Tắt luật #' + task.rule.n + ' trong Tự động hoá">Tắt loại này</button>');
-    return out.join("");
-  }
-
-  function waTaskItem(task, inUnit = false) {
-    const status = waStatus(task);
-    const seen = waState.seen[task.id];
-    const level = WA_LEVEL[task.rule.level];
-    const u = task.uid && byUid(task.uid);
-    const tags = ['<span class="tag ' + level.c + '" title="' + esc(level.d) + '">' + level.l + '</span>'];
-    if (status === "reminded") tags.push('<span class="tag t-lock">Đã nhắc</span>');
-    if (seen?.auto && task.rule.autoShort) tags.push('<span class="tag t-lock" title="' + esc(task.rule.auto) + '">Agent đã ' + esc(task.rule.autoShort) + '</span>');
-    if (task.bucket === "overdue" && status === "open" && seen && Date.now() - seen.at > DAY_MS) tags.push('<span class="tag t-sold">Đã leo thang quản lý</span>');
-    return '<li class="wa-task b-' + task.bucket + '"><div class="wa-task-row"><span class="wa-dot" aria-hidden="true"></span>' +
-      '<div class="wa-task-text">' + (inUnit ? '' : '<b>' + esc(task.label) + '</b>') +
-      '<p class="wa-task-title">' + esc(task.title) + '</p>' +
-      '<p class="wa-task-meta">' + task.meta.filter(Boolean).map(esc).join(' <span aria-hidden="true">·</span> ') + '</p>' +
-      '<p class="wa-why"><b>Vì sao:</b> ' + esc(task.why) + ' <span>Luật #' + task.rule.n + ' · Phụ trách: ' + esc(waOwner(task.rule)) + '</span></p></div>' +
-      '<div class="wa-tags">' + tags.join("") + '</div></div>' +
-      '<div class="work-actions wa-actions">' + waActions(task, inUnit) + '</div>' +
-      (task.primary === "remind" && u ? reminderPanel(u) : '') + (task.confirm ? waConfirmPanel(task) : '') + '</li>';
-  }
-
-  function waInbox(tasks) {
-    const live = tasks.filter(waLive).sort(waSort);
-    const snoozed = tasks.filter((task) => waStatus(task) === "snoozed").length;
-    const today = waDate(Date.now());
-    const auto = waState.audit.filter((entry) => entry.actor === "Agent" && !entry.undone && waDate(entry.at) === today).length;
-    const shown = waUI.all ? live : live.slice(0, WA_INBOX_LIMIT);
-    const counts = WA_BUCKETS.map(([id, label]) => [id, label, live.filter((task) => task.bucket === id).length]);
-    const groups = WA_BUCKETS.map(([id, label]) => {
-      const items = shown.filter((task) => task.bucket === id);
-      return items.length ? '<li class="wa-bucket b-' + id + '"><h3>' + label + '<span>' + counts.find((c) => c[0] === id)[2] + '</span></h3></li>' +
-        items.map((task) => waTaskItem(task)).join("") : "";
-    }).join("");
-    return '<section class="work-section wa-inbox" aria-labelledby="wa-inbox-title">' +
-      '<div class="wa-digest"><div><h2 id="wa-inbox-title">Hộp việc</h2><p>' +
-      (live.length ? live.length + ' việc cần người xử lý' : 'Không còn việc cần xử lý') + '</p></div>' +
-      '<ul class="wa-digest-counts">' + counts.map(([id, label, n]) =>
-        '<li class="b-' + id + '"><span class="wa-dot" aria-hidden="true"></span>' + label + ' <b>' + n + '</b></li>').join("") + '</ul>' +
-      '<p class="wa-digest-auto">Agent đã tự xử lý <b>' + auto + '</b> việc hôm nay' +
-      (snoozed ? ' · <b>' + snoozed + '</b> việc đang hoãn' : '') +
-      ' <button type="button" class="btn ghost" data-act="wa-tab" data-watab="log">Xem nhật ký</button></p></div>' +
-      (live.length ? '<ul class="wa-list">' + groups + '</ul>' +
-        (live.length > WA_INBOX_LIMIT ? '<div class="wa-more"><span class="note">' +
-          (waUI.all ? 'Đang hiện tất cả ' + live.length + ' việc.' : 'Chỉ hiện ' + WA_INBOX_LIMIT + ' việc ưu tiên nhất để tránh nhiễu.') + '</span>' +
-          '<button type="button" class="btn" data-act="wa-all">' + (waUI.all ? 'Thu gọn' : 'Xem tất cả ' + live.length + ' việc') + '</button></div>' : '')
-        : '<p class="work-empty">Agent sẽ báo khi dữ liệu giao dịch phát sinh việc mới.</p>') + '</section>';
-  }
-
+  /* Unit-level Contextual AI Agent Banner */
   function unitAgentCard(u) {
-    const tasks = waLast.filter((task) => task.uid === u.uid && waLive(task)).sort(waSort).slice(0, 3);
-    if (!tasks.length) return "";
-    return '<section class="wa-nba" aria-labelledby="wa-nba-title"><header><h2 id="wa-nba-title">' +
-      '<svg class="ic sm" aria-hidden="true"><use href="#i-agent"/></svg>Nên làm tiếp theo</h2>' +
-      '<span class="note">Agent · ' + tasks.length + ' việc từ luật đang bật</span></header>' +
-      '<ul class="wa-list">' + tasks.map((task) => waTaskItem(task, true)).join("") + '</ul></section>';
+    const scan = scanVault.get(u.uid);
+    const hold = agentTxState.holdTimes[u.uid];
+    const isTx = u.status === "IN_TRANSACTION";
+    const isSold = u.status === "SOLD";
+
+    if (scan) {
+      return '<div class="unit-agent-banner"><div class="unit-agent-badge success">' +
+        '<span class="pulse-dot"></span>' +
+        '<div style="flex:1;"><b>Hồ sơ đã số hóa mộc đỏ:</b> Tệp <code>' + esc(scan.name) + '</code> đã được AI Legal Guard kiểm định hợp lệ (' + esc(scan.date) + ').</div>' +
+        '<button type="button" class="btn sm" data-act="view-scan" data-uid="' + esc(u.uid) + '">Xem file scan</button>' +
+        '</div></div>';
+    }
+    if (hold && u.status !== "AVAILABLE") {
+      return '<div class="unit-agent-banner"><div class="unit-agent-badge danger">' +
+        '<svg class="ic sm" style="color:#dc2626;"><use href="#i-clock"/></svg>' +
+        '<div style="flex:1;"><b>Canh giữ chỗ 48h:</b> Căn hộ đang trong thời hạn giữ chỗ, còn lại: <b class="countdown">' + esc(formatHoldRemaining(hold.expiresAt)) + '</b>.</div>' +
+        '<div style="display:flex;gap:6px;">' +
+        '<button type="button" class="btn sm" data-act="agent-extend-hold" data-uid="' + esc(u.uid) + '">Gia hạn 24h</button>' +
+        '<button type="button" class="btn danger sm" data-act="agent-release-unit" data-uid="' + esc(u.uid) + '">Giải phóng căn</button>' +
+        '</div></div></div>';
+    }
+    if (isTx || isSold) {
+      return '<div class="unit-agent-banner"><div class="unit-agent-badge warning">' +
+        '<svg class="ic sm" style="color:#d97706;"><use href="#i-alert"/></svg>' +
+        '<div style="flex:1;"><b>Khuyến nghị AI Agent:</b> Căn đã hoàn tất đặt cọc. Cần xuất HĐMB chính thức kèm Phụ lục lịch thanh toán và thu thập bản scan có mộc đỏ sau khi ký.</div>' +
+        '<div style="display:flex;gap:6px;">' +
+        '<button type="button" class="btn pri sm" data-act="hdmb-pdf-view" data-uid="' + esc(u.uid) + '"><svg class="ic sm"><use href="#i-file"/></svg>Xuất HĐMB</button>' +
+        '<button type="button" class="btn sm" data-act="agent-upload-scan" data-uid="' + esc(u.uid) + '"><svg class="ic sm"><use href="#i-upload"/></svg>Tải scan</button>' +
+        '</div></div></div>';
+    }
+    return '';
   }
 
-  function waRulesView(tasks) {
-    const levels = '<section class="wa-levels" aria-label="Ba mức quyền của Agent">' + [1, 2, 3].map((n) =>
-      '<div class="wa-level"><span class="tag ' + WA_LEVEL[n].c + '">Mức ' + n + ' · ' + WA_LEVEL[n].l + '</span><p>' + WA_LEVEL[n].d +
-      '</p><p class="note">' + WA_LEVEL[n].ex + '</p></div>').join("") + '</section>';
-    const rules = WA_RULES.map((rule) => {
-      const on = waEnabled(rule);
-      const matches = on ? tasks.filter((task) => task.rule === rule).length : rule.scan().length;
-      const runs = waState.audit.filter((entry) => entry.rule === rule.id).length;
-      return '<li class="wa-rule' + (on ? '' : ' off') + '"><button type="button" class="wa-switch" role="switch" aria-checked="' + on +
-        '" data-act="wa-rule-toggle" data-rule="' + rule.id + '" aria-label="' + (on ? 'Tắt' : 'Bật') + ' luật #' + rule.n + '"><span></span></button>' +
-        '<div class="wa-rule-text"><b>#' + rule.n + ' · Nếu ' + esc(rule.when.charAt(0).toLowerCase() + rule.when.slice(1)) + '</b>' +
-        '<p>→ ' + esc(rule.then) + (rule.auto ? ' <span class="note">(Agent tự: ' + esc(rule.auto.toLowerCase()) + ')</span>' : '') + '</p>' +
-        '<p class="note">' + (on ? 'Đang khớp ' + matches + ' việc' : 'Đang tắt · sẽ khớp ' + matches + ' việc nếu bật') +
-        ' · ' + runs + ' dòng nhật ký · Phụ trách: ' + esc(waOwner(rule)) + '</p></div>' +
-        '<div class="wa-rule-side"><span class="tag ' + WA_LEVEL[rule.level].c + '">Mức ' + rule.level + ' · ' + WA_LEVEL[rule.level].l + '</span>' +
-        (runs ? '<button type="button" class="btn ghost" data-act="wa-log-rule" data-rule="' + rule.id + '">Xem nhật ký</button>' : '') + '</div></li>';
-    }).join("");
-    const noise = ["Hộp việc chỉ hiện " + WA_INBOX_LIMIT + " việc ưu tiên nhất; phần còn lại gộp vào “Xem tất cả”.",
-      "Không báo lại cùng một việc khi dữ liệu chưa đổi: mỗi việc có mã theo nguyên nhân.",
-      "Việc đã hoãn im lặng đến hết hạn hoãn rồi mới hiện lại.",
-      "Việc tự đóng khi nguyên nhân hết (khách đã đóng tiền, hồ sơ đã đủ).",
-      "Mọi việc trong Hộp việc đều có “Đã xử lý” và “Tắt loại này”."];
-    return '<section class="work-section" aria-labelledby="wa-rules-title"><div class="wa-section-head"><h2 id="wa-rules-title">Tự động hoá</h2>' +
-      '<p class="note">Nguyên tắc: Agent được tự làm việc nhắc nhở, không được tự làm việc tài chính.</p></div>' + levels +
-      '<ul class="wa-rules">' + rules + '</ul></section>' +
-      '<section class="work-section" aria-labelledby="wa-noise-title"><h2 id="wa-noise-title">Chống nhiễu</h2><ul class="wa-noise">' +
-      noise.map((item) => '<li><svg class="ic sm" aria-hidden="true"><use href="#i-check"/></svg>' + esc(item) + '</li>').join("") + '</ul></section>';
+  function openVietQrDialog(uid) {
+    const u = byUid(uid);
+    if (!u) return;
+    const dialog = $("#vietqr-dialog");
+    const container = $("#vietqr-content");
+    const buyerName = u.buyer ? customerName(u.buyer) : "Quý khách";
+    const amount = 212500000;
+    const refCode = "HDMB " + u.code.replace(/[^A-Za-z0-9]/g, "") + " DOT 2";
+    const bankName = "MBBank (Ngân hàng Quân Đội)";
+    const accNo = "0987654321001";
+    const accName = "CONG TY CP DAU TU BAT DONG SAN MERAKI LAND";
+    const qrUrl = "https://api.vietqr.io/image/970422-" + accNo + "-compact2.jpg?amount=" + amount + "&addInfo=" + encodeURIComponent(refCode) + "&accountName=" + encodeURIComponent(accName);
+
+    container.innerHTML = 
+      '<div class="vietqr-card">' +
+        '<img class="vietqr-qr-img" src="' + qrUrl + '" alt="Mã VietQR" onerror="this.onerror=null;this.src=\'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'220\' height=\'220\' viewBox=\'0 0 220 220\'><rect width=\'220\' height=\'220\' fill=\'%23f3f4f6\'/><text x=\'50%\' y=\'50%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23156757\' font-size=\'14\'>VietQR Chuẩn NAPAS</text></svg>\'">' +
+        '<div class="vietqr-info">' +
+          '<div><b>Khách hàng:</b> ' + esc(buyerName) + ' (Căn ' + esc(u.code) + ')</div>' +
+          '<div><b>Số tiền thanh toán:</b> <b style="color:#2563eb;">' + fmt(amount) + '</b></div>' +
+          '<div><b>Ngân hàng thụ hưởng:</b> ' + esc(bankName) + '</div>' +
+          '<div><b>Số tài khoản:</b> <code style="font-size:13px;font-weight:700;">' + esc(accNo) + '</code></div>' +
+          '<div><b>Chủ tài khoản:</b> ' + esc(accName) + '</div>' +
+          '<div><b>Nội dung chuyển khoản:</b> <code id="vietqr-ref" style="background:#e0f2fe;color:#0369a1;padding:2px 6px;border-radius:4px;font-weight:700;">' + esc(refCode) + '</code></div>' +
+        '</div>' +
+      '</div>';
+    dialog.showModal();
   }
 
-  function waLogView() {
-    const now = Date.now();
-    const used = WA_RULES.filter((rule) => waState.audit.some((entry) => entry.rule === rule.id));
-    const entries = waState.audit.filter((entry) => !waUI.logRule || entry.rule === waUI.logRule);
-    const chips = '<div class="wa-chips" role="group" aria-label="Lọc theo luật">' +
-      '<button type="button" class="btn" data-act="wa-log-rule" data-rule="" aria-pressed="' + !waUI.logRule + '">Tất cả · ' + waState.audit.length + '</button>' +
-      used.map((rule) => '<button type="button" class="btn" data-act="wa-log-rule" data-rule="' + rule.id + '" aria-pressed="' +
-        (waUI.logRule === rule.id) + '">Luật #' + rule.n + ' · ' + waState.audit.filter((entry) => entry.rule === rule.id).length + '</button>').join("") + '</div>';
-    const rows = entries.slice(0, 120).map((entry) => {
-      const rule = WA_RULES.find((item) => item.id === entry.rule);
-      const undo = entry.undone ? '<span class="note">Đã hoàn tác</span>' :
-        !entry.undo ? '<span class="note" title="' + esc(entry.noUndo || "") + '">' + esc(entry.noUndo || "Không hoàn tác") + '</span>' :
-        now - entry.at > WA_UNDO_MS ? '<span class="note">Hết hạn hoàn tác</span>' :
-        '<button type="button" class="btn" data-act="wa-undo" data-id="' + esc(entry.id) + '">Hoàn tác</button>';
-      return '<li class="wa-log-row' + (entry.undone ? ' undone' : '') + '"><time>' + esc(dtime(entry.at)) + '</time>' +
-        '<span class="tag ' + (entry.actor === "Agent" ? 't-av' : 't-lock') + '">' + esc(entry.actor) + '</span>' +
-        '<div class="wa-log-text"><b>' + esc(entry.action) + '</b><p class="note">' + esc(entry.ref || "") +
-        (rule ? ' · Luật #' + rule.n + ' · Mức ' + rule.level : '') + ' · ' + esc(entry.before) + ' → ' + esc(entry.after) + '</p></div>' +
-        '<div class="wa-log-undo">' + undo + '</div></li>';
-    }).join("");
-    return '<section class="work-section" aria-labelledby="wa-log-title"><div class="wa-section-head"><h2 id="wa-log-title">Nhật ký Agent</h2>' +
-      '<p class="note">Ai · khi nào · làm gì · trước → sau. Hoàn tác được 24 giờ với hành động không phải tiền.</p></div>' + chips +
-      (rows ? '<ul class="wa-log">' + rows + '</ul>' : '<p class="work-empty">Chưa có hành động nào.</p>') + '</section>';
-  }
-
+  /* Full Operations Center in Tab "Giao dịch" */
   function viewWork() {
-    const drafts = Array.from(saleDrafts).flatMap(([uid, draft]) => {
-      const unit = byUid(uid);
-      if (!unit) return [];
-      const label = agentLabel(unit);
-      const buyer = saleCustomerName(draft);
-      if (!draft.signedDate && unit.status === "AVAILABLE" && saleInProgress(draft)) {
-        const steps = ["Hoàn tất thông tin khách hàng", "Xác nhận lịch thanh toán", "Hoàn tất thông tin giao dịch", "Kiểm tra thỏa thuận và xác nhận ngày ký"];
-        const stages = ["Hồ sơ khách hàng", "Báo giá", "Thông tin giao dịch", "Chờ ký quỹ"];
-        return [{ uid, label, buyer, job: steps[draft.step - 1], stage: stages[draft.step - 1], tab: 0 }];
+    const now = Date.now();
+    const txUnits = UNITS.filter((u) => u.status === "IN_TRANSACTION" || u.status === "SOLD" || (agentTxState.holdTimes[u.uid] && u.status !== "AVAILABLE"));
+
+    // Metrics
+    const needHdmbList = txUnits.filter((u) => (u.status === "IN_TRANSACTION" || u.status === "SOLD") && !scanVault.has(u.uid));
+    const missingScanList = txUnits.filter((u) => (u.status === "IN_TRANSACTION" || u.status === "SOLD") && !scanVault.has(u.uid));
+    const hold48hList = Object.entries(agentTxState.holdTimes)
+      .map(([uid, hold]) => ({ u: byUid(uid), hold }))
+      .filter((item) => item.u && item.u.status !== "AVAILABLE");
+    const digitizedList = txUnits.filter((u) => scanVault.has(u.uid));
+
+    // Filters
+    let displayList = txUnits;
+    if (agentTxState.filter === "need-hdmb") {
+      displayList = needHdmbList;
+    } else if (agentTxState.filter === "missing-scan") {
+      displayList = missingScanList;
+    } else if (agentTxState.filter === "hold-48h") {
+      displayList = hold48hList.map((x) => x.u);
+    } else if (agentTxState.filter === "digitized") {
+      displayList = digitizedList;
+    }
+
+    if (agentTxState.searchQuery) {
+      const q = agentTxState.searchQuery.trim().toLowerCase();
+      displayList = displayList.filter((u) =>
+        u.code.toLowerCase().includes(q) ||
+        (u.buyer && u.buyer.toLowerCase().includes(q)) ||
+        u.proj.toLowerCase().includes(q)
+      );
+    }
+
+    // NBA Recommendations
+    const nbaCards = [
+      {
+        tag: "hdmb", tagLabel: "Xuất HĐMB",
+        title: "Xuất HĐMB chính thức: Căn SD-0802",
+        desc: "Đã hoàn tất đợt ký quỹ 10% (425.000.000 đ). Pháp chế AI đã kiểm tra: Thông thủy 78.4 m², đủ điều kiện xuất HĐMB chính thức kèm Phụ lục 01.",
+        uid: "orchard:SD:0802",
+        primaryAct: "agent-export-hdmb", primaryLabel: "Xuất HĐMB (PDF)",
+        secAct: "work-open", secLabel: "Mở hồ sơ"
+      },
+      {
+        tag: "scan", tagLabel: "Thiếu Scan",
+        title: "Cảnh báo thiếu scan mộc đỏ: Căn SD-0702",
+        desc: "HĐMB đã được các bên ký 3 ngày trước nhưng hệ thống chưa ghi nhận file scan có dấu mộc đỏ của Meraki Land. Cần bổ sung để số hóa hồ sơ.",
+        uid: "orchard:SD:0702",
+        primaryAct: "agent-upload-scan", primaryLabel: "Tải lên scan ngay",
+        secAct: "work-open", secLabel: "Mở hồ sơ"
+      },
+      {
+        tag: "lock", tagLabel: "Canh giữ chỗ",
+        title: "Cảnh báo hết hạn giữ chỗ: Căn SD-0304",
+        desc: "Thời hạn giữ chỗ còn lại: " + formatHoldRemaining(agentTxState.holdTimes["orchard:SD:0304"]?.expiresAt || (now + 14 * 3600 * 1000)) + ". Khách chưa thanh toán ủy nhiệm chi tiền cọc 100 triệu.",
+        uid: "orchard:SD:0304",
+        primaryAct: "agent-extend-hold", primaryLabel: "Gia hạn 24h",
+        secAct: "agent-release-unit", secLabel: "Giải phóng căn"
+      },
+      {
+        tag: "cash", tagLabel: "VietQR Thu tiền",
+        title: "Nhắc tiến độ thanh toán: Căn SA-1002",
+        desc: "Đợt 2 thanh toán 5% (212.500.000 đ) đến hạn ngày 28/11/2026. Agent đã soạn sẵn thông báo kèm mã VietQR tự động khớp cú pháp ngân hàng.",
+        uid: "orchard:SA:1002",
+        primaryAct: "agent-vietqr", primaryLabel: "Tạo & Gửi VietQR",
+        secAct: "work-open", secLabel: "Xem lịch thu", tab: 3
       }
-      if (!draft.signedDate) return [];
-      const contract = contractDraft(unit);
-      if (contract.stage === "dat-coc") return [{ uid, label, buyer, job: "Tiếp tục hồ sơ đặt cọc", stage: "Đặt cọc", tab: 4 }];
-      if (contract.stage === "hdmb" && contract.status === "Nháp") {
-        return [{ uid, label, buyer, job: contract.appliedSchedule ? "Rà soát và hoàn thiện HĐMB nháp" : "Đối chiếu lịch thanh toán cho HĐMB", stage: "HĐMB nháp", tab: 4 }];
+    ];
+
+    const nbaHtml = nbaCards.map((nba) =>
+      '<div class="nba-card ' + (nba.tag === 'scan' ? 'scan-warn' : nba.tag === 'lock' ? 'lock-warn' : nba.tag === 'cash' ? 'cash-info' : '') + '">' +
+        '<div>' +
+          '<div class="nba-head">' +
+            '<span class="nba-tag ' + nba.tag + '">' + nba.tagLabel + '</span>' +
+            '<small style="color:#627b82;font-family:monospace;font-size:11px;">' + esc(nba.uid) + '</small>' +
+          '</div>' +
+          '<h3 class="nba-title">' + esc(nba.title) + '</h3>' +
+          '<p class="nba-desc">' + esc(nba.desc) + '</p>' +
+        '</div>' +
+        '<div class="nba-actions">' +
+          '<button type="button" class="btn pri sm" data-act="' + nba.primaryAct + '" data-uid="' + esc(nba.uid) + '">' +
+            (nba.primaryAct === "agent-export-hdmb" ? '<svg class="ic sm"><use href="#i-file"/></svg>' : '') +
+            (nba.primaryAct === "agent-upload-scan" ? '<svg class="ic sm"><use href="#i-upload"/></svg>' : '') +
+            esc(nba.primaryLabel) +
+          '</button>' +
+          (nba.secAct ? '<button type="button" class="btn sm" data-act="' + nba.secAct + '" data-uid="' + esc(nba.uid) + '"' + (nba.tab ? ' data-tab="' + nba.tab + '"' : ' data-tab="4"') + '>' + esc(nba.secLabel) + '</button>' : '') +
+        '</div>' +
+      '</div>'
+    ).join("");
+
+    // Table Rows
+    const tableRowsHtml = displayList.map((u) => {
+      const proj = projOf(u);
+      const tw = towerOf(u);
+      const scan = scanVault.get(u.uid);
+      const hold = agentTxState.holdTimes[u.uid];
+      const buyerName = u.buyer ? customerName(u.buyer) : "Chưa liên kết";
+
+      let statusBadge = '';
+      if (u.status === "SOLD") {
+        statusBadge = '<span class="tag t-sold">Đã bán</span>';
+      } else if (u.status === "IN_TRANSACTION") {
+        statusBadge = '<span class="tag t-tx">Đang giao dịch</span>';
+      } else if (hold && u.status !== "AVAILABLE") {
+        statusBadge = '<span class="tag t-lock">Đang giữ chỗ</span>';
+      } else {
+        statusBadge = '<span class="tag t-av">Còn bán</span>';
       }
-      return [];
-    });
-    const draftRows = drafts.sort((a, b) => b.tab - a.tab || a.label.localeCompare(b.label)).map((item) =>
-      '<li class="work-row"><div class="work-detail"><b>' + esc(item.buyer || item.label) +
-      '</b><p>' + (item.buyer ? esc(item.label) + ' · ' : '') + esc(item.job) + '</p></div>' +
-      '<span class="tag t-lock">' + esc(item.stage) + '</span><div class="work-actions">' +
-      workAction("work-open", item.uid, "Tiếp tục hồ sơ", "pri", ' data-tab="' + item.tab + '"') + '</div></li>').join("");
-    const tasks = waLast;
-    const live = tasks.filter(waLive);
-    const tabs = [["inbox", "Hộp việc", live.length], ["rules", "Tự động hoá", WA_RULES.filter(waEnabled).length + "/" + WA_RULES.length],
-      ["log", "Nhật ký", waState.audit.length]];
-    const head = '<div class="work-page"><header class="work-header"><div><h1>Giao dịch</h1>' +
-      '<p>Agent giao dịch · ' + WA_RULES.filter(waEnabled).length + ' luật đang bật · tự nhắc việc, không tự làm việc tài chính' +
-      (DEMO ? ' · Dữ liệu minh họa ' + TODAY : '') + '</p></div>' +
-      '<button type="button" class="btn" data-act="nav" data-view="project">Mở sơ đồ căn</button></header>' +
-      '<nav class="wa-tabs" aria-label="Agent giao dịch">' + tabs.map(([id, label, count]) =>
-        '<button type="button" class="wa-tab" data-act="wa-tab" data-watab="' + id + '" aria-current="' +
-        (waUI.tab === id ? "page" : "false") + '">' + label + '<span class="wa-count">' + count + '</span></button>').join("") + '</nav>';
-    if (waUI.tab === "rules") return head + waRulesView(tasks) + '</div>';
-    if (waUI.tab === "log") return head + waLogView() + '</div>';
-    return head + waInbox(tasks) +
-      '<section class="work-unit-search" aria-labelledby="work-search-title"><h2 id="work-search-title">Tìm căn hộ</h2>' +
-      '<div class="work-search-field"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg>' +
-      '<input id="work-unit-query" class="inp" type="search" placeholder="' + (DEMO ? "Nhập mã căn, ví dụ 1001" : "Tìm theo mã căn") +
-      '" aria-label="Tìm theo mã căn" autocomplete="off" maxlength="12" value="' + esc(S.unitQuery) + '" aria-controls="work-unit-results"></div>' +
-      '<div id="work-unit-results" aria-live="polite">' + unitSearchResults(S.unitQuery) + '</div></section>' +
-      '<section class="work-section" aria-labelledby="work-drafts-title"><h2 id="work-drafts-title">Giao dịch đang làm</h2>' +
-      (drafts.length ? '<ul class="work-list">' + draftRows + '</ul>' : '<p class="work-empty">Giao dịch bạn bắt đầu sẽ xuất hiện tại đây.</p>') + '</section></div>';
+
+      let scanBadge = '';
+      if (scan) {
+        scanBadge = '<span class="tag t-av" title="' + esc(scan.name) + ' · ' + esc(scan.date) + '"><svg class="ic sm" style="margin-right:3px;"><use href="#i-check"/></svg>Đã có mộc đỏ</span>';
+      } else if (u.status !== "AVAILABLE") {
+        scanBadge = '<span class="tag t-sold"><svg class="ic sm" style="margin-right:3px;"><use href="#i-alert"/></svg>Chưa có scan</span>';
+      } else {
+        scanBadge = '<span class="note">—</span>';
+      }
+
+      let agentNotice = '';
+      if (scan) {
+        agentNotice = '<span style="color:#166534;font-size:12px;">Đã lưu Document Vault (OCR OK)</span>';
+      } else if (hold && u.status !== "AVAILABLE") {
+        agentNotice = '<span style="color:#dc2626;font-size:12px;font-weight:600;">Còn ' + formatHoldRemaining(hold.expiresAt) + '</span>';
+      } else if (u.status === "IN_TRANSACTION" || u.status === "SOLD") {
+        agentNotice = '<span style="color:#d97706;font-size:12px;">Cần xuất HĐMB & nạp scan</span>';
+      } else {
+        agentNotice = '<span class="note">Bình thường</span>';
+      }
+
+      let actionsHtml = '';
+      if (scan) {
+        actionsHtml += '<button type="button" class="btn sm" data-act="view-scan" data-uid="' + esc(u.uid) + '" title="Xem thông tin scan">File scan</button> ';
+      } else {
+        actionsHtml += '<button type="button" class="btn pri sm" data-act="agent-export-hdmb" data-uid="' + esc(u.uid) + '" title="Xuất PDF HĐMB chính thức"><svg class="ic sm"><use href="#i-file"/></svg>Xuất HĐMB</button> ';
+        actionsHtml += '<button type="button" class="btn sm" data-act="agent-upload-scan" data-uid="' + esc(u.uid) + '" title="Tải lên bản scan"><svg class="ic sm"><use href="#i-upload"/></svg>Scan</button> ';
+      }
+      actionsHtml += '<button type="button" class="btn ghost sm" data-act="work-open" data-uid="' + esc(u.uid) + '" data-tab="4">Chi tiết</button>';
+
+      return '<tr>' +
+        '<td><b>Căn ' + esc(u.code) + '</b><br><small style="color:#536b72;">' + esc(proj?.short || "") + ' · ' + esc(tw?.name || "") + '</small></td>' +
+        '<td><b>' + esc(buyerName) + '</b><br><small style="color:#536b72;">' + esc(u.phone || "—") + '</small></td>' +
+        '<td>' + statusBadge + '</td>' +
+        '<td>' + scanBadge + '</td>' +
+        '<td>' + agentNotice + '</td>' +
+        '<td>' + actionsHtml + '</td>' +
+      '</tr>';
+    }).join("");
+
+    return '<div class="agent-center">' +
+      '<header class="agent-header">' +
+        '<div>' +
+          '<h1><svg class="ic" style="width:24px;height:24px;color:#156757" aria-hidden="true"><use href="#i-agent"/></svg> Trung tâm Giám sát Giao dịch & Pháp lý AI</h1>' +
+          '<p>Tự động thẩm định hồ sơ · Kiểm soát tiến độ ký HĐMB · Thu thập scan mộc đỏ · Canh giữ chỗ 48h · Nhắc nợ VietQR</p>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:10px;">' +
+          '<span class="agent-live-badge"><span class="pulse-dot"></span> Giám sát tự động 24/7</span>' +
+          '<button type="button" class="btn" data-act="agent-batch-demo" title="Mô phỏng quét và nạp file scan hàng loạt">' +
+            '<svg class="ic sm"><use href="#i-upload"/></svg> Quét scan mẫu' +
+          '</button>' +
+        '</div>' +
+      '</header>' +
+
+      '<div class="agent-kpi-grid">' +
+        '<div class="agent-kpi hdmb">' +
+          '<span><svg class="ic sm"><use href="#i-file"/></svg> Căn cần xuất HĐMB</span>' +
+          '<b>' + needHdmbList.length + '</b>' +
+          '<small style="color:#536b72;font-size:11px;">Đủ điều kiện xuất HĐMB chính thức</small>' +
+        '</div>' +
+        '<div class="agent-kpi scan">' +
+          '<span><svg class="ic sm"><use href="#i-alert"/></svg> Thiếu scan mộc đỏ</span>' +
+          '<b>' + missingScanList.length + '</b>' +
+          '<small style="color:#536b72;font-size:11px;">Đã ký nhưng chưa lưu scan mộc đỏ</small>' +
+        '</div>' +
+        '<div class="agent-kpi lock">' +
+          '<span><svg class="ic sm"><use href="#i-clock"/></svg> Canh giữ chỗ 48h</span>' +
+          '<b>' + hold48hList.length + '</b>' +
+          '<small style="color:#536b72;font-size:11px;">Đang đếm lùi thời hạn giữ chỗ</small>' +
+        '</div>' +
+        '<div class="agent-kpi cash">' +
+          '<span><svg class="ic sm"><use href="#i-check"/></svg> Hồ sơ đã số hóa</span>' +
+          '<b>' + scanVault.size + '</b>' +
+          '<small style="color:#536b72;font-size:11px;">File scan có mộc đỏ trong Vault</small>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="agent-sec-title">' +
+        '<span><svg class="ic sm" style="margin-right:6px;"><use href="#i-agent"/></svg> Khuyến nghị hành động ưu tiên (Next-Best-Actions)</span>' +
+        '<small style="color:#627b82;font-weight:400;font-size:12px;">Đề xuất thông minh theo thời gian thực</small>' +
+      '</div>' +
+      '<div class="agent-action-feed">' + nbaHtml + '</div>' +
+
+      '<div class="agent-dropzone-box" style="margin-bottom:24px;background:#f8fafb;border:2px dashed #b8d4cf;border-radius:8px;padding:18px 24px;text-align:center;">' +
+        '<div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px;">' +
+          '<svg class="ic" style="width:24px;height:24px;color:#156757"><use href="#i-upload"/></svg>' +
+          '<h3 style="margin:0;font-size:14px;color:#172c33;font-weight:700;">Tiếp nhận & Số hóa tệp scan HĐMB hàng loạt (AI OCR Vault)</h3>' +
+        '</div>' +
+        '<p style="font-size:12px;color:#536b72;margin:0 0 12px;max-width:700px;margin-left:auto;margin-right:auto;">' +
+          'Kéo thả tệp PDF hoặc ảnh scan HĐMB có mộc đỏ vào đây. Agent sẽ tự động trích xuất mã căn hộ, kiểm tra tính hợp lệ của con dấu CĐT Meraki Land và lưu vào Document Vault.' +
+        '</p>' +
+        '<div style="display:flex;justify-content:center;gap:10px;">' +
+          '<label class="btn pri" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;">' +
+            '<svg class="ic sm"><use href="#i-upload"/></svg> Chọn tệp tải lên' +
+            '<input type="file" multiple accept=".pdf,image/*" style="display:none" onchange="handleBatchScanUpload(this.files)">' +
+          '</label>' +
+          '<button type="button" class="btn" data-act="agent-batch-demo">' +
+            '<svg class="ic sm"><use href="#i-check"/></svg> Thử nạp tệp scan mẫu (Demo)' +
+          '</button>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="agent-sec-title">' +
+        '<span><svg class="ic sm" style="margin-right:6px;"><use href="#i-layers"/></svg> Bảng điều phối giao dịch & Kiểm soát hồ sơ</span>' +
+        '<div class="agent-filter-pills">' +
+          '<button type="button" class="agent-pill ' + (agentTxState.filter === "all" ? "on" : "") + '" data-act="agent-filter" data-f="all">Tất cả (' + txUnits.length + ')</button>' +
+          '<button type="button" class="agent-pill ' + (agentTxState.filter === "need-hdmb" ? "on" : "") + '" data-act="agent-filter" data-f="need-hdmb">Cần xuất HĐMB (' + needHdmbList.length + ')</button>' +
+          '<button type="button" class="agent-pill ' + (agentTxState.filter === "missing-scan" ? "on" : "") + '" data-act="agent-filter" data-f="missing-scan">Thiếu scan mộc đỏ (' + missingScanList.length + ')</button>' +
+          '<button type="button" class="agent-pill ' + (agentTxState.filter === "hold-48h" ? "on" : "") + '" data-act="agent-filter" data-f="hold-48h">Đang giữ chỗ 48h (' + hold48hList.length + ')</button>' +
+          '<button type="button" class="agent-pill ' + (agentTxState.filter === "digitized" ? "on" : "") + '" data-act="agent-filter" data-f="digitized">Đã số hóa (' + digitizedList.length + ')</button>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="agent-table-card">' +
+        '<div class="agent-search-bar">' +
+          '<svg class="ic sm" style="color:#536b72;"><use href="#i-search"/></svg>' +
+          '<input type="text" id="agent-tx-query" placeholder="Tìm kiếm nhanh theo mã căn, tên khách hàng hoặc dự án..." value="' + esc(agentTxState.searchQuery) + '" data-act="agent-search-inp">' +
+        '</div>' +
+        '<table class="agent-tx-table">' +
+          '<thead>' +
+            '<tr>' +
+              '<th>Căn hộ & Dự án</th>' +
+              '<th>Khách hàng & SĐT</th>' +
+              '<th>Trạng thái</th>' +
+              '<th>Bản scan mộc đỏ</th>' +
+              '<th>Giám sát Agent</th>' +
+              '<th>Thao tác nhanh</th>' +
+            '</tr>' +
+          '</thead>' +
+          '<tbody>' +
+            (tableRowsHtml || '<tr><td colspan="6" style="text-align:center;color:#627b82;padding:24px;">Không có giao dịch nào khớp với bộ lọc hiện tại.</td></tr>') +
+          '</tbody>' +
+        '</table>' +
+      '</div>' +
+    '</div>';
   }
 
   function agentLink(source) {
@@ -4926,7 +4751,7 @@ body.detail-mode #viewbar{display:none}
       if (c) { box.innerHTML = detailCust(c); box.scrollTop = y; return; }
       S.route = null;
     }
-    box.innerHTML = S.view === "work" ? viewWork() : S.view === "agent" ? viewAgent() : S.view === "project" ? viewProject() : S.view === "vault" ? viewVault() : viewCustomers();
+    box.innerHTML = S.view === "work" ? viewWork() : S.view === "agent" ? viewAgent() : S.view === "project" ? viewProject() : viewCustomers();
     const el = $("#vbcount");
     if (el) el.textContent = "· " + filteredCustomers().length + " người";
     box.scrollTop = y;
@@ -4955,80 +4780,56 @@ body.detail-mode #viewbar{display:none}
       return;
     }
     if (a === "nav") { S.view = el.dataset.view; S.f = "all"; S.ct = "all"; S.q = ""; S.route = null; S.menu = ""; render(); return; }
-    if (a.startsWith("wa-")) {
-      const task = el.dataset.task ? waFind(el.dataset.task) : null;
-      if (a === "wa-tab") { waUI.tab = el.dataset.watab; waUI.confirm = ""; S.route = null; S.view = "work"; render(); $(".wa-tab[aria-current='page']")?.focus(); return; }
-      if (a === "wa-all") { waUI.all = !waUI.all; renderContent(); $('[data-act="wa-all"]')?.focus(); return; }
-      if (a === "wa-log-rule") { waUI.logRule = el.dataset.rule; waUI.tab = "log"; renderContent(); $('[data-act="wa-log-rule"][aria-pressed="true"]')?.focus(); return; }
-      if (a === "wa-rule-toggle") {
-        const rule = WA_RULES.find((item) => item.id === el.dataset.rule);
-        waToggleRule(el.dataset.rule);
-        renderContent();
-        toast((waState.rules[el.dataset.rule] === false ? "Đã tắt" : "Đã bật") + " luật #" + rule.n + " · hoàn tác trong Nhật ký");
-        $('.wa-switch[data-rule="' + el.dataset.rule + '"]')?.focus();
-        return;
+    // Actions của Agent giám sát giao dịch
+    if (a === "agent-filter") {
+      agentTxState.filter = el.dataset.f;
+      renderContent();
+      return;
+    }
+    if (a === "agent-batch-demo") {
+      simulateBatchDrop();
+      return;
+    }
+    if (a === "agent-export-hdmb") {
+      useHdmbPdf(el, true);
+      return;
+    }
+    if (a === "agent-upload-scan") {
+      simulateScanUpload(el.dataset.uid);
+      return;
+    }
+    if (a === "view-scan") {
+      const scan = scanVault.get(el.dataset.uid);
+      if (scan) {
+        toast("Tệp scan: " + scan.name + " (" + scan.size + ") · Đã kiểm định con dấu đỏ bởi AI Legal Guard");
       }
-      if (a === "wa-undo") {
-        if (waUndo(el.dataset.id)) toast("Đã hoàn tác");
+      return;
+    }
+    if (a === "agent-extend-hold") {
+      const uid = el.dataset.uid;
+      if (agentTxState.holdTimes[uid]) {
+        agentTxState.holdTimes[uid].expiresAt += 24 * 3600 * 1000;
+        agentTxState.holdTimes[uid].extended = true;
+        toast("Agent: Đã gia hạn giữ chỗ thêm 24 giờ cho căn " + uid);
         renderContent();
-        return;
       }
-      if (a === "wa-tower") {
-        Object.assign(S, { view: "project", pid: el.dataset.pid, tid: el.dataset.tid, f: "AVAILABLE", route: null, menu: "" });
+      return;
+    }
+    if (a === "agent-release-unit") {
+      const uid = el.dataset.uid;
+      const u = byUid(uid);
+      if (u) {
+        u.status = "AVAILABLE";
+        u.buyer = "";
+        delete agentTxState.holdTimes[uid];
+        toast("Agent: Đã giải phóng căn " + u.code + " về trạng thái Còn bán");
         render();
-        return;
       }
-      if (a === "wa-cust") { openCustByName(el.dataset.name); return; }
-      if (a === "wa-l3-confirm") {
-        const dialog = $("#wa-l3");
-        const pending = waFind(dialog.dataset.task);
-        dialog.close();
-        if (!pending) return;
-        waState.tasks[pending.id] = { state: "done", at: Date.now() };
-        waLog({ actor: CUSTOMER_ACTOR, rule: pending.rule.id, task: pending.id, ref: pending.label, action: pending.l3.cta,
-          before: "Đang mở", after: "Đã chuyển kế toán", undo: null, noUndo: "Tài chính · không hoàn tác" });
-        waSave();
-        renderContent();
-        toast("Đã chuyển kế toán đối soát · ghi vào Nhật ký");
-        return;
-      }
-      if (!task) { renderContent(); return; }
-      if (a === "wa-snooze") {
-        waSetTask(task, { state: "snoozed", until: Date.now() + DAY_MS, at: Date.now() }, "Hoãn 1 ngày · " + task.title);
-        renderContent();
-        toast("Đã hoãn đến " + dtime(Date.now() + DAY_MS) + " · hoàn tác trong Nhật ký");
-        return;
-      }
-      if (a === "wa-done") {
-        waSetTask(task, { state: "done", at: Date.now() }, "Đánh dấu đã xử lý · " + task.title);
-        if (agentSession.workReview?.uid === task.uid) agentSession.workReview = null;
-        if (waUI.confirm === task.id) waUI.confirm = "";
-        renderContent();
-        toast("Đã xử lý · hoàn tác trong Nhật ký");
-        return;
-      }
-      if (a === "wa-confirm-open" || a === "wa-confirm-cancel") {
-        waUI.confirm = a === "wa-confirm-open" && waUI.confirm !== task.id ? task.id : "";
-        renderContent();
-        (waUI.confirm ? $("#wa-confirm-panel .work-saved-body") : $('[data-act="wa-confirm-open"][data-task="' + task.id + '"]'))?.focus();
-        return;
-      }
-      if (a === "wa-confirm") {
-        waUI.confirm = "";
-        waSetTask(task, { state: task.rule.id === "r8" ? "done" : "reminded", at: Date.now() }, task.confirm.done);
-        renderContent();
-        toast(task.confirm.done + " · hoàn tác trong Nhật ký");
-        return;
-      }
-      if (a === "wa-l3-open") {
-        const dialog = $("#wa-l3");
-        dialog.dataset.task = task.id;
-        $("#wa-l3-title").textContent = task.l3.title;
-        $("#wa-l3-facts").innerHTML = task.l3.facts.map((fact) => '<li>' + esc(fact) + '</li>').join("");
-        $("#wa-l3-confirm").textContent = task.l3.cta;
-        dialog.showModal();
-        return;
-      }
+      return;
+    }
+    if (a === "agent-vietqr") {
+      openVietQrDialog(el.dataset.uid);
+      return;
     }
     if (a === "agent-for-unit" || a === "agent-unpin") {
       agentRequest?.abort();
@@ -5586,6 +5387,23 @@ body.detail-mode #viewbar{display:none}
   }
 
   /* ================= boot ================= */
+  document.addEventListener("input", (e) => {
+    if (e.target && e.target.id === "agent-tx-query") {
+      agentTxState.searchQuery = e.target.value;
+      renderContent();
+      const inp = $("#agent-tx-query");
+      if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+    }
+  });
+
+  $("#vietqr-copy-btn")?.addEventListener("click", () => {
+    const ref = $("#vietqr-ref")?.textContent || "";
+    if (ref) {
+      navigator.clipboard?.writeText(ref);
+      toast("Đã sao chép nội dung chuyển khoản: " + ref);
+    }
+  });
+
   bindHScroll();
   restore();
   waLoad();
