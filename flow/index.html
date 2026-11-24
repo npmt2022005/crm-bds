@@ -1,0 +1,1690 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CRM BĐS — n8n Chi Tiết Luồng Nghiệp Vụ (Fix Wire Labels)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* === N8N DESIGN SYSTEM TOKENS === */
+:root {
+  --canvas-bg: #0e1017;
+  --grid-dot: #242938;
+  --surface: #181b24;
+  --surface-hover: #1f2330;
+  --surface-card: #151821;
+  --border: #282e3f;
+  --border-light: #373f55;
+  --border-hover: #4e5873;
+  
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --text-mono: 'JetBrains Mono', monospace;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  /* n8n brand accents */
+  --n8n-orange: #ff6d5a;
+  --n8n-orange-dim: rgba(255, 109, 90, 0.15);
+  
+  /* Wire colors */
+  --wire-idle: #3d475d;
+  --wire-main: #4e5d78;
+  --wire-active: #6366f1;
+  --wire-danger: #ef4444;
+  
+  --shadow-node: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border);
+  --shadow-hover: 0 10px 30px -4px rgba(0, 0, 0, 0.7), 0 0 0 1.5px var(--n8n-orange);
+}
+
+[data-theme="light"] {
+  --canvas-bg: #f8fafc;
+  --grid-dot: #cbd5e1;
+  --surface: #ffffff;
+  --surface-hover: #f1f5f9;
+  --surface-card: #f8fafc;
+  --border: #e2e8f0;
+  --border-light: #cbd5e1;
+  --border-hover: #94a3b8;
+  
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-dim: #94a3b8;
+  
+  --wire-idle: #cbd5e1;
+  --wire-main: #94a3b8;
+  --shadow-node: 0 4px 16px -2px rgba(15, 23, 42, 0.08), 0 0 0 1px var(--border);
+  --shadow-hover: 0 10px 24px -4px rgba(255, 109, 90, 0.25), 0 0 0 2px var(--n8n-orange);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: var(--canvas-bg); color: var(--text-main); font-family: var(--font-ui); font-size: 13px; }
+
+/* === TOP BAR === */
+.topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 54px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  z-index: 100;
+  user-select: none;
+}
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.n8n-logo {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, #ff6d5a, #ea4b71);
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 15px;
+  box-shadow: 0 2px 8px rgba(255, 109, 90, 0.4);
+}
+.workflow-title-wrap {
+  display: flex;
+  flex-direction: column;
+}
+.workflow-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.badge-tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.workflow-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.center-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-exec {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 18px;
+  background: var(--n8n-orange);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 8px rgba(255, 109, 90, 0.35);
+}
+.btn-exec:hover {
+  background: #ff5741;
+  box-shadow: 0 4px 14px rgba(255, 109, 90, 0.5);
+  transform: translateY(-1px);
+}
+.btn-exec.running {
+  background: #f59e0b;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+}
+.btn-secondary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: var(--surface-card);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-secondary:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-light);
+}
+
+.active-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.active-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulse-dot 2s infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+.right-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.icon-btn {
+  width: 32px; height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.icon-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text-main);
+  border-color: var(--border);
+}
+.icon-btn svg { width: 16px; height: 16px; }
+
+/* === WORKFLOW CANVAS === */
+.viewport {
+  position: absolute;
+  top: 54px; bottom: 38px; left: 0; right: 0;
+  overflow: hidden;
+  cursor: grab;
+  background-color: var(--canvas-bg);
+  background-image: radial-gradient(var(--grid-dot) 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+}
+.viewport.grabbing { cursor: grabbing; user-select: none; }
+
+.canvas-transform {
+  position: absolute;
+  left: 0; top: 0;
+  transform-origin: 0 0;
+}
+
+/* === SECTION FRAME HIGHLIGHTS === */
+.group-frame {
+  position: absolute;
+  border-radius: 14px;
+  border: 1px dashed var(--border-light);
+  background: rgba(255, 255, 255, 0.015);
+  pointer-events: none;
+  z-index: 5;
+}
+.group-title {
+  position: absolute;
+  top: -12px; left: 18px;
+  padding: 3px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: var(--text-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+}
+
+/* === SVG WIRE CONNECTIONS === */
+svg.wire-layer {
+  position: absolute;
+  left: 0; top: 0;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 10;
+}
+.wire {
+  fill: none;
+  stroke: var(--wire-idle);
+  stroke-width: 2.2;
+  transition: stroke 0.2s ease, stroke-width 0.2s ease;
+}
+.wire.w-main {
+  stroke: var(--wire-main);
+}
+.wire.w-alt {
+  stroke: #a855f7;
+  stroke-dasharray: 4 4;
+  opacity: 0.85;
+}
+.wire.w-danger, .wire.w-back {
+  stroke: var(--wire-danger);
+  stroke-dasharray: 6 5;
+  opacity: 0.85;
+}
+
+/* Glowing laser pulses */
+.pulse-circle {
+  fill: #818cf8;
+  filter: drop-shadow(0 0 5px #6366f1);
+}
+.pulse-circle.p-danger {
+  fill: #ef4444;
+  filter: drop-shadow(0 0 6px #ef4444);
+}
+.pulse-circle.p-main {
+  fill: var(--n8n-orange);
+  filter: drop-shadow(0 0 6px var(--n8n-orange));
+}
+
+/* === WIRE LABELS (FIX ĐÈ LỖI & NẰM GỌN TRÊN ĐƯỜNG NỐI) === */
+.wire-badge {
+  position: absolute;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  color: var(--text-main);
+  font-family: var(--text-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  z-index: 35;
+  line-height: 1.4;
+  transition: opacity 0.2s ease;
+}
+.wire-badge.b-danger {
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.5);
+  background: #201317;
+}
+[data-theme="light"] .wire-badge.b-danger {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+.wire-badge.b-main {
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.4);
+  background: #111e2e;
+}
+[data-theme="light"] .wire-badge.b-main {
+  background: #f0f9ff;
+  border-color: #bae6fd;
+  color: #0284c7;
+}
+
+/* === N8N NODE CARD COMPONENT === */
+.n8n-node {
+  position: absolute;
+  width: 250px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-node);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+  user-select: none;
+  z-index: 20;
+}
+.n8n-node:hover {
+  border-color: var(--n8n-orange);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+.n8n-node.selected {
+  border-color: var(--n8n-orange);
+  box-shadow: 0 0 0 2px var(--n8n-orange), 0 8px 24px rgba(255, 109, 90, 0.35);
+}
+.n8n-node.exec-running {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 2px #f59e0b, 0 0 20px rgba(245, 158, 11, 0.5);
+  animation: node-pulse 0.9s infinite alternate;
+}
+.n8n-node.exec-success {
+  border-color: #10b981;
+  box-shadow: 0 0 0 1.5px #10b981, 0 4px 16px rgba(16, 185, 129, 0.25);
+}
+@keyframes node-pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.025); }
+}
+
+/* Node Ports */
+.port {
+  position: absolute;
+  top: 50%;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--border-light);
+  transform: translateY(-50%);
+  z-index: 25;
+  transition: all 0.15s ease;
+}
+.port::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  transition: all 0.15s ease;
+}
+.port-in { left: -6px; }
+.port-out { right: -6px; }
+.n8n-node:hover .port,
+.n8n-node.selected .port {
+  border-color: var(--n8n-orange);
+}
+.n8n-node:hover .port::after,
+.n8n-node.selected .port::after {
+  background: var(--n8n-orange);
+}
+.n8n-node.exec-success .port { border-color: #10b981; }
+.n8n-node.exec-success .port::after { background: #10b981; }
+
+/* Node Header & Body */
+.node-content {
+  padding: 12px 14px;
+}
+.node-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.node-icon-box {
+  flex: 0 0 34px;
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  transition: transform 0.15s ease;
+}
+.n8n-node:hover .node-icon-box {
+  transform: scale(1.08);
+}
+.node-icon-box svg {
+  width: 18px; height: 18px;
+}
+.node-headings {
+  flex: 1;
+  min-width: 0;
+}
+.node-step-tag {
+  display: inline-block;
+  font-family: var(--text-mono);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-bottom: 2px;
+}
+.node-module {
+  font-family: var(--text-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.node-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+.node-sub {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.node-footer {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.node-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--surface-hover);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+.node-chip-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Node Execution Duration Badge */
+.node-exec-badge {
+  position: absolute;
+  top: -8px; right: 10px;
+  background: #10b981;
+  color: #fff;
+  font-family: var(--text-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 10px;
+  display: none;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+  z-index: 30;
+}
+.node-exec-badge.show { display: inline-flex; }
+
+/* === BOTTOM STATUS / EXECUTION CONSOLE === */
+.bottom-panel {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 38px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  font-size: 11.5px;
+  z-index: 90;
+  user-select: none;
+}
+.status-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+}
+.stat-val {
+  font-family: var(--text-mono);
+  font-weight: 600;
+  color: var(--text-main);
+}
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--surface-card);
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+.zoom-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  width: 22px; height: 22px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.zoom-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text-main);
+}
+.zoom-val {
+  font-family: var(--text-mono);
+  font-size: 11px;
+  width: 44px;
+  text-align: center;
+  color: var(--text-main);
+}
+
+/* === DETAIL INSPECTOR MODAL === */
+.inspector-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 150;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.inspector-overlay.open { display: flex; }
+.inspector-card {
+  width: 660px;
+  max-width: 90vw;
+  max-height: 84vh;
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modal-up 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modal-up {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.inspector-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface-card);
+}
+.insp-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.insp-icon {
+  width: 38px; height: 38px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+}
+.insp-icon svg { width: 20px; height: 20px; }
+.insp-name {
+  font-size: 16px;
+  font-weight: 700;
+}
+.insp-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  width: 32px; height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+}
+.close-btn:hover { background: var(--surface-hover); color: var(--text-main); }
+.inspector-tabs {
+  display: flex;
+  gap: 20px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.insp-tab {
+  padding: 10px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+.insp-tab.active {
+  color: var(--n8n-orange);
+  border-bottom-color: var(--n8n-orange);
+}
+.inspector-body {
+  padding: 20px;
+  overflow-y: auto;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.json-preview {
+  background: #090b10;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  font-family: var(--text-mono);
+  font-size: 11.5px;
+  color: #38bdf8;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+.meta-grid {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 10px 16px;
+  margin-bottom: 16px;
+}
+.meta-label {
+  color: var(--text-dim);
+  font-weight: 600;
+  font-size: 11.5px;
+  text-transform: uppercase;
+}
+.meta-val {
+  color: var(--text-main);
+  font-weight: 500;
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV BAR -->
+<header class="topbar">
+  <div class="brand-group">
+    <div class="n8n-logo">n8n</div>
+    <div class="workflow-title-wrap">
+      <div class="workflow-title">
+        Luồng Nghiệp Vụ BĐS Chi Tiết
+        <span class="badge-tag">Labels Clean</span>
+      </div>
+      <div class="workflow-sub">
+        <span>22 Node Tường Minh</span>
+        <span>•</span>
+        <span>Khoảng Cách Chuẩn 160px</span>
+        <span>•</span>
+        <span>Nhãn Dây Nổi Độc Lập</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="center-controls">
+    <button class="btn-exec" id="btnRun" title="Chạy mô phỏng toàn bộ luồng">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      <span id="btnRunText">Execute Workflow</span>
+    </button>
+    <button class="btn-secondary" id="btnReset" title="Đặt lại trạng thái">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Reset
+    </button>
+    <div class="active-toggle">
+      <div class="active-dot"></div>
+      Active
+    </div>
+  </div>
+
+  <div class="right-controls">
+    <button class="icon-btn" id="btnFit" title="Căn vừa toàn cảnh">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+    </button>
+    <button class="icon-btn" id="btnTheme" title="Chuyển chế độ Sáng / Tối">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- INFINITE CANVAS VIEWPORT -->
+<div class="viewport" id="viewport">
+  <div class="canvas-transform" id="canvas">
+    <!-- Group frame visual outlines -->
+    <div class="group-frame" style="left: 860px; top: 320px; width: 1520px; height: 230px;">
+      <span class="group-title" style="color: #6366f1;">Tiến trình Lập hồ sơ bán căn (4 bước Wizard)</span>
+    </div>
+    <div class="group-frame" style="left: 1360px; top: 630px; width: 1440px; height: 200px;">
+      <span class="group-title" style="color: #ef4444;">Nhánh Huỷ giao dịch & Hoàn tiền (Rollback Loop)</span>
+    </div>
+    <div class="group-frame" style="left: 3730px; top: 320px; width: 1120px; height: 230px;">
+      <span class="group-title" style="color: #ec4899;">Quy trình Phê duyệt & Ký HĐMB</span>
+    </div>
+    <div class="group-frame" style="left: 5370px; top: 320px; width: 1120px; height: 230px;">
+      <span class="group-title" style="color: #14b8a6;">Checklist Bàn giao căn hộ</span>
+    </div>
+
+    <!-- SVG Connections Layer -->
+    <svg class="wire-layer" id="svgWire"></svg>
+    <!-- HTML Nodes Container -->
+    <div id="nodesContainer"></div>
+  </div>
+</div>
+
+<!-- BOTTOM STATUS STRIP -->
+<footer class="bottom-panel">
+  <div class="status-left">
+    <div class="stat-item">
+      <span>Trạng thái:</span>
+      <span class="stat-val" id="statStatus" style="color: #10b981;">Sẵn sàng</span>
+    </div>
+    <div class="stat-item">
+      <span>Đang chạy:</span>
+      <span class="stat-val" id="statActiveNode">None</span>
+    </div>
+    <div class="stat-item">
+      <span>Tổng số Node:</span>
+      <span class="stat-val">22 bước chi tiết</span>
+    </div>
+    <div class="stat-item">
+      <span>Thời gian:</span>
+      <span class="stat-val" id="statDuration">0ms</span>
+    </div>
+  </div>
+  
+  <div class="zoom-controls">
+    <button class="zoom-btn" id="btnZoomOut">−</button>
+    <span class="zoom-val" id="lblZoom">100%</span>
+    <button class="zoom-btn" id="btnZoomIn">+</button>
+  </div>
+</footer>
+
+<!-- NODE INSPECTOR MODAL -->
+<div class="inspector-overlay" id="inspectorOverlay">
+  <div class="inspector-card">
+    <div class="inspector-header">
+      <div class="insp-title-row">
+        <div class="insp-icon" id="inspIcon"></div>
+        <div>
+          <div class="insp-name" id="inspName">Node Title</div>
+          <div class="insp-sub" id="inspModule">MODULE</div>
+        </div>
+      </div>
+      <button class="close-btn" id="btnCloseInspector">&times;</button>
+    </div>
+    <div class="inspector-tabs">
+      <div class="insp-tab active" data-tab="tab-params">Thông số & Quy tắc</div>
+      <div class="insp-tab" data-tab="tab-json">Payload JSON</div>
+    </div>
+    <div class="inspector-body">
+      <div id="tab-params">
+        <div class="meta-grid">
+          <div class="meta-label">Mã Node:</div>
+          <div class="meta-val" id="inspId">id</div>
+          <div class="meta-label">Phân hệ CRM:</div>
+          <div class="meta-val" id="inspMod">module</div>
+          <div class="meta-label">Hành động:</div>
+          <div class="meta-val" id="inspAction">action</div>
+          <div class="meta-label">Mục tiêu nghiệp vụ:</div>
+          <div class="meta-val" id="inspDesc">desc</div>
+          <div class="meta-label">Trạng thái gắn:</div>
+          <div class="meta-val" id="inspChip">chip</div>
+          <div class="meta-label">Đầu vào (Upstream):</div>
+          <div class="meta-val" id="inspIn">in</div>
+          <div class="meta-label">Đầu ra (Downstream):</div>
+          <div class="meta-val" id="inspOut">out</div>
+        </div>
+      </div>
+      <div id="tab-json" style="display: none;">
+        <pre class="json-preview" id="inspJson">{}</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  /* === SVG ICONS === */
+  const ICONS = {
+    build: '<path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5M9 10h.01M15 10h.01"/>',
+    grid: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+    userCheck: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/>',
+    calculator: '<rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="18"/><path d="M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01"/>',
+    building: '<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"/>',
+    signature: '<path d="M3 19c3.5-2 6.5-1 8.5-4s1.5-6 4-6 4 3 6 3"/><path d="M21 19c-2 0-3-1-4-2"/>',
+    lock: '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+    doc: '<path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+    pen: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/>',
+    check: '<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',
+    coin: '<circle cx="12" cy="12" r="9"/><path d="M15 9c-.5-1-1.6-1.5-3-1.5-1.7 0-3 .8-3 2s1.3 1.8 3 2.2 3 1 3 2.3-1.3 2-3 2c-1.4 0-2.6-.6-3-1.6M12 6v1.5M12 16.5V18"/>',
+    key: '<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/>',
+    swap: '<path d="M4 8h14l-3-3M20 16H6l3 3"/>',
+    x: '<circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/>',
+    refresh: '<path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>',
+    clipboard: '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/>',
+    gift: '<polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>',
+    bell: '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/>'
+  };
+
+  /* === 22 UNBUNDLED NODES WITH SPACIOUS 160px GAPS === */
+  const NODES = [
+    // --- 1. MỞ BÁN & TIẾP NHẬN ---
+    {
+      id: "proj",
+      stepTag: "KHỞI TẠO",
+      mod: "Dự án",
+      t: "Mở bán giỏ hàng",
+      sub: "Chưa mở bán → Chưa bán",
+      chip: "Chưa mở bán",
+      color: "#ff6d5a",
+      ic: "build",
+      x: 80, y: 130,
+      hasIn: false, hasOut: true,
+      desc: "Kích hoạt giỏ hàng căn hộ từ trạng thái Chưa mở bán sang Chưa bán để đưa lên bảng hàng phục vụ kinh doanh."
+    },
+    {
+      id: "grid",
+      stepTag: "BẢNG HÀNG",
+      mod: "Dự án",
+      t: "Bảng căn (Stacking)",
+      sub: "Lưới căn 4 màu trạng thái",
+      chip: "Chưa bán",
+      color: "#10b981",
+      ic: "grid",
+      x: 480, y: 130,
+      hasIn: true, hasOut: true,
+      desc: "Sơ đồ xếp chồng (Stacking Plan) hiển thị trực quan toàn bộ căn hộ, lọc theo toà, tầng, hướng và khoảng giá."
+    },
+    {
+      id: "cust",
+      stepTag: "ĐẦU VÀO",
+      mod: "Khách hàng",
+      t: "Tiếp nhận Lead",
+      sub: "Tạo mới hoặc nhập Excel",
+      chip: "Lead mới",
+      color: "#3b82f6",
+      ic: "user",
+      x: 80, y: 400,
+      hasIn: false, hasOut: true,
+      desc: "Tiếp nhận thông tin khách hàng từ các kênh marketing, sự kiện mở bán hoặc nhập danh sách từ file Excel."
+    },
+
+    // --- 2. TIẾN TRÌNH LẬP HỒ SƠ BÁN CĂN (4 BƯỚC WIZARD) ---
+    {
+      id: "s1_cust",
+      stepTag: "WIZARD B1",
+      mod: "Hồ sơ bán căn",
+      t: "Định danh khách hàng",
+      sub: "Cá nhân 41KB / DN 88KB · Check trùng",
+      chip: "Chống trùng SĐT",
+      color: "#6366f1",
+      ic: "userCheck",
+      x: 880, y: 400,
+      hasIn: true, hasOut: true,
+      desc: "Điền form thông tin định danh người mua, kiểm tra trùng số điện thoại / CCCD / MST để bảo vệ quyền môi giới."
+    },
+    {
+      id: "s2_quote",
+      stepTag: "WIZARD B2",
+      mod: "Hồ sơ bán căn",
+      t: "Báo giá & Chiết khấu",
+      sub: "3 Phương án TT + Áp chiết khấu",
+      chip: "Tính giá bán",
+      color: "#06b6d4",
+      ic: "calculator",
+      x: 1290, y: 400,
+      hasIn: true, hasOut: true,
+      desc: "Chọn phương thức thanh toán (Tiến độ / Nhanh / Vay NH), áp dụng chiết khấu mở bán và tính tổng giá có VAT."
+    },
+    {
+      id: "s3_trans",
+      stepTag: "WIZARD B3",
+      mod: "Hồ sơ bán căn",
+      t: "Sàn GD & Tiền ký quỹ",
+      sub: "Gán sàn môi giới · Hạn mức ký quỹ",
+      chip: "50–100 triệu",
+      color: "#8b5cf6",
+      ic: "building",
+      x: 1700, y: 400,
+      hasIn: true, hasOut: true,
+      desc: "Xác nhận sàn giao dịch phụ trách, số tiền nộp ký quỹ và ngày hẹn nộp tiền vào tài khoản phong tỏa."
+    },
+    {
+      id: "s4_sign",
+      stepTag: "WIZARD B4",
+      mod: "Hồ sơ bán căn",
+      t: "Ký Thỏa thuận Ký quỹ",
+      sub: "Sinh mẫu PDF · Ký xác nhận",
+      chip: "Xác nhận ký",
+      color: "#a855f7",
+      ic: "signature",
+      x: 2110, y: 400,
+      hasIn: true, hasOut: true,
+      desc: "Sinh văn bản Thỏa thuận Ký quỹ hoàn chỉnh, khách hàng và nhân viên ký xác nhận để hoàn tất hồ sơ bán."
+    },
+
+    // --- 3. KHÓA CĂN & NHÁNH HỦY ---
+    {
+      id: "hold",
+      stepTag: "KHÓA CĂN",
+      mod: "Trạng thái căn",
+      t: "Khóa giữ chỗ (Hold)",
+      sub: "Chống xung đột giỏ hàng",
+      chip: "Đang xử lý GD",
+      color: "#f59e0b",
+      ic: "lock",
+      x: 2520, y: 400,
+      hasIn: true, hasOut: true,
+      desc: "Căn hộ lập tức đổi sang màu vàng (Đang xử lý GD). Khóa toàn hệ thống để các sàn khác không thể chọn mua đè."
+    },
+    {
+      id: "cancel_req",
+      stepTag: "HỦY GD B1",
+      mod: "Huỷ giao dịch",
+      t: "Yêu cầu rút căn",
+      sub: "Khách hủy hoặc quá hạn nộp tiền",
+      chip: "Yêu cầu hủy",
+      color: "#ef4444",
+      ic: "x",
+      x: 2520, y: 710,
+      hasIn: true, hasOut: true,
+      desc: "Ghi nhận lý do hủy giao dịch từ khách hàng hoặc hệ thống tự động kích hoạt hủy do quá hạn nộp tiền 24h–48h."
+    },
+    {
+      id: "cancel_proc",
+      stepTag: "HỦY GD B2",
+      mod: "Huỷ giao dịch",
+      t: "Xử lý hoàn quỹ / Phạt cọc",
+      sub: "Đối soát tài khoản phong tỏa",
+      chip: "Thanh lý hồ sơ",
+      color: "#ef4444",
+      ic: "coin",
+      x: 1960, y: 710,
+      hasIn: true, hasOut: true,
+      desc: "Thực hiện thủ tục hoàn trả tiền ký quỹ hoặc tịch thu tiền cọc theo điều khoản thỏa thuận đã ký."
+    },
+    {
+      id: "cancel_rel",
+      stepTag: "HỦY GD B3",
+      mod: "Huỷ giao dịch",
+      t: "Nhả căn về giỏ hàng",
+      sub: "Đang xử lý GD → Chưa bán",
+      chip: "Mở khóa căn",
+      color: "#10b981",
+      ic: "refresh",
+      x: 1400, y: 710,
+      hasIn: true, hasOut: true,
+      desc: "Xóa liên kết khách hàng, mở khóa căn hộ và trả ngược về Bảng căn để mở bán lại cho khách khác."
+    },
+
+    // --- 4. PHÁP LÝ KÝ QUỸ & ĐẶT CỌC ---
+    {
+      id: "stage_escrow",
+      stepTag: "PHÁP LÝ B1",
+      mod: "Hợp đồng",
+      t: "Tài khoản Ký quỹ (Escrow)",
+      sub: "Tiền phong tỏa tại ngân hàng",
+      chip: "Đã vào quỹ",
+      color: "#8b5cf6",
+      ic: "doc",
+      x: 2930, y: 220,
+      hasIn: true, hasOut: true,
+      desc: "Tiền ký quỹ đã vào tài khoản phong tỏa của chủ đầu tư tại ngân hàng liên kết, bảo đảm quyền ưu tiên mua."
+    },
+    {
+      id: "stage_deposit",
+      stepTag: "PHÁP LÝ B2",
+      mod: "Hợp đồng",
+      t: "Thỏa thuận đặt cọc",
+      sub: "Chuyển Ký quỹ → Đặt cọc chính thức",
+      chip: "Đã vào cọc",
+      color: "#a855f7",
+      ic: "pen",
+      x: 3340, y: 220,
+      hasIn: true, hasOut: true,
+      desc: "Khi dự án đủ điều kiện giao kết, khoản ký quỹ được giải tỏa và chuyển thành Hợp đồng đặt cọc chính thức."
+    },
+
+    // --- 5. QUY TRÌNH HĐMB (3 BƯỚC DUYỆT & KÝ) ---
+    {
+      id: "hdmb_draft",
+      stepTag: "HĐMB B1",
+      mod: "Hợp đồng mua bán",
+      t: "Lập HĐMB nháp",
+      sub: "Tích hợp giá, căn & phụ lục lịch TT",
+      chip: "Bản nháp",
+      color: "#ec4899",
+      ic: "doc",
+      x: 3750, y: 400,
+      hasIn: true, hasOut: true,
+      desc: "Hệ thống tự động đổ thông tin khách hàng, số căn, giá trị thanh toán và phụ lục các đợt thu vào mẫu HĐMB."
+    },
+    {
+      id: "hdmb_review",
+      stepTag: "HĐMB B2",
+      mod: "Hợp đồng mua bán",
+      t: "Trình duyệt nội bộ",
+      sub: "Phòng kinh doanh & Pháp chế duyệt",
+      chip: "Đã duyệt",
+      color: "#ec4899",
+      ic: "clipboard",
+      x: 4160, y: 400,
+      hasIn: true, hasOut: true,
+      desc: "Hồ sơ được rà soát nội bộ qua các cấp thẩm quyền, kiểm tra chính sách chiết khấu và phê duyệt xuất bản in."
+    },
+    {
+      id: "hdmb_sign",
+      stepTag: "HĐMB B3",
+      mod: "Hợp đồng mua bán",
+      t: "Ký kết HĐMB chính thức",
+      sub: "Khách hàng & Đại diện CĐT ký",
+      chip: "Đã ký HĐMB",
+      color: "#ec4899",
+      ic: "signature",
+      x: 4570, y: 400,
+      hasIn: true, hasOut: true,
+      desc: "Hai bên hoàn tất ký kết HĐMB giấy hoặc ký số eSign, đóng dấu pháp nhân của Chủ đầu tư."
+    },
+    {
+      id: "sold",
+      stepTag: "CHỐT BÁN",
+      mod: "Trạng thái căn",
+      t: "Căn hộ Đã bán",
+      sub: "Khóa vĩnh viễn trên Stacking Plan",
+      chip: "Đã bán",
+      color: "#eab308",
+      ic: "check",
+      x: 4980, y: 400,
+      hasIn: true, hasOut: true,
+      desc: "Căn hộ chuyển sang màu đỏ (Đã bán). Hoàn tất giai đoạn bán hàng và chuyển sang quản lý sau bán."
+    },
+
+    // --- 6. HẬU MÃI & SAU BÁN ---
+    {
+      id: "pay_due",
+      stepTag: "CÔNG NỢ B1",
+      mod: "Lịch thanh toán",
+      t: "Nhắc hạn từng đợt",
+      sub: "Tự động thông báo nợ T-7 ngày",
+      chip: "Theo dõi công nợ",
+      color: "#22c55e",
+      ic: "bell",
+      x: 5390, y: 140,
+      hasIn: true, hasOut: true,
+      desc: "Hệ thống tự động quét các đợt thu theo tiến độ xây dựng hoặc lịch giải ngân ngân hàng để gửi thông báo cho khách."
+    },
+    {
+      id: "pay_rcpt",
+      stepTag: "CÔNG NỢ B2",
+      mod: "Lịch thanh toán",
+      t: "Ghi nhận thu & Phiếu thu",
+      sub: "Đối soát sao kê · Xuất phiếu PDF",
+      chip: "Đã thu tiền",
+      color: "#22c55e",
+      ic: "coin",
+      x: 5800, y: 140,
+      hasIn: true, hasOut: false,
+      desc: "Xác nhận tiền về tài khoản, cập nhật công nợ còn lại và xuất phiếu thu tiền điện tử gửi cho người mua."
+    },
+    {
+      id: "handover_spec",
+      stepTag: "BÀN GIAO B1",
+      mod: "Bàn giao nhà",
+      t: "Rà soát Spec bàn giao",
+      sub: "Thô / Cơ bản / Hoàn thiện",
+      chip: "Hạng mục bàn giao",
+      color: "#14b8a6",
+      ic: "clipboard",
+      x: 5390, y: 400,
+      hasIn: true, hasOut: true,
+      desc: "Kiểm tra tiêu chuẩn bàn giao cam kết trong HĐMB của căn hộ (sàn, trần, thiết bị vệ sinh, điều hòa, tủ bếp)."
+    },
+    {
+      id: "handover_snag",
+      stepTag: "BÀN GIAO B2",
+      mod: "Bàn giao nhà",
+      t: "Nghiệm thu Snagging",
+      sub: "Checklist lỗi & Khắc phục",
+      chip: "Biên bản lỗi",
+      color: "#14b8a6",
+      ic: "key",
+      x: 5800, y: 400,
+      hasIn: true, hasOut: true,
+      desc: "Cùng khách hàng kiểm tra thực tế căn hộ, chụp ảnh ghi nhận các lỗi nhỏ (snagging) và hẹn ngày nhà thầu xử lý."
+    },
+    {
+      id: "handover_act",
+      stepTag: "BÀN GIAO B3",
+      mod: "Bàn giao nhà",
+      t: "Bàn giao chìa khóa & Quà",
+      sub: "Chỉ số điện nước · Thẻ từ · Quà tặng",
+      chip: "Đã nhận nhà",
+      color: "#14b8a6",
+      ic: "gift",
+      x: 6210, y: 400,
+      hasIn: true, hasOut: true,
+      desc: "Ký biên bản bàn giao, chốt số đồng hồ điện nước, bàn giao bộ chìa khóa/thẻ từ và trao gói quà tân gia (0,1% giá trị căn)."
+    },
+    {
+      id: "transfer",
+      stepTag: "HẬU MÃI",
+      mod: "Hồ sơ căn",
+      t: "Chuyển nhượng HĐMB",
+      sub: "Đổi chủ hợp đồng có công chứng",
+      chip: "Đổi chủ sở hữu",
+      color: "#0ea5e9",
+      ic: "swap",
+      x: 6210, y: 620,
+      hasIn: true, hasOut: false,
+      desc: "Hỗ trợ khách hàng thủ tục chuyển nhượng hợp đồng mua bán sang tên người mua thứ cấp theo quy định pháp luật."
+    }
+  ];
+
+  /* === 26 CONNECTIONS TƯỜNG MINH === */
+  const EDGES = [
+    // Khởi tạo & Chọn căn
+    { from: "proj", to: "grid", type: "main", label: "Mở bán giỏ hàng" },
+    { from: "grid", to: "s1_cust", type: "main", label: "Chọn căn mua" },
+    { from: "cust", to: "s1_cust", type: "main", label: "Tiếp nhận khách" },
+
+    // Chuỗi 4 bước con trong Wizard bán căn
+    { from: "s1_cust", to: "s2_quote", type: "main", label: "Định danh xong" },
+    { from: "s2_quote", to: "s3_trans", type: "main", label: "Chốt báo giá" },
+    { from: "s3_trans", to: "s4_sign", type: "main", label: "Chốt sàn & Ký quỹ" },
+    { from: "s4_sign", to: "hold", type: "main", label: "Ký xác nhận → Khóa căn" },
+
+    // Nhánh Hủy giao dịch (Rollback loop)
+    { from: "hold", to: "cancel_req", type: "danger", label: "Khách hủy / Quá hạn" },
+    { from: "cancel_req", to: "cancel_proc", type: "danger", label: "Xác nhận hủy" },
+    { from: "cancel_proc", to: "cancel_rel", type: "danger", label: "Xong đối soát" },
+    { from: "cancel_rel", to: "grid", type: "back", label: "Mở khóa trả về Chưa bán" },
+
+    // Tiến trình Pháp lý hợp đồng
+    { from: "hold", to: "stage_escrow", type: "main", label: "Nộp tiền ký quỹ" },
+    { from: "stage_escrow", to: "stage_deposit", type: "main", label: "Đủ ĐK chuyển Cọc" },
+    { from: "stage_deposit", to: "hdmb_draft", type: "main", label: "Chuyển sang HĐMB" },
+    { from: "stage_escrow", to: "hdmb_draft", type: "alt", label: "Bán thẳng (Bỏ cọc)" },
+
+    // Áp lịch thanh toán sang HĐMB
+    { from: "s2_quote", to: "hdmb_draft", type: "alt", label: "Áp lịch & Giá bán" },
+
+    // Quy trình Duyệt & Ký HĐMB
+    { from: "hdmb_draft", to: "hdmb_review", type: "main", label: "Trình duyệt HĐ" },
+    { from: "hdmb_review", to: "hdmb_sign", type: "main", label: "Đã duyệt → Ký" },
+    { from: "hdmb_sign", to: "sold", type: "main", label: "Ký HĐMB thành công" },
+
+    // Nhánh Công nợ thu tiền
+    { from: "sold", to: "pay_due", type: "main", label: "Theo dõi thu tiền" },
+    { from: "pay_due", to: "pay_rcpt", type: "main", label: "Thu từng đợt" },
+
+    // Nhánh Bàn giao nhà
+    { from: "sold", to: "handover_spec", type: "main", label: "Khởi động bàn giao" },
+    { from: "handover_spec", to: "handover_snag", type: "main", label: "Kiểm tra lỗi" },
+    { from: "handover_snag", to: "handover_act", type: "main", label: "Hết lỗi → Bàn giao" },
+    { from: "handover_act", to: "transfer", type: "main", label: "Chuyển nhượng (nếu có)" }
+  ];
+
+  /* Node lookup index */
+  const nodeMap = new Map();
+  NODES.forEach(n => nodeMap.set(n.id, n));
+
+  /* Canvas state */
+  const viewport = document.getElementById("viewport");
+  const canvas = document.getElementById("canvas");
+  const svgWire = document.getElementById("svgWire");
+  const nodesContainer = document.getElementById("nodesContainer");
+
+  let zoom = 0.55;
+  let panX = 40;
+  let panY = 20;
+  let isDragging = false;
+  let dragStart = { x: 0, y: 0 };
+  let selectedNode = null;
+  let isRunning = false;
+
+  function updateTransform() {
+    canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+    document.getElementById("lblZoom").textContent = Math.round(zoom * 100) + "%";
+  }
+
+  const NODE_W = 250;
+
+  /* Render Nodes */
+  function renderNodes() {
+    nodesContainer.innerHTML = "";
+    NODES.forEach(n => {
+      const el = document.createElement("div");
+      el.id = "node-" + n.id;
+      el.className = "n8n-node";
+      el.style.left = n.x + "px";
+      el.style.top = n.y + "px";
+
+      el.innerHTML = `
+        <div class="node-exec-badge" id="badge-${n.id}">✓ 18ms</div>
+        ${n.hasIn ? '<div class="port port-in"></div>' : ''}
+        ${n.hasOut ? '<div class="port port-out"></div>' : ''}
+        <div class="node-content">
+          <div class="node-top">
+            <div class="node-icon-box" style="background: ${n.color};">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                ${ICONS[n.ic] || ICONS.build}
+              </svg>
+            </div>
+            <div class="node-headings">
+              <span class="node-step-tag" style="background: ${n.color}20; color: ${n.color};">${n.stepTag}</span>
+              <div class="node-module">${n.mod}</div>
+              <div class="node-name">${n.t}</div>
+            </div>
+          </div>
+          <div class="node-sub">${n.sub}</div>
+          <div class="node-footer">
+            <span class="node-chip" style="color: ${n.color}; border-color: ${n.color}40; background: ${n.color}15;">
+              <span class="node-chip-dot"></span>
+              ${n.chip}
+            </span>
+          </div>
+        </div>
+      `;
+
+      el.addEventListener("click", (e) => {
+        e.stopPropagation();
+        selectNode(n);
+        openInspector(n);
+      });
+
+      nodesContainer.appendChild(el);
+      n.element = el;
+    });
+  }
+
+  /* Calculate Wire Path */
+  function getPath(fromNode, toNode, type) {
+    const fromH = fromNode.element.offsetHeight || 105;
+    const toH = toNode.element.offsetHeight || 105;
+    
+    // Right port of fromNode
+    const sx = fromNode.x + NODE_W;
+    const sy = fromNode.y + fromH / 2;
+    
+    // Left port of toNode
+    let tx = toNode.x;
+    let ty = toNode.y + toH / 2;
+
+    if (type === "back") {
+      // Loop backwards from cancel_rel (X=1400, Y=710) back to grid (X=480, Y=130)
+      const laneY = 920;
+      const cornerR = 20;
+      return `M ${fromNode.x} ${sy} ` +
+             `H ${toNode.x - 30} ` +
+             `Q ${toNode.x - 50} ${sy} ${toNode.x - 50} ${sy - cornerR} ` +
+             `V ${ty + cornerR} ` +
+             `Q ${toNode.x - 50} ${ty} ${toNode.x - 30} ${ty} ` +
+             `H ${tx}`;
+    }
+
+    if (type === "danger" && fromNode.id === "hold" && toNode.id === "cancel_req") {
+      // Vertical drop straight from bottom of hold to top of cancel_req
+      const hx = fromNode.x + NODE_W / 2;
+      return `M ${hx} ${fromNode.y + fromH} V ${toNode.y}`;
+    }
+
+    if (fromNode.id === "cancel_req" && toNode.id === "cancel_proc") {
+      // Horizontal straight wire going right to left
+      return `M ${fromNode.x} ${sy} H ${toNode.x + NODE_W}`;
+    }
+    if (fromNode.id === "cancel_proc" && toNode.id === "cancel_rel") {
+      // Horizontal straight wire going right to left
+      return `M ${fromNode.x} ${sy} H ${toNode.x + NODE_W}`;
+    }
+
+    if (fromNode.id === "s2_quote" && toNode.id === "hdmb_draft") {
+      // Arched bypass bridge underneath the flow
+      const midY = 610;
+      return `M ${sx} ${sy} C ${sx + 160} ${midY}, ${tx - 160} ${midY}, ${tx} ${ty}`;
+    }
+
+    // Default smooth horizontal bezier
+    const dx = Math.max(60, (tx - sx) * 0.45);
+    return `M ${sx} ${sy} C ${sx + dx} ${sy}, ${tx - dx} ${ty}, ${tx} ${ty}`;
+  }
+
+  /* Render SVG Connections */
+  function renderWires() {
+    svgWire.innerHTML = "";
+    document.querySelectorAll(".wire-badge").forEach(b => b.remove());
+
+    EDGES.forEach((edge, idx) => {
+      const fromN = nodeMap.get(edge.from);
+      const toN = nodeMap.get(edge.to);
+      if (!fromN || !toN) return;
+
+      const pathData = getPath(fromN, toN, edge.type);
+      const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      pathEl.id = `wire-${edge.from}-${edge.to}`;
+      pathEl.setAttribute("d", pathData);
+      pathEl.setAttribute("class", `wire w-${edge.type}`);
+      svgWire.appendChild(pathEl);
+      edge.pathElement = pathEl;
+
+      // Add animated laser pulse
+      const pulse = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      pulse.setAttribute("r", "3.6");
+      pulse.setAttribute("class", `pulse-circle ${edge.type === 'danger' || edge.type === 'back' ? 'p-danger' : 'p-main'}`);
+      
+      const anim = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
+      const pathLen = pathEl.getTotalLength();
+      anim.setAttribute("dur", Math.max(2.0, (pathLen / 140)).toFixed(2) + "s");
+      anim.setAttribute("repeatCount", "indefinite");
+      anim.setAttribute("begin", ((idx * 0.35) % 2.5).toFixed(2) + "s");
+      
+      const mpath = document.createElementNS("http://www.w3.org/2000/svg", "mpath");
+      mpath.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", `#wire-${edge.from}-${edge.to}`);
+      mpath.setAttribute("href", `#wire-${edge.from}-${edge.to}`);
+      
+      anim.appendChild(mpath);
+      pulse.appendChild(anim);
+      svgWire.appendChild(pulse);
+
+      // Add edge badge label (Vị trí thông minh, không đè lên node hay sợi dây)
+      if (edge.label) {
+        const badge = document.createElement("span");
+        badge.className = `wire-badge ${edge.type === 'danger' || edge.type === 'back' ? 'b-danger' : 'b-main'}`;
+        badge.textContent = edge.label;
+        
+        if (fromN.id === "hold" && toN.id === "cancel_req") {
+          // Đoạn thẳng đứng: Đặt lệch sang phải 14px
+          const fromH = fromN.element.offsetHeight || 105;
+          const hx = fromN.x + NODE_W / 2;
+          const hy = (fromN.y + fromH + toN.y) / 2;
+          badge.style.left = (hx + 12) + "px";
+          badge.style.top = hy + "px";
+          badge.style.transform = "translate(0, -50%)";
+        } else if (edge.type === "back") {
+          // Đường quay về: Đặt nổi trên đoạn thẳng
+          const fromH = fromN.element.offsetHeight || 105;
+          badge.style.left = ((fromN.x + toN.x) / 2) + "px";
+          badge.style.top = (fromN.y + fromH / 2) + "px";
+          badge.style.transform = "translate(-50%, -100%) translateY(-8px)";
+        } else {
+          // Đường cong chuẩn: Lấy điểm giữa đường cong và nhấc bổng lên 8px
+          const pt = pathEl.getPointAtLength(pathLen * 0.5);
+          badge.style.left = pt.x + "px";
+          badge.style.top = pt.y + "px";
+          badge.style.transform = "translate(-50%, -100%) translateY(-8px)";
+        }
+
+        canvas.appendChild(badge);
+      }
+    });
+  }
+
+  /* Canvas Pan & Zoom */
+  viewport.addEventListener("pointerdown", (e) => {
+    if (e.target.closest(".n8n-node") || e.target.closest(".inspector-card")) return;
+    isDragging = true;
+    dragStart = { x: e.clientX - panX, y: e.clientY - panY };
+    viewport.classList.add("grabbing");
+  });
+
+  window.addEventListener("pointermove", (e) => {
+    if (!isDragging) return;
+    panX = e.clientX - dragStart.x;
+    panY = e.clientY - dragStart.y;
+    updateTransform();
+  });
+
+  window.addEventListener("pointerup", () => {
+    isDragging = false;
+    viewport.classList.remove("grabbing");
+  });
+
+  viewport.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
+    const newZoom = Math.min(1.8, Math.max(0.2, zoom * zoomFactor));
+    
+    const rect = viewport.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+
+    panX = mx - (mx - panX) * (newZoom / zoom);
+    panY = my - (my - panY) * (newZoom / zoom);
+    zoom = newZoom;
+    updateTransform();
+  }, { passive: false });
+
+  /* Fit to Screen */
+  function fitView() {
+    const vw = viewport.clientWidth;
+    const vh = viewport.clientHeight;
+    const contentW = 6600;
+    const contentH = 980;
+
+    const scaleX = (vw - 80) / contentW;
+    const scaleY = (vh - 80) / contentH;
+    zoom = Math.min(1.0, Math.max(0.22, Math.min(scaleX, scaleY)));
+    panX = Math.max(20, (vw - contentW * zoom) / 2);
+    panY = Math.max(20, (vh - contentH * zoom) / 2);
+    updateTransform();
+  }
+
+  /* Node Selection */
+  function selectNode(n) {
+    if (selectedNode) {
+      selectedNode.element.classList.remove("selected");
+    }
+    selectedNode = n;
+    n.element.classList.add("selected");
+  }
+
+  /* Node Inspector Modal */
+  const inspectorOverlay = document.getElementById("inspectorOverlay");
+  const inspName = document.getElementById("inspName");
+  const inspModule = document.getElementById("inspModule");
+  const inspIcon = document.getElementById("inspIcon");
+  const inspId = document.getElementById("inspId");
+  const inspMod = document.getElementById("inspMod");
+  const inspAction = document.getElementById("inspAction");
+  const inspDesc = document.getElementById("inspDesc");
+  const inspChip = document.getElementById("inspChip");
+  const inspIn = document.getElementById("inspIn");
+  const inspOut = document.getElementById("inspOut");
+  const inspJson = document.getElementById("inspJson");
+
+  function openInspector(n) {
+    inspName.textContent = n.t;
+    inspModule.textContent = `${n.stepTag} · ${n.mod}`;
+    inspIcon.style.background = n.color;
+    inspIcon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[n.ic] || ICONS.build}</svg>`;
+    
+    inspId.textContent = n.id;
+    inspMod.textContent = n.mod;
+    inspAction.textContent = n.t;
+    inspDesc.textContent = n.desc;
+    inspChip.textContent = n.chip;
+    
+    const inEdges = EDGES.filter(e => e.to === n.id).map(e => `${e.from} (${e.label || 'kết nối'})`);
+    const outEdges = EDGES.filter(e => e.from === n.id).map(e => `${e.to} (${e.label || 'kết nối'})`);
+    
+    inspIn.textContent = inEdges.length ? inEdges.join(", ") : "Khởi tạo luồng (Trigger)";
+    inspOut.textContent = outEdges.length ? outEdges.join(", ") : "Điểm kết thúc (Sink)";
+
+    const payload = {
+      nodeId: n.id,
+      stageTag: n.stepTag,
+      module: n.mod,
+      action: n.t,
+      statusChip: n.chip,
+      parameters: {
+        crmContext: "Twenty CRM Meraki Spec (Unbundled & Clean Labels)",
+        projectId: "orchard",
+        unitCode: "ORCH-SD-2001",
+        stage: n.chip,
+        executionMode: "Granular Production Verified"
+      },
+      upstream: inEdges,
+      downstream: outEdges
+    };
+    inspJson.textContent = JSON.stringify(payload, null, 2);
+
+    inspectorOverlay.classList.add("open");
+  }
+
+  document.getElementById("btnCloseInspector").addEventListener("click", () => {
+    inspectorOverlay.classList.remove("open");
+  });
+  inspectorOverlay.addEventListener("click", (e) => {
+    if (e.target === inspectorOverlay) inspectorOverlay.classList.remove("open");
+  });
+
+  /* Tabs inside Inspector */
+  document.querySelectorAll(".insp-tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".insp-tab").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      const tabTarget = tab.dataset.tab;
+      document.getElementById("tab-params").style.display = tabTarget === "tab-params" ? "block" : "none";
+      document.getElementById("tab-json").style.display = tabTarget === "tab-json" ? "block" : "none";
+    });
+  });
+
+  /* === WORKFLOW EXECUTION SIMULATION === */
+  const btnRun = document.getElementById("btnRun");
+  const btnRunText = document.getElementById("btnRunText");
+  const statStatus = document.getElementById("statStatus");
+  const statActiveNode = document.getElementById("statActiveNode");
+  const statDuration = document.getElementById("statDuration");
+
+  // Topological execution waves across all 22 unbundled nodes
+  const EXEC_WAVES = [
+    { nodes: ["proj", "cust"], dur: 40 },
+    { nodes: ["grid"], dur: 50 },
+    { nodes: ["s1_cust"], dur: 60 },
+    { nodes: ["s2_quote"], dur: 60 },
+    { nodes: ["s3_trans"], dur: 60 },
+    { nodes: ["s4_sign"], dur: 70 },
+    { nodes: ["hold"], dur: 80 },
+    { nodes: ["stage_escrow"], dur: 90 },
+    { nodes: ["stage_deposit"], dur: 90 },
+    { nodes: ["hdmb_draft"], dur: 100 },
+    { nodes: ["hdmb_review"], dur: 100 },
+    { nodes: ["hdmb_sign"], dur: 110 },
+    { nodes: ["sold"], dur: 80 },
+    { nodes: ["pay_due", "handover_spec"], dur: 120 },
+    { nodes: ["pay_rcpt", "handover_snag"], dur: 120 },
+    { nodes: ["handover_act"], dur: 90 },
+    { nodes: ["transfer"], dur: 80 }
+  ];
+
+  async function executeWorkflow() {
+    if (isRunning) return;
+    isRunning = true;
+    btnRun.classList.add("running");
+    btnRunText.textContent = "Running...";
+    statStatus.textContent = "Đang chạy mô phỏng...";
+    statStatus.style.color = "#f59e0b";
+
+    NODES.forEach(n => {
+      n.element.classList.remove("exec-running", "exec-success");
+      const badge = document.getElementById(`badge-${n.id}`);
+      if (badge) badge.classList.remove("show");
+    });
+
+    const startTime = performance.now();
+
+    for (let wave of EXEC_WAVES) {
+      statActiveNode.textContent = wave.nodes.map(id => nodeMap.get(id)?.t || id).join(", ");
+      
+      wave.nodes.forEach(id => {
+        const n = nodeMap.get(id);
+        if (n) n.element.classList.add("exec-running");
+      });
+
+      await new Promise(r => setTimeout(r, 550));
+
+      wave.nodes.forEach(id => {
+        const n = nodeMap.get(id);
+        if (n) {
+          n.element.classList.remove("exec-running");
+          n.element.classList.add("exec-success");
+          const badge = document.getElementById(`badge-${n.id}`);
+          if (badge) {
+            badge.textContent = `✓ ${Math.floor(Math.random() * 20 + 8)}ms`;
+            badge.classList.add("show");
+          }
+        }
+      });
+
+      statDuration.textContent = Math.round(performance.now() - startTime) + "ms";
+    }
+
+    statActiveNode.textContent = "Hoàn tất (17/17 sóng)";
+    statStatus.textContent = "Thành công (100%)";
+    statStatus.style.color = "#10b981";
+    btnRun.classList.remove("running");
+    btnRunText.textContent = "Execute Workflow";
+    isRunning = false;
+  }
+
+  function resetWorkflow() {
+    NODES.forEach(n => {
+      n.element.classList.remove("exec-running", "exec-success", "selected");
+      const badge = document.getElementById(`badge-${n.id}`);
+      if (badge) badge.classList.remove("show");
+    });
+    statStatus.textContent = "Sẵn sàng";
+    statStatus.style.color = "#10b981";
+    statActiveNode.textContent = "None";
+    statDuration.textContent = "0ms";
+  }
+
+  btnRun.addEventListener("click", executeWorkflow);
+  document.getElementById("btnReset").addEventListener("click", resetWorkflow);
+
+  /* Zoom buttons */
+  document.getElementById("btnZoomIn").addEventListener("click", () => {
+    zoom = Math.min(1.8, zoom * 1.15);
+    updateTransform();
+  });
+  document.getElementById("btnZoomOut").addEventListener("click", () => {
+    zoom = Math.max(0.2, zoom * 0.85);
+    updateTransform();
+  });
+  document.getElementById("btnFit").addEventListener("click", fitView);
+
+  /* Theme Switcher */
+  const btnTheme = document.getElementById("btnTheme");
+  let isDark = true;
+  btnTheme.addEventListener("click", () => {
+    isDark = !isDark;
+    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+  });
+
+  /* Initialize */
+  renderNodes();
+  setTimeout(() => {
+    renderWires();
+    fitView();
+  }, 60);
+
+  window.addEventListener("resize", () => {
+    renderWires();
+  });
+
+})();
+</script>
+</body>
+</html>
