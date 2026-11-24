@@ -757,9 +757,6 @@ body.detail-mode #viewbar{display:none}
   <header class="topbar">
     <div class="crumb" id="crumb"></div>
     <div class="top-actions">
-      <button type="button" class="btn top-agent" data-act="nav" data-view="agent" aria-label="Hỏi CRM" title="Hỏi CRM">
-        <svg class="ic sm" aria-hidden="true"><use href="#i-agent"/></svg><span>Hỏi CRM</span>
-      </button>
       <button class="iconbtn" data-act="search-cust" title="Tìm khách hàng (⌘K)">
         <svg class="ic"><use href="#i-search"/></svg>
       </button>
@@ -854,6 +851,35 @@ body.detail-mode #viewbar{display:none}
   <footer style="padding:12px 18px;border-top:1px solid #dce5e5;display:flex;justify-content:flex-end;gap:8px;background:#f8fafb;">
     <form method="dialog"><button class="btn" type="submit">Đóng</button></form>
     <button class="btn pri" type="button" id="vietqr-copy-btn"><svg class="ic sm" aria-hidden="true"><use href="#i-check"/></svg> Sao chép nội dung CK</button>
+  </footer>
+</dialog>
+<dialog class="customer-dialog" id="scan-upload-dialog" aria-labelledby="scan-upload-title" style="max-width:520px;border-radius:10px;padding:0;overflow:hidden;border:1px solid #dce5e5;box-shadow:0 8px 30px rgba(0,0,0,0.15);">
+  <header style="padding:14px 18px;border-bottom:1px solid #dce5e5;display:flex;justify-content:space-between;align-items:center;background:#fff;">
+    <h2 id="scan-upload-title" style="font-size:15px;margin:0;font-weight:700;display:flex;align-items:center;gap:6px;color:#172c33;">
+      <svg class="ic sm" style="color:#156757;" aria-hidden="true"><use href="#i-upload"/></svg>
+      Tiếp nhận & Số hóa file scan HĐMB (OCR Vault)
+    </h2>
+    <form method="dialog"><button class="iconbtn" aria-label="Đóng"><svg class="ic"><use href="#i-x"/></svg></button></form>
+  </header>
+  <div style="padding:20px;text-align:center;">
+    <div style="border:2px dashed #b8d4cf;background:#f8fafb;border-radius:8px;padding:24px 16px;margin-bottom:16px;">
+      <svg class="ic" style="width:36px;height:36px;color:#156757;margin-bottom:8px;"><use href="#i-upload"/></svg>
+      <p style="font-size:13px;font-weight:600;color:#172c33;margin:0 0 4px;">Kéo thả file scan (PDF hoặc ảnh) vào đây</p>
+      <p style="font-size:12px;color:#536b72;margin:0 0 14px;">Agent AI sẽ tự động trích xuất mã căn hộ và xác thực dấu mộc đỏ</p>
+      <label class="btn pri" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+        <svg class="ic sm"><use href="#i-upload"/></svg> Chọn file từ máy tính
+        <input type="file" multiple accept=".pdf,image/*" style="display:none" onchange="$('#scan-upload-dialog').close(); handleBatchScanUpload(this.files)">
+      </label>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#536b72;background:#f1f5f9;padding:8px 12px;border-radius:6px;">
+      <span>Hoặc thử nghiệm nhanh với dữ liệu giả lập:</span>
+      <button type="button" class="btn sm" onclick="$('#scan-upload-dialog').close(); simulateBatchDrop();">
+        <svg class="ic sm"><use href="#i-check"/></svg> Quét mẫu
+      </button>
+    </div>
+  </div>
+  <footer style="padding:12px 18px;border-top:1px solid #dce5e5;display:flex;justify-content:flex-end;background:#f8fafb;">
+    <form method="dialog"><button class="btn" type="submit">Đóng</button></form>
   </footer>
 </dialog>
 <dialog class="customer-dialog escrow-pdf-dialog" id="escrow-pdf-dialog" aria-labelledby="escrow-pdf-title">
@@ -3519,7 +3545,6 @@ body.detail-mode #viewbar{display:none}
       '<button type="button" class="customer-back" data-act="back"><svg class="ic sm"><use href="#i-arrow-left"/></svg>' +
       (S.view === "project" ? "Về sơ đồ căn" : "Quay lại") + '</button>' +
       '<span class="flex1"></span>' +
-      '<button class="btn ghost icon" data-act="agent-for-unit" aria-label="Hỏi trợ lý về căn này" title="Hỏi trợ lý về căn này"><svg class="ic"><use href="#i-agent"/></svg></button>' +
       '<button class="btn ghost icon" data-act="toast" data-msg="Đã sao chép liên kết hồ sơ căn ' + u.code + '" title="Chia sẻ hồ sơ"><svg class="ic sm"><use href="#i-external"/></svg></button>' +
       "</div>" +
       '<div class="d-title">' +
@@ -4097,173 +4122,6 @@ body.detail-mode #viewbar{display:none}
     toast("Đã khôi phục dữ liệu mẫu");
   }
 
-  /* ================= agent workspace ================= */
-  const agentSession = { result: null, workReview: null, prompt: "", uid: "", pinnedUnit: "", reviewedUnit: "", profile: "coordinator", returnTo: null, drafts: [] };
-  const localAgentEnabled = Boolean($('meta[name="meraki-local-agent"]'));
-  let agentRequest = null;
-  const agentLabel = (u) => "Căn " + u.code + " · " + projOf(u).short + " · " + towerOf(u).name;
-  const agentSource = (u, tab, label, paymentView) => ({ uid: u.uid, tab, label, paymentView });
-  const agentExpired = (u) => schedule(u).filter((item) => item.overdue)
-    .sort((a, b) => dateISO(a.date).localeCompare(dateISO(b.date)));
-
-  function agentPaymentRows({ uid, project } = {}) {
-    return UNITS.filter((u) => (u.buyer || uid === u.uid) && tracksPayments(u) &&
-      (!uid || u.uid === uid) && (!project || project === u.proj)).flatMap((u) => {
-      const items = agentExpired(u);
-      if (!items.length) return [];
-      return [{ uid: u.uid, label: agentLabel(u), due: items[0].date,
-        amount: items.reduce((sum, item) => sum + item.remaining, 0), count: items.length }];
-    }).sort((a, b) => dateISO(a.due).localeCompare(dateISO(b.due)) || b.amount - a.amount);
-  }
-
-  const crmAgent = createCrmAgent({
-    findUnits: ({ code, project, tower }) => UNITS.filter((u) =>
-      u.code === code && (!project || u.proj === project) && (!tower || u.tower === tower))
-      .map((u) => ({ uid: u.uid, label: agentLabel(u) })),
-    overduePayments: (scope) => {
-      const u = byUid(scope.uid);
-      if (u && !tracksPayments(u)) return { status: "Chưa đến bước", text: "Chưa có lịch thu đang theo dõi." };
-      const rows = agentPaymentRows(scope);
-      const sum = rows.reduce((total, item) => total + item.amount, 0);
-      return { text: rows.length ? rows.length + " căn có khoản quá hạn · Tổng còn phải thu " + fmt(sum) + "." :
-        "CRM chưa ghi nhận khoản quá hạn trong phạm vi này.", rows,
-        status: rows.length ? "Cần xử lý" : "Đã kiểm tra",
-        source: u && agentSource(u, 3, "Mở lịch thu", "collection") };
-    },
-    inspectCustomer: ({ uid }) => {
-      const u = byUid(uid);
-      if (!u) return { status: "Cần kiểm tra", text: "Không tìm thấy căn." };
-      const sale = saleDrafts.get(uid);
-      const key = sale?.customerKey || u.buyer;
-      const customer = sale ? sale.contacts[sale.type] : key ? custOf(key, u) : null;
-      const fields = customer?.type === "org" ? F_ORG : F_IND;
-      const missing = fields.filter((field) => (sale || !customer || field.req) && !String(customer?.[field.k] || "").trim());
-      const duplicates = customer ? CustomerData.duplicateIndex(customers()).find(customer, key, key ? custOf(key, u) : null) : [];
-      return { status: missing.length || duplicates.length ? "Cần xử lý" : "Đủ thông tin",
-        text: !customer ? "Chưa có hồ sơ khách hàng." : missing.length || duplicates.length ?
-          [missing.length && "Thiếu " + missing.length + " trường", duplicates.length && duplicates.length + " hồ sơ có dữ liệu trùng"].filter(Boolean).join(" · ") + "." :
-          "Đủ trường bắt buộc. Không phát hiện dữ liệu trùng.",
-        facts: missing.length && customer ? [missing.map((field) => field.l).join(", ")] : [],
-        source: u.status === "AVAILABLE" && !sale?.signedDate ?
-          { ...agentSource(u, 0, "Mở hồ sơ khách hàng"), step: 1 } : agentSource(u, 2, "Mở hồ sơ khách hàng") };
-    },
-    inspectQuote: ({ uid }) => {
-      const u = byUid(uid);
-      if (!u) return { status: "Cần kiểm tra", text: "Không tìm thấy căn." };
-      const sale = saleDrafts.get(uid);
-      if (!sale?.paymentPlan || sale.step < 3) return { status: "Chưa chốt",
-        text: "Chưa xác nhận báo giá và lịch dự kiến trong luồng bán căn.",
-        source: agentSource(u, 3, "Mở báo giá dự kiến", "quote") };
-      const selected = seniquePaymentPlans[sale.paymentPlan];
-      const quote = seniqueQuote(selected, u, sale.discountsByPlan?.[sale.paymentPlan]);
-      return { status: "Đã xác nhận dự kiến", text: selected.label + " · " + fmt(quote.total),
-        source: agentSource(u, 3, "Mở lịch dự kiến", "quote") };
-    },
-    inspectContract: ({ uid }) => {
-      const u = byUid(uid);
-      if (!u) return { status: "Cần kiểm tra", text: "Không tìm thấy căn." };
-      const sale = saleDrafts.get(uid);
-      const contract = contractDraft(u);
-      if (contract.stage === "hdmb") return { status: contract.status,
-        text: contract.number ? "HĐMB " + contract.number + (contract.signed ? " · Ký " + dateVN(contract.signed) : " · Chưa nhập ngày ký") : "Chưa cấp số HĐMB.",
-        source: agentSource(u, 4, "Mở HĐMB") };
-      if (sale?.signedDate) return { status: "Chờ đặt cọc", text: "Đã xác nhận ngày ký quỹ " + dateVN(sale.signedDate) + ".",
-        source: agentSource(u, 4, "Mở hồ sơ đặt cọc") };
-      return { status: "Chưa xác nhận ký", text: sale?.step === 4 ? "Hồ sơ đã tới bước xác nhận ngày ký quỹ." :
-        contract.stage === "dat-coc" ? "Giao dịch đang ở bước đặt cọc." : "Chưa tới bước xác nhận ngày ký quỹ.",
-        source: agentSource(u, sale?.step === 4 ? 0 : 4, "Kiểm tra hợp đồng") };
-    },
-    dealProgress: ({ uid }) => {
-      const u = byUid(uid);
-      if (!u) return { text: "Không tìm thấy hồ sơ căn." };
-      if (u.status === "UNRELEASED") return { text: agentLabel(u) + " chưa mở bán.",
-        source: agentSource(u, 1, "Xem thông tin căn") };
-      const sale = saleDrafts.get(uid);
-      const draft = contractDraft(u);
-      if (u.status === "AVAILABLE" && !sale?.signedDate) {
-        const steps = ["Hoàn tất hồ sơ khách hàng", "Xác nhận lịch thanh toán", "Nhập thông tin giao dịch", "Xác nhận ngày ký thỏa thuận"];
-        return { text: agentLabel(u) + ". Việc tiếp theo: " + steps[(sale?.step || 1) - 1] + ".",
-          source: agentSource(u, 0, "Mở luồng bán căn") };
-      }
-      const stage = contractStages.find((item) => item.id === draft.stage).label;
-      return { text: agentLabel(u) + ". " + ST[u.status].l + " · " + stage + " · " + draft.status + ".",
-        facts: [
-          u.buyer ? "Đã liên kết hồ sơ khách hàng." : "Chưa liên kết hồ sơ khách hàng trong CRM.",
-          draft.stage === "hdmb" ? "Số HĐMB " + (draft.number || "chưa cấp") + "." :
-            "Giao dịch đang ở giai đoạn " + stage.toLowerCase() + "."
-        ],
-        source: agentSource(u, 4, "Mở HĐMB & mẫu") };
-    },
-    compareQuotes: ({ uid }) => {
-      const u = byUid(uid);
-      if (uid && !u) return { text: "Không tìm thấy căn để so sánh báo giá." };
-      const sale = u && saleDrafts.get(uid);
-      const standard = seniqueQuote(seniquePaymentPlans.standard, u, sale?.discountsByPlan?.standard);
-      const special = seniqueQuote(seniquePaymentPlans.special, u, sale?.discountsByPlan?.special);
-      return { text: u ? agentLabel(u) + " · Báo giá dự kiến theo chính sách mẫu Senique." : "So sánh báo giá mẫu Senique cho căn S2.29.03.",
-        facts: [
-          "Tiêu chuẩn · Tổng " + fmt(standard.total) + " · Trước bàn giao " + fmt(standard.beforeHandover),
-          "Đặc biệt 30/70 · Tổng " + fmt(special.total) + " · Trước bàn giao " + fmt(special.beforeHandover)
-        ], source: u && agentSource(u, 3, "Mở báo giá của căn", "quote"),
-        planUnit: u?.status === "AVAILABLE" && !sale?.signedDate ? u.uid : "" };
-    },
-    previewReminder: ({ uid }) => {
-      const u = byUid(uid);
-      if (!u?.buyer) return { text: "Căn này chưa liên kết khách hàng. Hãy kiểm tra hồ sơ trước khi soạn nhắc thu.",
-        source: u && agentSource(u, 2, "Mở hồ sơ khách hàng của căn") };
-      if (!tracksPayments(u)) return { text: "Căn này chưa có giao dịch đang theo dõi thu.",
-        source: agentSource(u, 1, "Xem thông tin căn") };
-      const item = agentExpired(u)[0];
-      if (!item) return { text: "Căn này chưa có khoản quá hạn để soạn nhắc thu.", source: agentSource(u, 3, "Mở lịch thanh toán", "collection") };
-      const source = agentSource(u, 3, "Kiểm tra lịch thanh toán", "collection");
-      return { text: agentLabel(u) + " · " + item.k + " còn " + fmt(item.remaining) + ", hạn " + item.date + ".",
-        source, proposal: { uid, buyer: u.buyer, key: item.k, amount: item.remaining, due: item.date,
-          body: "Kính gửi Quý khách, Meraki Land xin nhắc khoản thanh toán " + item.k.toLowerCase() +
-            " của căn " + u.code + " tại " + projOf(u).short + " còn " + fmt(item.remaining) +
-            ", hạn thanh toán " + item.date + ". Nếu Quý khách đã thanh toán, vui lòng liên hệ để đối chiếu. Xin cảm ơn." } };
-    }
-  });
-
-  function saveAgentReminder(proposal, body) {
-    const u = byUid(proposal.uid);
-    const current = u && agentExpired(u).find((item) => item.k === proposal.key);
-    if (!current || current.remaining !== proposal.amount || current.date !== proposal.due || u.buyer !== proposal.buyer ||
-        !tracksPayments(u)) return "Khoản thu đã thay đổi. Hãy tạo lại bản nháp từ lịch mới.";
-    if (currentReminderDraft(u, current)) return "Khoản thu này đã có bản nháp được xác nhận.";
-    const before = agentSession.drafts;
-    agentSession.drafts = [{ ...proposal, body, label: agentLabel(u), actor: CUSTOMER_ACTOR },
-      ...before.filter((item) => item.uid !== proposal.uid || item.key !== proposal.key || item.buyer !== proposal.buyer)];
-    if (!persist(true)) {
-      agentSession.drafts = before;
-      return "Chưa lưu được bản nháp. Tải lại nếu dữ liệu vừa đổi ở tab khác.";
-    }
-    return "";
-  }
-
-  function currentReminderDraft(u, item) {
-    return item && agentSession.drafts.find((draft) => draft.uid === u.uid && draft.buyer === u.buyer &&
-      draft.key === item.k && draft.amount === item.remaining && draft.due === item.date);
-  }
-
-  function workAction(action, uid, label, style = "", attributes = "") {
-    return '<button type="button" class="btn ' + style + '" data-act="' + action + '" data-uid="' + esc(uid) +
-      '"' + attributes + '>' + label + '</button>';
-  }
-
-  function unitSearchResults(query) {
-    const code = query.trim().toUpperCase();
-    if (!code) return "";
-    const results = UNITS.filter((unit) => unit.code.startsWith(code))
-      .sort((a, b) => Number(b.status === "AVAILABLE") - Number(a.status === "AVAILABLE")).slice(0, 8);
-    if (!results.length) return '<p class="work-search-note" role="status">Không tìm thấy căn theo mã đã nhập.</p>';
-    return '<ul class="work-search-results">' + results.map((u) =>
-      '<li><button type="button" class="work-search-result" data-act="unit" data-uid="' + esc(u.uid) + '">' +
-      '<span><b>' + esc(agentLabel(u)) + '</b><small>' + esc(u.type) + ' · ' + fmtA(u.area) + ' m² · ' +
-      fmt(pricing(u).base) + ' trước VAT và phí</small></span>' +
-      '<span class="tag ' + ST[u.status].t + '">' + (u.status === "AVAILABLE" ? "Còn bán" : esc(ST[u.status].l)) +
-      '</span></button></li>').join("") + '</ul>';
-  }
-
   /* ================= TRUNG TÂM GIÁM SÁT GIAO DỊCH & PHÁP LÝ AI (TRANSACTION AI AGENT) =================
    * 1. Tự động kiểm soát tiến độ & xuất HĐMB chính thức kèm Phụ lục 01 (Lịch thanh toán chuẩn).
    * 2. Quản lý Document Vault & thu thập bản scan HĐMB có mộc đỏ hợp lệ của Chủ đầu tư.
@@ -4398,59 +4256,54 @@ body.detail-mode #viewbar{display:none}
       );
     }
 
-    // NBA Recommendations
+    // Streamlined NBA Recommendations (compact horizontal alert rows)
     const nbaCards = [
       {
         tag: "hdmb", tagLabel: "Xuất HĐMB",
-        title: "Xuất HĐMB chính thức: Căn SD-0802",
-        desc: "Đã hoàn tất đợt ký quỹ 10% (425.000.000 đ). Pháp chế AI đã kiểm tra: Thông thủy 78.4 m², đủ điều kiện xuất HĐMB chính thức kèm Phụ lục 01.",
+        title: "Căn SD-0802",
+        desc: "Đã cọc 10% (425 tr) · Thông thủy 78.4 m² · Đủ điều kiện xuất HĐMB chính thức kèm Phụ lục 01.",
         uid: "orchard:SD:0802",
-        primaryAct: "agent-export-hdmb", primaryLabel: "Xuất HĐMB (PDF)",
-        secAct: "work-open", secLabel: "Mở hồ sơ"
+        primaryAct: "agent-export-hdmb", primaryLabel: "Xuất HĐMB (PDF)"
       },
       {
         tag: "scan", tagLabel: "Thiếu Scan",
-        title: "Cảnh báo thiếu scan mộc đỏ: Căn SD-0702",
-        desc: "HĐMB đã được các bên ký 3 ngày trước nhưng hệ thống chưa ghi nhận file scan có dấu mộc đỏ của Meraki Land. Cần bổ sung để số hóa hồ sơ.",
+        title: "Căn SD-0702",
+        desc: "HĐMB đã ký 3 ngày trước nhưng chưa lưu scan mộc đỏ Meraki Land vào Document Vault.",
         uid: "orchard:SD:0702",
-        primaryAct: "agent-upload-scan", primaryLabel: "Tải lên scan ngay",
-        secAct: "work-open", secLabel: "Mở hồ sơ"
+        primaryAct: "agent-upload-scan", primaryLabel: "Tải scan ngay"
       },
       {
-        tag: "lock", tagLabel: "Canh giữ chỗ",
-        title: "Cảnh báo hết hạn giữ chỗ: Căn SD-0304",
-        desc: "Thời hạn giữ chỗ còn lại: " + formatHoldRemaining(agentTxState.holdTimes["orchard:SD:0304"]?.expiresAt || (now + 14 * 3600 * 1000)) + ". Khách chưa thanh toán ủy nhiệm chi tiền cọc 100 triệu.",
+        tag: "lock", tagLabel: "Giữ chỗ 48h",
+        title: "Căn SD-0304",
+        desc: "Thời hạn còn lại: " + formatHoldRemaining(agentTxState.holdTimes["orchard:SD:0304"]?.expiresAt || (now + 14 * 3600 * 1000)) + ". Khách chưa hoàn tất UNC cọc 100 triệu.",
         uid: "orchard:SD:0304",
         primaryAct: "agent-extend-hold", primaryLabel: "Gia hạn 24h",
         secAct: "agent-release-unit", secLabel: "Giải phóng căn"
       },
       {
-        tag: "cash", tagLabel: "VietQR Thu tiền",
-        title: "Nhắc tiến độ thanh toán: Căn SA-1002",
-        desc: "Đợt 2 thanh toán 5% (212.500.000 đ) đến hạn ngày 28/11/2026. Agent đã soạn sẵn thông báo kèm mã VietQR tự động khớp cú pháp ngân hàng.",
+        tag: "cash", tagLabel: "VietQR",
+        title: "Căn SA-1002",
+        desc: "Đợt 2 (212.5 tr) đến hạn 28/11/2026. Agent đã tạo sẵn thông báo kèm mã VietQR tự động.",
         uid: "orchard:SA:1002",
-        primaryAct: "agent-vietqr", primaryLabel: "Tạo & Gửi VietQR",
-        secAct: "work-open", secLabel: "Xem lịch thu", tab: 3
+        primaryAct: "agent-vietqr", primaryLabel: "Mã VietQR"
       }
     ];
 
     const nbaHtml = nbaCards.map((nba) =>
-      '<div class="nba-card ' + (nba.tag === 'scan' ? 'scan-warn' : nba.tag === 'lock' ? 'lock-warn' : nba.tag === 'cash' ? 'cash-info' : '') + '">' +
-        '<div>' +
-          '<div class="nba-head">' +
-            '<span class="nba-tag ' + nba.tag + '">' + nba.tagLabel + '</span>' +
-            '<small style="color:#627b82;font-family:monospace;font-size:11px;">' + esc(nba.uid) + '</small>' +
-          '</div>' +
-          '<h3 class="nba-title">' + esc(nba.title) + '</h3>' +
-          '<p class="nba-desc">' + esc(nba.desc) + '</p>' +
+      '<div class="agent-nba-row ' + nba.tag + '">' +
+        '<div class="agent-nba-info">' +
+          '<span class="nba-tag ' + nba.tag + '">' + nba.tagLabel + '</span>' +
+          '<b>' + esc(nba.title) + '</b>' +
+          '<span class="nba-desc-inline">' + esc(nba.desc) + '</span>' +
         '</div>' +
-        '<div class="nba-actions">' +
+        '<div class="agent-nba-btns">' +
           '<button type="button" class="btn pri sm" data-act="' + nba.primaryAct + '" data-uid="' + esc(nba.uid) + '">' +
             (nba.primaryAct === "agent-export-hdmb" ? '<svg class="ic sm"><use href="#i-file"/></svg>' : '') +
             (nba.primaryAct === "agent-upload-scan" ? '<svg class="ic sm"><use href="#i-upload"/></svg>' : '') +
             esc(nba.primaryLabel) +
           '</button>' +
-          (nba.secAct ? '<button type="button" class="btn sm" data-act="' + nba.secAct + '" data-uid="' + esc(nba.uid) + '"' + (nba.tab ? ' data-tab="' + nba.tab + '"' : ' data-tab="4"') + '>' + esc(nba.secLabel) + '</button>' : '') +
+          (nba.secAct ? '<button type="button" class="btn sm" data-act="' + nba.secAct + '" data-uid="' + esc(nba.uid) + '">' + esc(nba.secLabel) + '</button>' : '') +
+          '<button type="button" class="btn ghost sm" data-act="work-open" data-uid="' + esc(nba.uid) + '" data-tab="4">Chi tiết</button>' +
         '</div>' +
       '</div>'
     ).join("");
@@ -4485,7 +4338,7 @@ body.detail-mode #viewbar{display:none}
 
       let agentNotice = '';
       if (scan) {
-        agentNotice = '<span style="color:#166534;font-size:12px;">Đã lưu Document Vault (OCR OK)</span>';
+        agentNotice = '<span style="color:#166534;font-size:12px;">Đã lưu Vault (OCR OK)</span>';
       } else if (hold && u.status !== "AVAILABLE") {
         agentNotice = '<span style="color:#dc2626;font-size:12px;font-weight:600;">Còn ' + formatHoldRemaining(hold.expiresAt) + '</span>';
       } else if (u.status === "IN_TRANSACTION" || u.status === "SOLD") {
@@ -4516,72 +4369,54 @@ body.detail-mode #viewbar{display:none}
     return '<div class="agent-center">' +
       '<header class="agent-header">' +
         '<div>' +
-          '<h1><svg class="ic" style="width:24px;height:24px;color:#156757" aria-hidden="true"><use href="#i-agent"/></svg> Trung tâm Giám sát Giao dịch & Pháp lý AI</h1>' +
-          '<p>Tự động thẩm định hồ sơ · Kiểm soát tiến độ ký HĐMB · Thu thập scan mộc đỏ · Canh giữ chỗ 48h · Nhắc nợ VietQR</p>' +
+          '<h1><svg class="ic" style="width:22px;height:22px;color:#156757" aria-hidden="true"><use href="#i-agent"/></svg> Quản lý Giao dịch & Pháp lý</h1>' +
+          '<p>Tự động hóa xuất HĐMB · Kiểm soát tài liệu scan mộc đỏ · Canh giữ chỗ 48h · Nhắc nợ VietQR</p>' +
         '</div>' +
-        '<div style="display:flex;align-items:center;gap:10px;">' +
-          '<span class="agent-live-badge"><span class="pulse-dot"></span> Giám sát tự động 24/7</span>' +
-          '<button type="button" class="btn" data-act="agent-batch-demo" title="Mô phỏng quét và nạp file scan hàng loạt">' +
-            '<svg class="ic sm"><use href="#i-upload"/></svg> Quét scan mẫu' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<span class="agent-live-badge"><span class="pulse-dot"></span> Giám sát tự động</span>' +
+          '<button type="button" class="btn pri sm" data-act="open-batch-upload">' +
+            '<svg class="ic sm"><use href="#i-upload"/></svg> Nạp file scan' +
+          '</button>' +
+          '<button type="button" class="btn sm" data-act="agent-batch-demo" title="Quét thử nghiệm scan mẫu">' +
+            '<svg class="ic sm"><use href="#i-check"/></svg> Quét mẫu' +
           '</button>' +
         '</div>' +
       '</header>' +
 
       '<div class="agent-kpi-grid">' +
         '<div class="agent-kpi hdmb">' +
-          '<span><svg class="ic sm"><use href="#i-file"/></svg> Căn cần xuất HĐMB</span>' +
+          '<span><svg class="ic sm"><use href="#i-file"/></svg> Cần xuất HĐMB</span>' +
           '<b>' + needHdmbList.length + '</b>' +
-          '<small style="color:#536b72;font-size:11px;">Đủ điều kiện xuất HĐMB chính thức</small>' +
         '</div>' +
         '<div class="agent-kpi scan">' +
           '<span><svg class="ic sm"><use href="#i-alert"/></svg> Thiếu scan mộc đỏ</span>' +
           '<b>' + missingScanList.length + '</b>' +
-          '<small style="color:#536b72;font-size:11px;">Đã ký nhưng chưa lưu scan mộc đỏ</small>' +
         '</div>' +
         '<div class="agent-kpi lock">' +
           '<span><svg class="ic sm"><use href="#i-clock"/></svg> Canh giữ chỗ 48h</span>' +
           '<b>' + hold48hList.length + '</b>' +
-          '<small style="color:#536b72;font-size:11px;">Đang đếm lùi thời hạn giữ chỗ</small>' +
         '</div>' +
         '<div class="agent-kpi cash">' +
-          '<span><svg class="ic sm"><use href="#i-check"/></svg> Hồ sơ đã số hóa</span>' +
+          '<span><svg class="ic sm"><use href="#i-check"/></svg> Đã số hóa mộc đỏ</span>' +
           '<b>' + scanVault.size + '</b>' +
-          '<small style="color:#536b72;font-size:11px;">File scan có mộc đỏ trong Vault</small>' +
         '</div>' +
+      '</div>' +
+
+      '<div class="agent-nba-container" style="margin-bottom:18px;">' +
+        '<div class="agent-sec-title">' +
+          '<span><svg class="ic sm" style="margin-right:6px;"><use href="#i-agent"/></svg> Khuyến nghị hành động ưu tiên</span>' +
+          '<small style="color:#627b82;font-size:12px;">Đề xuất thông minh theo thời gian thực</small>' +
+        '</div>' +
+        '<div class="agent-nba-feed-clean">' + nbaHtml + '</div>' +
       '</div>' +
 
       '<div class="agent-sec-title">' +
-        '<span><svg class="ic sm" style="margin-right:6px;"><use href="#i-agent"/></svg> Khuyến nghị hành động ưu tiên (Next-Best-Actions)</span>' +
-        '<small style="color:#627b82;font-weight:400;font-size:12px;">Đề xuất thông minh theo thời gian thực</small>' +
-      '</div>' +
-      '<div class="agent-action-feed">' + nbaHtml + '</div>' +
-
-      '<div class="agent-dropzone-box" style="margin-bottom:24px;background:#f8fafb;border:2px dashed #b8d4cf;border-radius:8px;padding:18px 24px;text-align:center;">' +
-        '<div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px;">' +
-          '<svg class="ic" style="width:24px;height:24px;color:#156757"><use href="#i-upload"/></svg>' +
-          '<h3 style="margin:0;font-size:14px;color:#172c33;font-weight:700;">Tiếp nhận & Số hóa tệp scan HĐMB hàng loạt (AI OCR Vault)</h3>' +
-        '</div>' +
-        '<p style="font-size:12px;color:#536b72;margin:0 0 12px;max-width:700px;margin-left:auto;margin-right:auto;">' +
-          'Kéo thả tệp PDF hoặc ảnh scan HĐMB có mộc đỏ vào đây. Agent sẽ tự động trích xuất mã căn hộ, kiểm tra tính hợp lệ của con dấu CĐT Meraki Land và lưu vào Document Vault.' +
-        '</p>' +
-        '<div style="display:flex;justify-content:center;gap:10px;">' +
-          '<label class="btn pri" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;">' +
-            '<svg class="ic sm"><use href="#i-upload"/></svg> Chọn tệp tải lên' +
-            '<input type="file" multiple accept=".pdf,image/*" style="display:none" onchange="handleBatchScanUpload(this.files)">' +
-          '</label>' +
-          '<button type="button" class="btn" data-act="agent-batch-demo">' +
-            '<svg class="ic sm"><use href="#i-check"/></svg> Thử nạp tệp scan mẫu (Demo)' +
-          '</button>' +
-        '</div>' +
-      '</div>' +
-
-      '<div class="agent-sec-title">' +
-        '<span><svg class="ic sm" style="margin-right:6px;"><use href="#i-layers"/></svg> Bảng điều phối giao dịch & Kiểm soát hồ sơ</span>' +
+        '<span><svg class="ic sm" style="margin-right:6px;"><use href="#i-layers"/></svg> Bảng điều phối giao dịch</span>' +
         '<div class="agent-filter-pills">' +
           '<button type="button" class="agent-pill ' + (agentTxState.filter === "all" ? "on" : "") + '" data-act="agent-filter" data-f="all">Tất cả (' + txUnits.length + ')</button>' +
           '<button type="button" class="agent-pill ' + (agentTxState.filter === "need-hdmb" ? "on" : "") + '" data-act="agent-filter" data-f="need-hdmb">Cần xuất HĐMB (' + needHdmbList.length + ')</button>' +
-          '<button type="button" class="agent-pill ' + (agentTxState.filter === "missing-scan" ? "on" : "") + '" data-act="agent-filter" data-f="missing-scan">Thiếu scan mộc đỏ (' + missingScanList.length + ')</button>' +
-          '<button type="button" class="agent-pill ' + (agentTxState.filter === "hold-48h" ? "on" : "") + '" data-act="agent-filter" data-f="hold-48h">Đang giữ chỗ 48h (' + hold48hList.length + ')</button>' +
+          '<button type="button" class="agent-pill ' + (agentTxState.filter === "missing-scan" ? "on" : "") + '" data-act="agent-filter" data-f="missing-scan">Thiếu scan (' + missingScanList.length + ')</button>' +
+          '<button type="button" class="agent-pill ' + (agentTxState.filter === "hold-48h" ? "on" : "") + '" data-act="agent-filter" data-f="hold-48h">Giữ chỗ 48h (' + hold48hList.length + ')</button>' +
           '<button type="button" class="agent-pill ' + (agentTxState.filter === "digitized" ? "on" : "") + '" data-act="agent-filter" data-f="digitized">Đã số hóa (' + digitizedList.length + ')</button>' +
         '</div>' +
       '</div>' +
@@ -4589,7 +4424,7 @@ body.detail-mode #viewbar{display:none}
       '<div class="agent-table-card">' +
         '<div class="agent-search-bar">' +
           '<svg class="ic sm" style="color:#536b72;"><use href="#i-search"/></svg>' +
-          '<input type="text" id="agent-tx-query" placeholder="Tìm kiếm nhanh theo mã căn, tên khách hàng hoặc dự án..." value="' + esc(agentTxState.searchQuery) + '" data-act="agent-search-inp">' +
+          '<input type="text" id="agent-tx-query" placeholder="Tìm theo mã căn, tên khách hàng hoặc dự án..." value="' + esc(agentTxState.searchQuery) + '" data-act="agent-search-inp">' +
         '</div>' +
         '<table class="agent-tx-table">' +
           '<thead>' +
@@ -4597,9 +4432,9 @@ body.detail-mode #viewbar{display:none}
               '<th>Căn hộ & Dự án</th>' +
               '<th>Khách hàng & SĐT</th>' +
               '<th>Trạng thái</th>' +
-              '<th>Bản scan mộc đỏ</th>' +
-              '<th>Giám sát Agent</th>' +
-              '<th>Thao tác nhanh</th>' +
+              '<th>Scan mộc đỏ</th>' +
+              '<th>Agent giám sát</th>' +
+              '<th>Thao tác</th>' +
             '</tr>' +
           '</thead>' +
           '<tbody>' +
@@ -4610,131 +4445,7 @@ body.detail-mode #viewbar{display:none}
     '</div>';
   }
 
-  function agentLink(source) {
-    return '<button type="button" class="btn" data-act="agent-source" data-uid="' + esc(source.uid) +
-      '" data-tab="' + source.tab + '" data-step="' + (source.step || "") + '" data-payment-view="' +
-      (source.paymentView || "") + '">' + esc(source.label) + '</button>';
-  }
-
-  function agentRows(rows) {
-    return '<ul class="agent-rows">' + rows.map((row) =>
-      '<li><div><b>' + esc(row.label) + '</b><span>' + row.count + ' khoản · Hạn lâu nhất ' + row.due +
-      '</span></div><strong>' + fmt(row.amount) + '</strong>' +
-      '<button type="button" class="btn" data-act="agent-remind" data-uid="' + esc(row.uid) +
-      '" aria-label="' + esc("Soạn nhắc thu " + row.label) + '">Soạn nhắc</button></li>'
-    ).join("") + '</ul>';
-  }
-
-  function agentResult(result) {
-    if (!result) return "";
-    return '<section class="agent-result" tabindex="-1" id="agent-result" aria-label="Kết quả trợ lý">' +
-      '<p>' + esc(result.text) + '</p>' +
-      (result.status ? '<span class="tag t-lock">' + esc(result.status) + '</span>' : '') +
-      (result.model ? '<p class="agent-provenance">Qwen · công cụ CRM</p>' : '') +
-      (result.fallback ? '<p class="agent-provenance">Dùng chế độ mô phỏng. LM Studio chưa trả được công cụ.</p>' : '') +
-      (result.facts ? '<ul>' + result.facts.map((fact) => '<li>' + esc(fact) + '</li>').join("") + '</ul>' : '') +
-      (result.review ? '<ol class="agent-review">' + result.review.map((item) =>
-        '<li><div class="agent-review-heading"><b>Agent ' + esc(item.agent) + '</b><span class="tag ' +
-        (item.status === "Cần xử lý" ? 't-tx' : 't-lock') + '">' + esc(item.status || "Đã kiểm tra") + '</span></div>' +
-        '<p>' + esc(item.text) + '</p>' + (item.facts?.length ? '<p class="note">' + esc(item.facts.join(" · ")) + '</p>' : '') +
-        '<div class="agent-review-actions">' + (item.source ? agentLink(item.source) : '') +
-        (item.rows?.length ? '<button type="button" class="btn pri" data-act="agent-remind" data-uid="' +
-          esc(item.rows[0].uid) + '">Bàn giao soạn nhắc thu</button>' : '') + '</div></li>'
-      ).join("") + '</ol>' : '') +
-      (result.choices ? '<div class="agent-choices">' + result.choices.map((item) =>
-        '<button type="button" class="btn" data-act="agent-choice" data-uid="' + esc(item.uid) + '">' +
-        esc(item.label) + '</button>').join("") + '</div>' : '') +
-      (result.rows?.length ? agentRows(result.rows) : '') +
-      (result.proposal ? '<form id="agent-draft-form"><label for="agent-draft-body">Xem lại lời nhắc</label>' +
-        '<textarea class="ta" id="agent-draft-body" rows="4" maxlength="2000" required>' + esc(result.proposal.body) + '</textarea>' +
-        '<p id="agent-draft-error" role="alert"></p>' +
-        '<button type="submit" class="btn pri">Xác nhận lưu nháp</button></form>' : '') +
-      (result.source ? '<div class="agent-source">' + agentLink(result.source) + '</div>' : '') +
-      (result.planUnit ? '<div class="agent-choices" role="group" aria-label="Chọn phương án trong luồng bán">' +
-        Object.entries(seniquePaymentPlans).map(([id, plan]) =>
-          '<button type="button" class="btn" data-act="agent-apply-plan" data-uid="' + esc(result.planUnit) +
-          '" data-plan="' + id + '">Dùng ' + esc(plan.label) + '</button>').join("") + '</div>' : '') + '</section>';
-  }
-
-  function viewAgent() {
-    const pinned = byUid(agentSession.pinnedUnit);
-    const due = agentPaymentRows(pinned ? { uid: pinned.uid } : {});
-    const showcase = {
-      coordinator: ["Bước tiếp theo của giao dịch", "Kiểm tra hồ sơ"],
-      customer: ["Kiểm tra trường còn thiếu hoặc trùng", "Rà hồ sơ khách hàng"],
-      pricing: ["So sánh chiết khấu và dòng tiền", "So sánh báo giá"],
-      contracts: ["Kiểm tra ngày ký và bước hợp đồng", "Rà hợp đồng"],
-      collections: ["Kiểm tra các khoản thu quá hạn", "Xem công nợ"]
-    }[agentSession.profile];
-    const demo = pinned || byUid("orchard:SD:0802");
-    return '<div class="agent-workspace"><header class="agent-header"><div><h1>Hỏi CRM</h1>' +
-      '<p>' + (pinned ? esc(agentLabel(pinned)) : 'Chọn hồ sơ cần rà soát và xử lý các việc Agent bàn giao.') +
-      '</p></div><span class="tag t-lock">' +
-      (localAgentEnabled ? 'AI cục bộ' : 'Mô phỏng') + '</span></header>' +
-      '<div class="agent-workflow"><div><h2>Rà soát một giao dịch</h2><p>' + esc(agentLabel(demo)) + '</p></div>' +
-      '<button type="button" class="btn pri" data-act="agent-review" data-uid="' + esc(demo.uid) +
-      '"><svg class="ic sm" aria-hidden="true"><use href="#i-agent"/></svg>Rà soát với 4 Agent</button></div>' +
-      '<div class="agent-grid"><section class="agent-card" aria-labelledby="agent-task-heading"><h2 id="agent-task-heading">Bạn muốn xử lý việc gì?</h2>' +
-      (pinned ? '<div class="agent-context"><span>' + esc(agentLabel(pinned)) + '</span><div class="agent-choices">' +
-        (agentSession.returnTo ? '<button type="button" class="btn" data-act="agent-return">Quay lại hồ sơ</button>' : '') +
-        '<button type="button" class="btn ghost" data-act="agent-unpin">Bỏ chọn căn</button></div></div>' : '') +
-      '<div class="agent-profiles" role="group" aria-label="Chọn Agent">' + crmAgent.listProfiles().map((profile) =>
-        '<button type="button" class="btn" data-act="agent-profile" data-profile="' + profile.id +
-        '" aria-pressed="' + (agentSession.profile === profile.id) + '" title="' + esc(profile.job) + '">' + esc(profile.label) + '</button>'
-      ).join("") + '</div>' +
-      '<form id="agent-task-form"><input id="agent-task" class="inp" maxlength="300" autocomplete="off" required' +
-      ' aria-label="Yêu cầu trợ lý" placeholder="Soạn nhắc thu căn 0802 tòa SD The Orchard">' +
-      '<button type="submit" class="btn pri">Thực hiện<svg class="ic sm" aria-hidden="true"><use href="#i-arrow-up"/></svg></button></form>' +
-      '<div class="agent-choices"><button type="button" class="btn" data-act="agent-prompt" data-prompt="' +
-        esc(showcase[0] + (pinned ? "" : " căn 0802 tòa SD The Orchard")) + '">' + esc(showcase[1]) + '</button></div>' +
-      (agentSession.prompt ? '<p class="agent-request">' + esc(agentSession.prompt) + '</p>' : '') +
-      agentResult(agentSession.result) +
-      (agentSession.reviewedUnit && !agentSession.result?.review ? '<div class="agent-source"><button type="button" class="btn" data-act="agent-review" data-uid="' +
-        esc(agentSession.reviewedUnit) + '">Quay lại lượt rà soát</button></div>' : '') + '</section>' +
-      '<aside class="agent-side"><section class="agent-card"><h2>Việc cần xử lý</h2>' +
-      '<p class="note">Lịch thu mẫu đến ' + TODAY + '</p>' +
-      (due.length ? agentRows(due.slice(0, 3)) : '<p class="note">Chưa có khoản quá hạn.</p>') + '</section>' +
-      '<section class="agent-card"><h2>Bản nháp đã xác nhận</h2>' +
-      (agentSession.drafts.length ? '<ul class="agent-archive">' + agentSession.drafts.map((item) =>
-        '<li><details><summary>' + esc(item.label + " · " + item.key) + '</summary><p>' + esc(item.body) +
-        '</p><small>' + esc(item.actor) + ' · Đã lưu nháp</small></details></li>').join("") + '</ul>' :
-        '<p class="note">Bản nháp được lưu tại đây sau khi bạn xác nhận.</p>') + '</section></aside></div></div>';
-  }
-
-  function showAgentResult(result) {
-    agentSession.result = result;
-    agentSession.uid = result.proposal?.uid || result.source?.uid || agentSession.uid;
-    if (S.view !== "agent" || S.route) return;
-    renderContent();
-    $("#agent-result")?.focus();
-  }
-
-  async function runAgentPrompt(prompt) {
-    if (!prompt.trim()) return;
-    agentSession.prompt = prompt.trim();
-    const profile = agentSession.profile;
-    const simulate = () => crmAgent.interpret(prompt.trim(), agentSession.uid, agentSession.pinnedUnit, profile);
-    if (!localAgentEnabled) { showAgentResult(simulate()); return; }
-    agentRequest?.abort();
-    const request = new AbortController();
-    agentRequest = request;
-    showAgentResult({ text: "Đang đọc dữ liệu giao dịch…" });
-    try {
-      const result = await crmAgent.runWithModel(prompt.trim(), agentSession.pinnedUnit || agentSession.uid, async (messages, profile) => {
-        const response = await fetch("/api/agent-plan", {
-          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages, profile }),
-          signal: request.signal
-        });
-        if (!response.ok) throw new Error("LM Studio chưa sẵn sàng.");
-        return (await response.json()).message;
-      }, profile);
-      if (!request.signal.aborted) showAgentResult({ ...result, model: true });
-    } catch {
-      if (!request.signal.aborted) showAgentResult({ ...simulate(), fallback: true });
-    } finally {
-      if (agentRequest === request) agentRequest = null;
-    }
-  }
+  const agentLabel = (u) => "Căn " + u.code + " · " + projOf(u).short + " · " + towerOf(u).name;
 
   /* ================= render ================= */
   function renderContent() {
@@ -4751,7 +4462,7 @@ body.detail-mode #viewbar{display:none}
       if (c) { box.innerHTML = detailCust(c); box.scrollTop = y; return; }
       S.route = null;
     }
-    box.innerHTML = S.view === "work" ? viewWork() : S.view === "agent" ? viewAgent() : S.view === "project" ? viewProject() : viewCustomers();
+    box.innerHTML = S.view === "work" ? viewWork() : S.view === "project" ? viewProject() : viewCustomers();
     const el = $("#vbcount");
     if (el) el.textContent = "· " + filteredCustomers().length + " người";
     box.scrollTop = y;
@@ -4781,6 +4492,10 @@ body.detail-mode #viewbar{display:none}
     }
     if (a === "nav") { S.view = el.dataset.view; S.f = "all"; S.ct = "all"; S.q = ""; S.route = null; S.menu = ""; render(); return; }
     // Actions của Agent giám sát giao dịch
+    if (a === "open-batch-upload") {
+      $("#scan-upload-dialog")?.showModal();
+      return;
+    }
     if (a === "agent-filter") {
       agentTxState.filter = el.dataset.f;
       renderContent();
