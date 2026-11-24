@@ -1934,17 +1934,19 @@ body.detail-mode #viewbar{display:none}
         return;
       }
     }
-    $("#crumb").innerHTML = S.view === "work" ? "<b>Giao dịch</b>" : S.view === "agent" ? "<b>Hỏi CRM</b>" :
+    $("#crumb").innerHTML = S.view === "work" ? "<b>Giao dịch</b>" :
       S.view === "project"
         ? '<span>Dự án</span><svg class="ic"><use href="#i-chevron-right"/></svg><b>' + esc(curProj().short) + " · " + esc(curTower().name) + "</b>"
         : '<span>Khách hàng</span><svg class="ic"><use href="#i-chevron-right"/></svg><b>Tất cả khách hàng</b>';
   }
 
   function renderNav() {
-    $("#cnt-units").textContent = UNITS.length + " căn";
-    $("#cnt-cust").textContent = customers().length;
-    $('[data-act="filter-toggle"]').hidden = ["agent", "work"].includes(S.view);
-    $(".top-agent").setAttribute("aria-current", S.view === "agent" ? "page" : "false");
+    const cntU = $("#cnt-units");
+    if (cntU) cntU.textContent = UNITS.length + " căn";
+    const cntC = $("#cnt-cust");
+    if (cntC) cntC.textContent = customers().length;
+    const filterToggle = $('[data-act="filter-toggle"]');
+    if (filterToggle) filterToggle.hidden = S.view === "work";
     $$(".sb-nav .nav-item").forEach((b) => {
       if (b.dataset.act === "nav") {
         const active = b.dataset.view === S.view;
