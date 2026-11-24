@@ -1,0 +1,1221 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Meraki AI CRM — Thiết Kế Thử Nghiệm 6 Nhu Cầu & Agentic System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- SheetJS for 1-click Excel export -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root {
+  --bg: #0d1217;
+  --bg-subtle: #131922;
+  --surface: #18202c;
+  --surface-card: #1c2635;
+  --surface-hover: #222e40;
+  --border: #29384c;
+  --border-light: #384d68;
+  
+  --text: #f0f4f8;
+  --text-muted: #94a3b8;
+  --text-dim: #62758f;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  --primary: #38bdf8;
+  --primary-glow: rgba(56, 189, 248, 0.25);
+  --accent: #ff6d5a;
+  
+  /* Status Colors */
+  --st-avail: #10b981;
+  --st-avail-bg: rgba(16, 185, 129, 0.15);
+  --st-trans: #f59e0b;
+  --st-trans-bg: rgba(245, 158, 11, 0.15);
+  --st-sold: #ef4444;
+  --st-sold-bg: rgba(239, 68, 68, 0.15);
+  --st-lock: #64748b;
+  --st-lock-bg: rgba(100, 116, 139, 0.15);
+  --st-resell: #a855f7;
+  --st-resell-bg: rgba(168, 85, 247, 0.15);
+}
+
+[data-theme="light"] {
+  --bg: #f8fafc;
+  --bg-subtle: #f1f5f9;
+  --surface: #ffffff;
+  --surface-card: #f8fafc;
+  --surface-hover: #eef2f6;
+  --border: #e2e8f0;
+  --border-light: #cbd5e1;
+  --text: #0f172a;
+  --text-muted: #475569;
+  --text-dim: #94a3b8;
+  --primary: #0284c7;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-x: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* === TOPBAR NAVIGATION === */
+.topbar {
+  height: 56px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  flex: 0 0 56px;
+  z-index: 50;
+}
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.logo-box {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #38bdf8, #6366f1);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: #fff;
+  font-size: 15px;
+}
+.project-info h1 {
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.live-badge {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--st-avail-bg);
+  color: var(--st-avail);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.center-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cmd-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.15s ease;
+}
+.cmd-trigger:hover {
+  border-color: var(--primary);
+  color: var(--text);
+  box-shadow: 0 0 12px var(--primary-glow);
+}
+.kbd {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.nav-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-light);
+}
+.nav-btn.btn-pri {
+  background: var(--primary);
+  color: #000;
+  font-weight: 700;
+  border-color: var(--primary);
+}
+.nav-btn.btn-pri:hover {
+  filter: brightness(1.1);
+}
+
+/* === MAIN LAYOUT === */
+.main-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* === STACKING PLAN CANVAS === */
+.stacking-viewport {
+  flex: 1;
+  overflow: auto;
+  padding: 20px 24px 60px;
+  background: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+.filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.filter-left, .filter-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.segmented-control {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 2px;
+}
+.seg-btn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.seg-btn.active {
+  background: var(--surface-card);
+  color: var(--text);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+.legend-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+
+/* Elevation Grid */
+.elevation-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+.floor-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.floor-label {
+  flex: 0 0 70px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--text-dim);
+  text-align: right;
+  padding-right: 6px;
+}
+.units-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  flex: 1;
+}
+
+/* Stacking Unit Card */
+.unit-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  user-select: none;
+}
+.unit-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+}
+.unit-card.active-selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary);
+}
+.u-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.u-code {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 14px;
+}
+.u-type {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.u-agency {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.agency-pill {
+  font-size: 9.5px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+}
+.u-status-chip {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+/* Status variants */
+.unit-card.st-avail .u-status-chip { color: var(--st-avail); background: var(--st-avail-bg); }
+.unit-card.st-trans .u-status-chip { color: var(--st-trans); background: var(--st-trans-bg); }
+.unit-card.st-sold .u-status-chip { color: var(--st-sold); background: var(--st-sold-bg); }
+.unit-card.st-lock .u-status-chip { color: var(--st-lock); background: var(--st-lock-bg); }
+.unit-card.st-resell .u-status-chip { color: var(--st-resell); background: var(--st-resell-bg); }
+
+/* === SLIDE-OVER DRAWER === */
+.drawer {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 540px;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 60;
+}
+.drawer.open {
+  transform: translateX(0);
+}
+.drawer-head {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface-card);
+}
+.drawer-tabs {
+  display: flex;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--border);
+  gap: 16px;
+}
+.d-tab {
+  padding: 12px 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+.d-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* Agent Next-Best-Action Banner */
+.agent-banner {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(99, 102, 241, 0.08));
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.agent-banner-icon {
+  color: var(--primary);
+  font-size: 16px;
+  line-height: 1;
+  margin-top: 2px;
+}
+.agent-banner-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 3px;
+}
+.agent-banner-sub {
+  font-size: 11.5px;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+/* Form controls inside Drawer */
+.sec-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}
+.card-box {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+.spec-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 12.5px;
+}
+.spec-label { color: var(--text-muted); }
+.spec-val { font-weight: 600; font-family: var(--font-mono); }
+
+/* Document Vault Dropzone */
+.dropzone {
+  border: 2px dashed var(--border-light);
+  border-radius: 8px;
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--bg-subtle);
+  transition: all 0.15s ease;
+}
+.dropzone:hover {
+  border-color: var(--primary);
+  background: var(--surface-card);
+}
+.drop-icon {
+  font-size: 24px;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  width: 780px;
+  max-width: 92vw;
+  max-height: 85vh;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 24px 50px rgba(0,0,0,0.7);
+}
+.modal-head {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface-card);
+}
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Command Palette */
+.cmd-palette {
+  position: fixed;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 580px;
+  max-width: 90vw;
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+  z-index: 200;
+  display: none;
+  overflow: hidden;
+}
+.cmd-palette.open { display: block; }
+.cmd-input {
+  width: 100%;
+  padding: 16px 20px;
+  background: var(--surface-card);
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+}
+.cmd-list {
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 8px;
+}
+.cmd-item {
+  padding: 10px 14px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+.cmd-item:hover, .cmd-item.active {
+  background: var(--surface-hover);
+  color: var(--primary);
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="brand-group">
+    <div class="logo-box">M</div>
+    <div class="project-info">
+      <h1>The Orchard — Sycamore <span class="live-badge">LIVE STACKING</span></h1>
+    </div>
+  </div>
+
+  <div class="center-actions">
+    <div class="cmd-trigger" id="btnCmdTrigger">
+      <span>⚡ Agent Command...</span>
+      <span class="kbd">Ctrl + K</span>
+    </div>
+
+    <!-- 6 Client Needs Navigation Buttons -->
+    <button class="nav-btn" id="btnOpenBI">
+      <span>📊 Báo cáo kinh doanh</span>
+    </button>
+    <button class="nav-btn" id="btnOpenEmail">
+      <span>✉️ Gửi Email hàng loạt</span>
+    </button>
+    <button class="nav-btn" id="btnExportFast">
+      <span>📥 Export Excel (1-Click)</span>
+    </button>
+  </div>
+</header>
+
+<!-- MAIN WORKSPACE -->
+<div class="main-layout">
+  
+  <!-- STACKING PLAN VIEWPORT (NHU CẦU 2) -->
+  <main class="stacking-viewport">
+    
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <div class="filter-left">
+        <span style="font-weight: 700; font-size: 12px; color: var(--text-dim);">LỌC SÀN F1:</span>
+        <div class="segmented-control" id="agencyFilters">
+          <button class="seg-btn active" data-agency="all">Tất cả sàn</button>
+          <button class="seg-btn" data-agency="CenLand">CenLand (18)</button>
+          <button class="seg-btn" data-agency="Đất Xanh">Đất Xanh (12)</button>
+          <button class="seg-btn" data-agency="Smartland">Smartland (10)</button>
+          <button class="seg-btn" data-agency="ERA">ERA (10)</button>
+        </div>
+      </div>
+
+      <div class="filter-right">
+        <div class="legend-group">
+          <div class="legend-item"><div class="legend-dot" style="background: var(--st-avail);"></div> Chưa bán (14)</div>
+          <div class="legend-item"><div class="legend-dot" style="background: var(--st-trans);"></div> Đang xử lý (8)</div>
+          <div class="legend-item"><div class="legend-dot" style="background: var(--st-sold);"></div> Đã bán (22)</div>
+          <div class="legend-item"><div class="legend-dot" style="background: var(--st-lock);"></div> CĐT khóa (4)</div>
+          <div class="legend-item"><div class="legend-dot" style="background: var(--st-resell);"></div> Chuyển nhượng (2)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ELEVATION GRID: 10 TẦNG x 5 CĂN -->
+    <div class="elevation-grid" id="elevationGrid"></div>
+
+  </main>
+
+  <!-- SLIDE-OVER DRAWER (NHU CẦU 1, 2, 6) -->
+  <aside class="drawer" id="unitDrawer">
+    <div class="drawer-head">
+      <div>
+        <h2 id="dUnitCode" style="font-size: 16px; font-weight: 800; font-family: var(--font-mono);">ORCH-2001</h2>
+        <p id="dUnitSub" style="font-size: 11.5px; color: var(--text-muted);">Tầng 10 · 2 Phòng ngủ · 85.5 m²</p>
+      </div>
+      <button class="nav-btn" id="btnCloseDrawer">&times; Đóng</button>
+    </div>
+
+    <div class="drawer-tabs">
+      <div class="d-tab active" data-dtab="tab-quote">1. Báo giá & Lịch thu</div>
+      <div class="d-tab" data-dtab="tab-docs">2. HĐMB & File Scan</div>
+      <div class="d-tab" data-dtab="tab-agency">3. Sàn F1 & Khách hàng</div>
+    </div>
+
+    <div class="drawer-body">
+      <!-- Agent Next-Best-Action Banner -->
+      <div class="agent-banner" id="agentBanner">
+        <div class="agent-banner-icon">⚡</div>
+        <div>
+          <div class="agent-banner-title" id="agentBannerTitle">Agent Giao dịch: Đề xuất hành động</div>
+          <div class="agent-banner-sub" id="agentBannerDesc">Căn hộ này đã giữ chỗ 42 giờ. Cần xác nhận nộp tiền ký quỹ trước 17:00 chiều nay hoặc tự động nhả về bảng hàng.</div>
+        </div>
+      </div>
+
+      <!-- TAB 1: BÁO GIÁ & LỊCH THANH TOÁN (NHU CẦU 6) -->
+      <div id="tab-quote">
+        <div class="sec-title">Chọn Kịch bản thanh toán</div>
+        <div class="segmented-control" style="margin-bottom: 14px;">
+          <button class="seg-btn active" id="btnPlanStandard">Chuẩn (Tiến độ)</button>
+          <button class="seg-btn" id="btnPlanFast">Thanh toán sớm (-7%)</button>
+          <button class="seg-btn" id="btnPlanLoan">Vay NH 70% (LS 0%)</button>
+        </div>
+
+        <div class="card-box">
+          <div class="spec-row"><span class="spec-label">Giá niêm yết:</span><span class="spec-val" id="qBasePrice">7.820.000.000 ₫</span></div>
+          <div class="spec-row"><span class="spec-label">Chiết khấu mở bán (2%):</span><span class="spec-val" style="color: #10b981;" id="qDiscount">-156.400.000 ₫</span></div>
+          <div class="spec-row"><span class="spec-label">Thuế VAT (8.45%):</span><span class="spec-val" id="qVat">+647.574.600 ₫</span></div>
+          <div class="spec-row"><span class="spec-label">Phí bảo trì (2%):</span><span class="spec-val" id="qMf">+153.272.000 ₫</span></div>
+          <div style="height: 1px; background: var(--border); margin: 8px 0;"></div>
+          <div class="spec-row" style="font-size: 14px; font-weight: 700;">
+            <span>TỔNG GIÁ THANH TOÁN:</span>
+            <span class="spec-val" style="color: var(--primary);" id="qFinalPrice">8.464.446.600 ₫</span>
+          </div>
+        </div>
+
+        <div class="sec-title">Lịch thu chi tiết 7 đợt</div>
+        <div class="card-box" style="padding: 0; overflow: hidden;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 11.5px;">
+            <thead>
+              <tr style="background: var(--bg-subtle); border-bottom: 1px solid var(--border); text-align: left;">
+                <th style="padding: 8px 10px;">Đợt</th>
+                <th style="padding: 8px 10px;">Hạn nộp</th>
+                <th style="padding: 8px 10px;">Tỷ lệ</th>
+                <th style="padding: 8px 10px; text-align: right;">Số tiền</th>
+              </tr>
+            </thead>
+            <tbody id="quoteScheduleBody"></tbody>
+          </table>
+        </div>
+
+        <button class="nav-btn btn-pri" style="width: 100%; justify-content: center; padding: 10px;" id="btnExportQuotePdf">
+          📄 Xuất file Báo giá PDF & Gửi Zalo
+        </button>
+      </div>
+
+      <!-- TAB 2: HĐMB, KÝ QUỸ & FILE SCAN (NHU CẦU 1) -->
+      <div id="tab-docs" style="display: none;">
+        <div class="sec-title">Biểu mẫu pháp lý (Tự động điền)</div>
+        <div class="card-box">
+          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <button class="nav-btn" style="flex: 1; justify-content: center;" onclick="alert('Đã xuất PDF Thỏa thuận ký quỹ chuẩn theo mẫu!')">📄 Xuất Ký quỹ (PDF)</button>
+            <button class="nav-btn" style="flex: 1; justify-content: center;" onclick="alert('Đã xuất HĐMB chính thức kèm phụ lục!')">📑 Xuất HĐMB (PDF)</button>
+          </div>
+          <div class="spec-row"><span class="spec-label">Ngày ký Ký quỹ:</span><span class="spec-val" id="docSignDate">20/11/2026</span></div>
+          <div class="spec-row"><span class="spec-label">Ngày ký HĐMB dự kiến:</span><span class="spec-val">15/12/2026</span></div>
+          <div class="spec-row"><span class="spec-label">Trạng thái hồ sơ:</span><span class="spec-val" style="color: #10b981;">Đã duyệt mộc đỏ</span></div>
+        </div>
+
+        <div class="sec-title">Document Vault — Lưu trữ File Scan</div>
+        <div class="dropzone" id="dropzoneSimulator">
+          <div class="drop-icon">📤</div>
+          <div style="font-weight: 700; margin-bottom: 4px;">Kéo thả file scan HĐMB đã có mộc đỏ vào đây</div>
+          <div style="font-size: 11px; color: var(--text-dim);">Hỗ trợ PDF, PNG, JPG (Tự động OCR nhận diện mã căn)</div>
+        </div>
+        
+        <div style="margin-top: 12px;" id="scanUploadResult">
+          <div class="card-box" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 18px;">📑</span>
+              <div>
+                <div style="font-weight: 700; font-size: 12px;">HDMB_ORCH-2001_Signed.pdf</div>
+                <div style="font-size: 10.5px; color: var(--st-avail);">✓ AI Matcher: Đã khớp mã căn & có đủ mộc đỏ</div>
+              </div>
+            </div>
+            <button class="nav-btn" style="padding: 4px 8px; font-size: 11px;" onclick="alert('Đang mở file scan đã lưu trữ...')">Xem</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: THÔNG TIN SÀN BÁN & KHÁCH HÀNG (NHU CẦU 2) -->
+      <div id="tab-agency" style="display: none;">
+        <div class="sec-title">Đại lý phân phối phụ trách</div>
+        <div class="card-box">
+          <div class="spec-row"><span class="spec-label">Sàn F1:</span><span class="spec-val" style="color: var(--primary);" id="dAgencyName">CenLand</span></div>
+          <div class="spec-row"><span class="spec-label">Chuyên viên kinh doanh:</span><span class="spec-val">Trần Minh Quân (0912.888.xxx)</span></div>
+          <div class="spec-row"><span class="spec-label">Mức hoa hồng:</span><span class="spec-val">2.5% (~195.500.000 ₫)</span></div>
+          <div class="spec-row"><span class="spec-label">Thời điểm ghi nhận:</span><span class="spec-val">10:15 20/11/2026</span></div>
+        </div>
+
+        <div class="sec-title">Hồ sơ khách hàng 360</div>
+        <div class="card-box">
+          <div class="spec-row"><span class="spec-label">Họ và tên:</span><span class="spec-val" id="dCustomerName">Nguyễn Văn An</span></div>
+          <div class="spec-row"><span class="spec-label">Số CCCD:</span><span class="spec-val">001089012xxx</span></div>
+          <div class="spec-row"><span class="spec-label">Số điện thoại:</span><span class="spec-val">0983.123.xxx</span></div>
+          <div class="spec-row"><span class="spec-label">Địa chỉ:</span><span class="spec-val">Cầu Giấy, Hà Nội</span></div>
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+</div>
+
+<!-- MODAL 1: BÁO CÁO TÌNH HÌNH KINH DOANH (NHU CẦU 5) -->
+<div class="modal-overlay" id="modalBI">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 18px;">📊</span>
+        <div>
+          <h2 style="font-size: 14px; font-weight: 700;">Executive Business Intelligence Dashboard</h2>
+          <p style="font-size: 11px; color: var(--text-muted);">Phân tích tốc độ hấp thụ giỏ hàng & Dòng tiền dự án</p>
+        </div>
+      </div>
+      <button class="nav-btn" onclick="closeModals()">&times; Đóng</button>
+    </div>
+    <div class="modal-body">
+      <!-- KPI summary row -->
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px;">
+        <div class="card-box">
+          <div class="spec-label">Tổng doanh thu chốt</div>
+          <div style="font-size: 18px; font-weight: 800; color: #10b981; margin-top: 4px;">386.4 Tỷ</div>
+          <div style="font-size: 10.5px; color: var(--text-dim);">22 căn đã ký HĐMB</div>
+        </div>
+        <div class="card-box">
+          <div class="spec-label">Tỷ lệ hấp thụ</div>
+          <div style="font-size: 18px; font-weight: 800; color: var(--primary); margin-top: 4px;">72.0%</div>
+          <div style="font-size: 10.5px; color: var(--text-dim);">36 / 50 căn giao dịch</div>
+        </div>
+        <div class="card-box">
+          <div class="spec-label">Dòng tiền thực thu</div>
+          <div style="font-size: 18px; font-weight: 800; color: #f59e0b; margin-top: 4px;">94.2 Tỷ</div>
+          <div style="font-size: 10.5px; color: var(--text-dim);">Mục tiêu: 110 Tỷ</div>
+        </div>
+        <div class="card-box">
+          <div class="spec-label">Quỹ căn còn lại</div>
+          <div style="font-size: 18px; font-weight: 800; color: #ec4899; margin-top: 4px;">14 Căn</div>
+          <div style="font-size: 10.5px; color: var(--text-dim);">Chưa bán trên giỏ</div>
+        </div>
+      </div>
+
+      <!-- Agent Strategic Insights -->
+      <div class="agent-banner" style="background: rgba(168, 85, 247, 0.12); border-color: rgba(168, 85, 247, 0.4);">
+        <div class="agent-banner-icon" style="color: #c084fc;">💡</div>
+        <div>
+          <div class="agent-banner-title" style="color: #c084fc;">Chiến Lược Tự Động Từ AI Agent</div>
+          <div class="agent-banner-sub">
+            • <b>Phát hiện lệch hấp thụ</b>: Trục 03 (1PN) bán chậm hơn 35% so với Trục 02 (3PN view sông). Đề xuất CĐT ban hành gói nội thất 50tr dành riêng cho trục 03 để xả hàng trước tháng 12.<br>
+            • <b>Hiệu quả sàn F1</b>: Sàn <b>CenLand</b> dẫn đầu với 18 căn, tỷ lệ chốt cọc thành công 94%. Sàn <b>ERA</b> đang có 3 căn giữ chỗ sắp chạm hạn 48h.
+          </div>
+        </div>
+      </div>
+
+      <!-- Agency Leaderboard -->
+      <div class="sec-title">Bảng xếp hạng đại lý phân phối (Sàn F1)</div>
+      <div class="card-box" style="padding: 0; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+          <thead>
+            <tr style="background: var(--bg-subtle); border-bottom: 1px solid var(--border); text-align: left;">
+              <th style="padding: 10px;">Sàn phân phối</th>
+              <th style="padding: 10px;">Đã bán</th>
+              <th style="padding: 10px;">Đang giữ chỗ</th>
+              <th style="padding: 10px;">Doanh thu</th>
+              <th style="padding: 10px; text-align: right;">Hoa hồng dự kiến</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 10px; font-weight: 700; color: var(--primary);">1. CenLand</td>
+              <td style="padding: 10px;">18 căn</td>
+              <td style="padding: 10px;">2 căn</td>
+              <td style="padding: 10px; font-weight: 600;">141.2 Tỷ</td>
+              <td style="padding: 10px; text-align: right; color: #10b981;">3.53 Tỷ</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 10px; font-weight: 700;">2. Đất Xanh</td>
+              <td style="padding: 10px;">12 căn</td>
+              <td style="padding: 10px;">3 căn</td>
+              <td style="padding: 10px; font-weight: 600;">94.8 Tỷ</td>
+              <td style="padding: 10px; text-align: right; color: #10b981;">2.37 Tỷ</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+              <td style="padding: 10px; font-weight: 700;">3. Smartland</td>
+              <td style="padding: 10px;">10 căn</td>
+              <td style="padding: 10px;">1 căn</td>
+              <td style="padding: 10px; font-weight: 600;">78.5 Tỷ</td>
+              <td style="padding: 10px; text-align: right; color: #10b981;">1.96 Tỷ</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 2: GỬI EMAIL HÀNG LOẠT (NHU CẦU 3) -->
+<div class="modal-overlay" id="modalEmail">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 18px;">✉️</span>
+        <div>
+          <h2 style="font-size: 14px; font-weight: 700;">Smart Email Campaign Studio</h2>
+          <p style="font-size: 11px; color: var(--text-muted);">Gửi thông báo tiến độ & nhắc nợ cá nhân hóa hàng loạt</p>
+        </div>
+      </div>
+      <button class="nav-btn" onclick="closeModals()">&times; Đóng</button>
+    </div>
+    <div class="modal-body">
+      <div class="sec-title">1. Chọn nhóm khách hàng mục tiêu</div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px;">
+        <div class="card-box" style="cursor: pointer; border-color: var(--primary);" onclick="selectEmailGroup(this, 50)">
+          <div style="font-weight: 700;">Toàn bộ cư dân</div>
+          <div style="font-size: 11px; color: var(--text-dim);">50 căn dự án</div>
+        </div>
+        <div class="card-box" style="cursor: pointer;" onclick="selectEmailGroup(this, 22)">
+          <div style="font-weight: 700;">Khách đã ký HĐMB</div>
+          <div style="font-size: 11px; color: var(--text-dim);">22 căn đã chốt</div>
+        </div>
+        <div class="card-box" style="cursor: pointer;" onclick="selectEmailGroup(this, 8)">
+          <div style="font-weight: 700;">Khách đến hạn đợt 2</div>
+          <div style="font-size: 11px; color: var(--text-dim);">8 căn cần thu tiền</div>
+        </div>
+      </div>
+
+      <div class="sec-title">2. Mẫu thư cá nhân hóa tự động (Dynamic Merge)</div>
+      <div class="card-box" style="background: var(--bg-subtle);">
+        <div style="margin-bottom: 8px;">
+          <span class="spec-label">Tiêu đề:</span> <b>[The Orchard] Thông báo cất nóc & Lịch thanh toán đợt 3 cho căn {{MA_CAN}}</b>
+        </div>
+        <div style="font-size: 12px; line-height: 1.6; color: var(--text-muted); background: var(--surface); padding: 12px; border-radius: 6px; border: 1px solid var(--border);">
+          Kính gửi Quý khách <b>{{TEN_KHACH}}</b>,<br><br>
+          Chủ đầu tư CapitaLand trân trọng thông báo toà Orchard đã chính thức hoàn thành đổ sàn Tầng 10 vào ngày 24/11/2026. Căn hộ <b>{{MA_CAN}}</b> của Quý khách sẽ bước vào đợt thanh toán số 3 với số tiền <b>{{SO_TIEN_DOT}}</b> trước ngày <b>15/12/2026</b>.<br><br>
+          Quý khách có thể quét mã VietQR đính kèm bên dưới để thanh toán chuyển khoản tự động được gạch nợ tức thì.
+        </div>
+      </div>
+
+      <button class="nav-btn btn-pri" style="width: 100%; justify-content: center; padding: 12px;" onclick="simulateSendBulkEmails()">
+        🚀 Bấm gửi hàng loạt cho <span id="lblEmailCount">50</span> khách hàng (AI Auto-batch)
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- COMMAND PALETTE (CTRL + K) -->
+<div class="cmd-palette" id="cmdPalette">
+  <input class="cmd-input" id="cmdInput" placeholder="Gõ lệnh Agent: /xuat-excel, /bao-cao, /gui-email..." autocomplete="off">
+  <div class="cmd-list">
+    <div class="cmd-item" onclick="exportFullInventory(); closeCmd();">
+      <span>📥 <b>Xuất file Excel Giỏ hàng toàn diện</b></span>
+      <span class="kbd">Enter</span>
+    </div>
+    <div class="cmd-item" onclick="openModal('modalBI'); closeCmd();">
+      <span>📊 <b>Mở Báo cáo Doanh thu & Tốc độ hấp thụ</b></span>
+      <span class="kbd">BI</span>
+    </div>
+    <div class="cmd-item" onclick="openModal('modalEmail'); closeCmd();">
+      <span>✉️ <b>Gửi Email tiến độ xây dựng hàng loạt</b></span>
+      <span class="kbd">Email</span>
+    </div>
+    <div class="cmd-item" onclick="filterByAgency('CenLand'); closeCmd();">
+      <span>🔍 <b>Lọc toàn bộ căn do sàn CenLand phân phối</b></span>
+      <span class="kbd">Filter</span>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  /* === SAMPLE 50 UNITS DATA (10 FLOORS x 5 AXES) === */
+  const AGENCIES = ["CenLand", "Đất Xanh", "Smartland", "ERA"];
+  const STATUSES = [
+    { k: "st-avail", l: "Chưa bán", count: 14 },
+    { k: "st-trans", l: "Đang xử lý GD", count: 8 },
+    { k: "st-sold", l: "Đã bán", count: 22 },
+    { k: "st-lock", l: "CĐT khóa", count: 4 },
+    { k: "st-resell", l: "Chuyển nhượng", count: 2 }
+  ];
+
+  const UNITS = [];
+  let idCounter = 1;
+
+  for (let f = 10; f >= 1; f--) {
+    for (let axis = 1; axis <= 5; axis++) {
+      const code = `ORCH-${f < 10 ? '0' + f : f}0${axis}`;
+      const type = axis === 3 ? "1PN" : (axis === 2 ? "3PN" : "2PN");
+      const area = axis === 3 ? 52.4 : (axis === 2 ? 112.0 : 85.5);
+      const basePrice = Math.round(area * 91500000);
+      
+      // Deterministic realistic status allocation
+      let statusKey = "st-avail";
+      if (f <= 4 && axis !== 3) statusKey = "st-sold";
+      else if (f === 5 || f === 6) statusKey = (axis % 2 === 0) ? "st-sold" : "st-trans";
+      else if (f === 10 && axis === 5) statusKey = "st-lock";
+      else if (f === 9 && axis === 1) statusKey = "st-lock";
+      else if (f === 7 && axis === 4) statusKey = "st-resell";
+      else if (idCounter % 3 === 0) statusKey = "st-sold";
+
+      const agency = AGENCIES[(f + axis) % AGENCIES.length];
+
+      UNITS.push({
+        id: idCounter++,
+        floor: f,
+        axis,
+        code,
+        type,
+        area,
+        basePrice,
+        status: statusKey,
+        agency,
+        buyer: statusKey !== 'st-avail' && statusKey !== 'st-lock' ? `Khách hàng ${code}` : null
+      });
+    }
+  }
+
+  /* Render Stacking Plan Grid */
+  const gridEl = document.getElementById("elevationGrid");
+
+  function renderGrid(filteredUnits = UNITS) {
+    gridEl.innerHTML = "";
+    
+    for (let f = 10; f >= 1; f--) {
+      const row = document.createElement("div");
+      row.className = "floor-row";
+
+      const label = document.createElement("div");
+      label.className = "floor-label";
+      label.textContent = `Tầng ${f < 10 ? '0' + f : f}`;
+      row.appendChild(label);
+
+      const container = document.createElement("div");
+      container.className = "units-container";
+
+      const floorUnits = filteredUnits.filter(u => u.floor === f);
+      floorUnits.forEach(u => {
+        const card = document.createElement("div");
+        card.className = `unit-card ${u.status}`;
+        card.id = `unit-${u.id}`;
+
+        const stObj = STATUSES.find(s => s.k === u.status);
+
+        card.innerHTML = `
+          <div class="u-top">
+            <span class="u-code">${u.code}</span>
+            <span class="u-type">${u.type} · ${u.area}m²</span>
+          </div>
+          <div class="u-agency">
+            <span>Sàn:</span>
+            <span class="agency-pill">${u.agency}</span>
+          </div>
+          <div class="u-status-chip">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: currentColor;"></span>
+            ${stObj.l}
+          </div>
+        `;
+
+        card.addEventListener("click", () => openDrawer(u));
+        container.appendChild(card);
+      });
+
+      row.appendChild(container);
+      gridEl.appendChild(row);
+    }
+  }
+
+  /* Filter by Agency F1 (Nhu cầu 2) */
+  window.filterByAgency = function(agency) {
+    document.querySelectorAll(".seg-btn").forEach(b => b.classList.remove("active"));
+    const matchBtn = document.querySelector(`[data-agency="${agency}"]`);
+    if (matchBtn) matchBtn.classList.add("active");
+
+    if (agency === "all") {
+      renderGrid(UNITS);
+    } else {
+      const filtered = UNITS.filter(u => u.agency === agency);
+      renderGrid(filtered);
+    }
+  };
+
+  document.getElementById("agencyFilters").addEventListener("click", (e) => {
+    if (e.target.classList.contains("seg-btn")) {
+      const agency = e.target.dataset.agency;
+      filterByAgency(agency);
+    }
+  });
+
+  /* Drawer handling (Nhu cầu 1, 2, 6) */
+  let currentUnit = null;
+  const drawer = document.getElementById("unitDrawer");
+
+  function openDrawer(u) {
+    currentUnit = u;
+    document.querySelectorAll(".unit-card").forEach(c => c.classList.remove("active-selected"));
+    const cardEl = document.getElementById(`unit-${u.id}`);
+    if (cardEl) cardEl.classList.add("active-selected");
+
+    document.getElementById("dUnitCode").textContent = u.code;
+    document.getElementById("dUnitSub").textContent = `Tầng ${u.floor} · ${u.type} · ${u.area} m² · ${u.basePrice.toLocaleString('vi-VN')} ₫`;
+    document.getElementById("dAgencyName").textContent = u.agency;
+    document.getElementById("dCustomerName").textContent = u.buyer || "Chưa có người mua";
+
+    // Set Agent banner advice based on status
+    const bannerTitle = document.getElementById("agentBannerTitle");
+    const bannerDesc = document.getElementById("agentBannerDesc");
+    if (u.status === "st-avail") {
+      bannerTitle.textContent = "Agent Đề Xuất Bán Hàng:";
+      bannerDesc.textContent = `Căn ${u.code} đang trống. Đơn giá đang tốt hơn 3.2% so với tầng trên. Thích hợp tư vấn cho tệp khách đầu tư tài chính 8 tỷ.`;
+    } else if (u.status === "st-trans") {
+      bannerTitle.textContent = "Agent Cảnh Báo Quá Hạn:";
+      bannerDesc.textContent = `Căn ${u.code} đang giữ cọc bởi sàn ${u.agency}. Đã qua 36h/48h. Cần nhắc sàn nộp Ủy nhiệm chi ký quỹ trước 17:00.`;
+    } else if (u.status === "st-sold") {
+      bannerTitle.textContent = "Agent Hậu Mãi & Dòng Tiền:";
+      bannerDesc.textContent = `HĐMB đã ký thành công. Đợt thanh toán tiếp theo (10%) đến hạn vào ngày 15/12/2026. Lịch nhắc nợ tự động đã được lập.`;
+    } else {
+      bannerTitle.textContent = "Agent Giỏ Hàng:";
+      bannerDesc.textContent = `Căn đang ở quỹ khóa của Chủ đầu tư. Bấm để mở khóa phát hành giỏ hàng.`;
+    }
+
+    renderQuoteSchedule(u.basePrice);
+    drawer.classList.add("open");
+  }
+
+  document.getElementById("btnCloseDrawer").addEventListener("click", () => {
+    drawer.classList.remove("open");
+    document.querySelectorAll(".unit-card").forEach(c => c.classList.remove("active-selected"));
+  });
+
+  /* Drawer Tab switching */
+  document.querySelectorAll(".d-tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".d-tab").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      const target = tab.dataset.dtab;
+      document.getElementById("tab-quote").style.display = target === "tab-quote" ? "block" : "none";
+      document.getElementById("tab-docs").style.display = target === "tab-docs" ? "block" : "none";
+      document.getElementById("tab-agency").style.display = target === "tab-agency" ? "block" : "none";
+    });
+  });
+
+  /* Quotation Calculation & Installment schedule (Nhu cầu 6) */
+  function renderQuoteSchedule(base, discountPercent = 0.02) {
+    const disc = Math.round(base * discountPercent);
+    const afterDisc = base - disc;
+    const vat = Math.round(afterDisc * 0.0845);
+    const mf = Math.round(afterDisc * 0.02);
+    const total = afterDisc + vat + mf;
+
+    document.getElementById("qBasePrice").textContent = base.toLocaleString('vi-VN') + " ₫";
+    document.getElementById("qDiscount").textContent = "-" + disc.toLocaleString('vi-VN') + " ₫";
+    document.getElementById("qVat").textContent = "+" + vat.toLocaleString('vi-VN') + " ₫";
+    document.getElementById("qMf").textContent = "+" + mf.toLocaleString('vi-VN') + " ₫";
+    document.getElementById("qFinalPrice").textContent = total.toLocaleString('vi-VN') + " ₫";
+
+    const tbody = document.getElementById("quoteScheduleBody");
+    tbody.innerHTML = "";
+
+    const percentages = [0.10, 0.10, 0.10, 0.15, 0.15, 0.35, 0.05];
+    const dates = ["Ký HĐMB", "15/12/2026", "15/02/2027", "15/05/2027", "15/08/2027", "Bàn giao nhà", "Nhận Sổ hồng"];
+
+    percentages.forEach((p, idx) => {
+      const amount = Math.round(total * p);
+      const tr = document.createElement("tr");
+      tr.style.borderBottom = "1px solid var(--border)";
+      tr.innerHTML = `
+        <td style="padding: 7px 10px; font-weight: 600;">Đợt ${idx + 1}</td>
+        <td style="padding: 7px 10px; color: var(--text-muted);">${dates[idx]}</td>
+        <td style="padding: 7px 10px; font-family: var(--font-mono);">${(p * 100).toFixed(0)}%</td>
+        <td style="padding: 7px 10px; text-align: right; font-weight: 600; font-family: var(--font-mono);">${amount.toLocaleString('vi-VN')} ₫</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.getElementById("btnPlanStandard").addEventListener("click", () => renderQuoteSchedule(currentUnit ? currentUnit.basePrice : 7820000000, 0.02));
+  document.getElementById("btnPlanFast").addEventListener("click", () => renderQuoteSchedule(currentUnit ? currentUnit.basePrice : 7820000000, 0.07));
+  document.getElementById("btnPlanLoan").addEventListener("click", () => renderQuoteSchedule(currentUnit ? currentUnit.basePrice : 7820000000, 0.01));
+
+  document.getElementById("btnExportQuotePdf").addEventListener("click", () => {
+    alert("📄 Đã tạo Bảng Báo Giá chi tiết chuẩn format PDF cao cấp của CapitaLand kèm mã QR thanh toán!");
+  });
+
+  /* Dropzone Scan simulator (Nhu cầu 1) */
+  document.getElementById("dropzoneSimulator").addEventListener("click", () => {
+    const res = document.getElementById("scanUploadResult");
+    res.innerHTML = `<div class="card-box" style="color: var(--primary);">⏳ AI Agent đang OCR bóc tách mã căn, kiểm tra chữ ký & mộc đỏ...</div>`;
+    setTimeout(() => {
+      res.innerHTML = `
+        <div class="card-box" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-color: #10b981;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 18px;">📑</span>
+            <div>
+              <div style="font-weight: 700; font-size: 12px;">SCAN_HDMB_${currentUnit ? currentUnit.code : 'ORCH-2001'}_Official.pdf</div>
+              <div style="font-size: 10.5px; color: #10b981;">✓ AI Verified: Đã khớp mã căn, mộc đỏ hợp lệ, đã lưu trữ trên Vault.</div>
+            </div>
+          </div>
+          <button class="nav-btn" style="padding: 4px 8px; font-size: 11px;" onclick="alert('Đang mở file scan gốc...')">Xem</button>
+        </div>
+      `;
+    }, 900);
+  });
+
+  /* 1-Click Fast Excel Export (Nhu cầu 4) */
+  window.exportFullInventory = function() {
+    const exportData = UNITS.map(u => ({
+      "Mã Căn Hộ": u.code,
+      "Tầng": u.floor,
+      "Trục": u.axis,
+      "Loại Căn": u.type,
+      "Diện Tích (m2)": u.area,
+      "Giá Niêm Yết (VND)": u.basePrice,
+      "Trạng Thái": STATUSES.find(s => s.k === u.status).l,
+      "Sàn Phân Phối": u.agency,
+      "Họ Tên Khách Hàng": u.buyer || "Chưa bán",
+      "Ngày Cập Nhật": "24/11/2026"
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Gio_Hang_The_Orchard");
+    XLSX.writeFile(wb, `Bao_Cao_Gio_Hang_Orchard_${new Date().toISOString().slice(0,10)}.xlsx`);
+  };
+
+  document.getElementById("btnExportFast").addEventListener("click", exportFullInventory);
+
+  /* Modal controls (Nhu cầu 3, 5) */
+  window.openModal = function(id) {
+    document.querySelectorAll(".modal-overlay").forEach(m => m.classList.remove("open"));
+    document.getElementById(id).classList.add("open");
+  };
+
+  window.closeModals = function() {
+    document.querySelectorAll(".modal-overlay").forEach(m => m.classList.remove("open"));
+  };
+
+  document.getElementById("btnOpenBI").addEventListener("click", () => openModal("modalBI"));
+  document.getElementById("btnOpenEmail").addEventListener("click", () => openModal("modalEmail"));
+
+  window.selectEmailGroup = function(el, count) {
+    el.parentElement.querySelectorAll(".card-box").forEach(c => c.style.borderColor = "var(--border)");
+    el.style.borderColor = "var(--primary)";
+    document.getElementById("lblEmailCount").textContent = count;
+  };
+
+  window.simulateSendBulkEmails = function() {
+    const count = document.getElementById("lblEmailCount").textContent;
+    alert(`🚀 AI Agent đã hoàn tất phát tán tự động ${count} email cá nhân hóa tiến độ kèm mã VietQR đến từng khách hàng!`);
+    closeModals();
+  };
+
+  /* Command Palette (Ctrl + K) */
+  const cmdPalette = document.getElementById("cmdPalette");
+  const cmdInput = document.getElementById("cmdInput");
+
+  window.openCmd = function() {
+    cmdPalette.classList.add("open");
+    cmdInput.value = "";
+    cmdInput.focus();
+  };
+
+  window.closeCmd = function() {
+    cmdPalette.classList.remove("open");
+  };
+
+  document.getElementById("btnCmdTrigger").addEventListener("click", openCmd);
+
+  window.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+      e.preventDefault();
+      openCmd();
+    }
+    if (e.key === "Escape") {
+      closeCmd();
+      closeModals();
+      drawer.classList.remove("open");
+    }
+  });
+
+  // Init
+  renderGrid(UNITS);
+
+})();
+</script>
+</body>
+</html>
