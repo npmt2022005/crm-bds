@@ -739,6 +739,11 @@ body.detail-mode #viewbar{display:none}
       <span>Khách hàng</span>
       <span class="nav-count" id="cnt-cust" title="Tổng số khách hàng"></span>
     </button>
+    <button class="nav-item" data-act="nav" data-view="vault" aria-label="Kho File Scan">
+      <svg class="ic"><use href="#i-file"/></svg>
+      <span>Kho File Scan</span>
+      <span class="nav-count" id="cnt-vault" title="Hồ sơ đã số hóa"></span>
+    </button>
   </nav>
 
   <div class="sb-foot">
@@ -823,10 +828,23 @@ body.detail-mode #viewbar{display:none}
   <p id="contract-preview-result" role="status"></p>
   <footer><form method="dialog"><button class="btn">Đóng</button></form>
     <div class="escrow-file-actions">
-      <button class="btn" type="button" data-act="escrow-pdf-view" hidden>Xem PDF</button>
-      <button class="btn pri" type="button" data-act="escrow-pdf-download" hidden><svg class="ic sm"><use href="#i-download"/></svg>Tải PDF</button>
+      <button class="btn" type="button" data-act="escrow-pdf-view" hidden>Xem PDF Ký quỹ</button>
+      <button class="btn pri" type="button" data-act="escrow-pdf-download" hidden><svg class="ic sm"><use href="#i-download"/></svg>Tải PDF Ký quỹ</button>
+      <button class="btn" type="button" data-act="hdmb-pdf-view" hidden>Xem PDF HĐMB</button>
+      <button class="btn pri" type="button" data-act="hdmb-pdf-download" hidden><svg class="ic sm"><use href="#i-download"/></svg>Tải PDF HĐMB</button>
       <button class="btn pri" type="button" data-act="contract-generate"><svg class="ic sm"><use href="#i-file"/></svg>Mô phỏng tạo tệp</button>
     </div>
+  </footer>
+</dialog>
+<dialog class="customer-dialog escrow-pdf-dialog" id="hdmb-pdf-dialog" aria-labelledby="hdmb-pdf-title">
+  <header><h2 id="hdmb-pdf-title">Hợp đồng mua bán căn hộ · Bản PDF chính thức</h2>
+    <form method="dialog"><button class="iconbtn" aria-label="Đóng bản xem PDF"><svg class="ic"><use href="#i-x"/></svg></button></form>
+  </header>
+  <p id="hdmb-pdf-status" role="status"></p>
+  <iframe id="hdmb-pdf-frame" title="Bản PDF hợp đồng mua bán" hidden></iframe>
+  <footer class="escrow-pdf-footer">
+    <a class="btn" id="hdmb-pdf-new-tab" target="_blank" rel="noopener" hidden>Mở trong tab mới</a>
+    <a class="btn pri" id="hdmb-pdf-save" download hidden><svg class="ic sm"><use href="#i-download"/></svg>Tải PDF HĐMB</a>
   </footer>
 </dialog>
 <dialog class="customer-dialog escrow-pdf-dialog" id="escrow-pdf-dialog" aria-labelledby="escrow-pdf-title">
@@ -930,6 +948,7 @@ body.detail-mode #viewbar{display:none}
 <link rel="stylesheet" href="./meraki.css" />
 <script src="./customer-data.js"></script>
 <script src="./escrow-pdf.js"></script>
+<script src="./hdmb-pdf.js"></script>
 <script src="./crm-agent.js"></script>
 
 <script>
@@ -1473,6 +1492,140 @@ body.detail-mode #viewbar{display:none}
   const UNITS_INIT = UNITS.map((u) => ({ uid: u.uid, status: u.status, buyer: u.buyer, phone: u.phone, cccd: u.cccd }));
   seedStatusMeta();
 
+  /* ================= DOCUMENT VAULT STATE & HELPERS ================= */
+  const scanVault = new Map();
+  // Khởi tạo một số căn demo đã có file scan mộc đỏ
+  scanVault.set("orchard-1001", {
+    name: "HDMB_ORCH-1001_Signed_MocDo.pdf",
+    size: "2.4 MB",
+    date: "18/11/2026",
+    verified: true,
+    checker: "AI Legal Guard",
+    url: null
+  });
+  scanVault.set("orchard-2001", {
+    name: "HDMB_ORCH-2001_Signed_MocDo.pdf",
+    size: "3.1 MB",
+    date: "20/11/2026",
+    verified: true,
+    checker: "AI Legal Guard",
+    url: null
+  });
+  scanVault.set("global-1001", {
+    name: "HDMB_GLO-1001_Official_RedSeal.pdf",
+    size: "2.8 MB",
+    date: "15/11/2026",
+    verified: true,
+    checker: "AI Legal Guard",
+    url: null
+  });
+
+  function saveScanFile(uid, fileObj) {
+    scanVault.set(uid, fileObj);
+    const u = byUid(uid);
+    if (u) {
+      const d = contractDraft(u);
+      d.hasScan = true;
+      d.scanFile = fileObj;
+    }
+    toast("Đã lưu trữ file scan " + fileObj.name + " vào Document Vault");
+    renderNav();
+    renderContent();
+  }
+
+  function removeScanFile(uid) {
+    scanVault.delete(uid);
+    const u = byUid(uid);
+    if (u) {
+      const d = contractDraft(u);
+      delete d.hasScan;
+      delete d.scanFile;
+    }
+    toast("Đã xóa file scan khỏi Document Vault");
+    renderNav();
+    renderContent();
+  }
+
+  function simulateScanUpload(uid) {
+    const u = byUid(uid);
+    if (!u) return;
+    const demoName = "HDMB_" + u.code + "_Signed_MocDo.pdf";
+    saveScanFile(uid, {
+      name: demoName,
+      size: (Math.random() * 2 + 1.5).toFixed(1) + " MB",
+      date: new Date().toLocaleDateString("vi-VN"),
+      verified: true,
+      checker: "AI Legal Guard",
+      url: null
+    });
+  }
+
+  function handleUnitScanUpload(input, uid) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const url = URL.createObjectURL(file);
+    saveScanFile(uid, {
+      name: file.name,
+      size: (file.size / 1024 > 1000 ? (file.size / 1024 / 1024).toFixed(1) + " MB" : (file.size / 1024).toFixed(0) + " KB"),
+      date: new Date().toLocaleDateString("vi-VN"),
+      verified: true,
+      checker: "AI Legal Guard",
+      url: url
+    });
+  }
+
+  function simulateBatchDrop() {
+    const p = curProj();
+    const t = curTower();
+    const candidates = towerUnits(p.id, t.id).filter((u) => u.status !== "AVAILABLE" && !scanVault.has(u.uid)).slice(0, 5);
+    if (!candidates.length) {
+      toast("Tất cả các căn đã có file scan lưu trữ!");
+      return;
+    }
+    candidates.forEach((u) => {
+      scanVault.set(u.uid, {
+        name: "HDMB_" + u.code + "_Signed_MocDo.pdf",
+        size: (Math.random() * 2 + 1.2).toFixed(1) + " MB",
+        date: new Date().toLocaleDateString("vi-VN"),
+        verified: true,
+        checker: "AI Batch Matcher",
+        url: null
+      });
+      const d = contractDraft(u);
+      d.hasScan = true;
+    });
+    toast("AI Agent đã nhận diện và phân loại thành công " + candidates.length + " file scan!");
+    renderNav();
+    renderContent();
+  }
+
+  function handleBatchScanUpload(input) {
+    if (!input.files || !input.files.length) return;
+    let count = 0;
+    Array.from(input.files).forEach((file) => {
+      const match = UNITS.find((u) => file.name.toUpperCase().includes(u.code.toUpperCase()) || file.name.toUpperCase().includes(u.uid.toUpperCase()));
+      if (match) {
+        scanVault.set(match.uid, {
+          name: file.name,
+          size: (file.size / 1024 > 1000 ? (file.size / 1024 / 1024).toFixed(1) + " MB" : (file.size / 1024).toFixed(0) + " KB"),
+          date: new Date().toLocaleDateString("vi-VN"),
+          verified: true,
+          checker: "AI Matcher & OCR",
+          url: URL.createObjectURL(file)
+        });
+        count++;
+      }
+    });
+    toast(count ? "AI Agent đã khớp và lưu trữ " + count + " file scan hợp đồng!" : "Không tìm thấy mã căn tương ứng trong tên file.");
+    renderNav();
+    renderContent();
+  }
+
+  window.simulateScanUpload = simulateScanUpload;
+  window.handleUnitScanUpload = handleUnitScanUpload;
+  window.simulateBatchDrop = simulateBatchDrop;
+  window.handleBatchScanUpload = handleBatchScanUpload;
+
   const PROSPECTS = [
     { name: "Nguyễn Thị Mai Hương", phone: "0906.555.777", cccd: "079188009012", email: "maihuong.nt@gmail.com", addr: "12 Nguyễn Văn Hưởng, Thảo Điền, TP.HCM", src: "Facebook Ads", note: "Quan tâm 2PN tầng 8–10, ngân sách 12–15 tỷ.", created: "02/11/2026" },
     { name: "Lý Gia Hân", phone: "0932.888.999", cccd: "079288003344", email: "giahan.ly@outlook.com", addr: "45 Xuân Thuỷ, Cầu Giấy, Hà Nội", src: "Giới thiệu", note: "Đầu tư cho thuê, ưu tiên view sông.", created: "08/11/2026" },
@@ -1747,6 +1900,7 @@ body.detail-mode #viewbar{display:none}
       }
     }
     $("#crumb").innerHTML = S.view === "work" ? "<b>Giao dịch</b>" : S.view === "agent" ? "<b>Hỏi CRM</b>" :
+      S.view === "vault" ? "<b>Kho File Scan (Document Vault)</b>" :
       S.view === "project"
         ? '<span>Dự án</span><svg class="ic"><use href="#i-chevron-right"/></svg><b>' + esc(curProj().short) + " · " + esc(curTower().name) + "</b>"
         : '<span>Khách hàng</span><svg class="ic"><use href="#i-chevron-right"/></svg><b>Tất cả khách hàng</b>';
@@ -1755,7 +1909,9 @@ body.detail-mode #viewbar{display:none}
   function renderNav() {
     $("#cnt-units").textContent = UNITS.length + " căn";
     $("#cnt-cust").textContent = customers().length;
-    $('[data-act="filter-toggle"]').hidden = ["agent", "work"].includes(S.view);
+    const cntVault = $("#cnt-vault");
+    if (cntVault) cntVault.textContent = (typeof scanVault !== "undefined" ? scanVault.size : 0) + " file";
+    $('[data-act="filter-toggle"]').hidden = ["agent", "work", "vault"].includes(S.view);
     $(".top-agent").setAttribute("aria-current", S.view === "agent" ? "page" : "false");
     $$(".sb-nav .nav-item").forEach((b) => {
       if (b.dataset.act === "nav") {
@@ -1923,6 +2079,74 @@ body.detail-mode #viewbar{display:none}
       '<div class="customer-list">' + table +
       '<div class="viewnote"><span>Hiển thị <span class="mono">' + list.length + "</span> / " + all.length + " khách hàng</span>" +
       '<span class="saved"><svg class="ic"><use href="#i-check"/></svg>Lưu tự động trên máy</span></div></div>'
+    );
+  }
+
+  /* ================= view: Document Vault ================= */
+  function viewVault() {
+    const p = curProj();
+    const t = curTower();
+    const allUnits = towerUnits(p.id, t.id);
+    const bookedUnits = allUnits.filter((u) => u.status !== "AVAILABLE");
+    const verifiedScans = bookedUnits.filter((u) => scanVault.has(u.uid));
+    const pendingScans = bookedUnits.filter((u) => !scanVault.has(u.uid));
+    const ratio = bookedUnits.length ? Math.round((verifiedScans.length / bookedUnits.length) * 100) : 0;
+
+    const filter = S.vaultFilter || "all";
+    const list = filter === "verified" ? verifiedScans : filter === "pending" ? pendingScans : bookedUnits;
+
+    const rows = list.map((u) => {
+      const sc = scanVault.get(u.uid);
+      const cd = contractDraft(u);
+      return (
+        '<tr>' +
+        '<td><b>Căn ' + esc(u.code) + '</b> <span class="note">Tầng ' + u.floor + ' · ' + esc(u.type) + '</span></td>' +
+        '<td><b>' + esc(customerName(u.buyer) || 'Chưa liên kết') + '</b></td>' +
+        '<td><span class="tag ' + ST[u.status].t + '">' + esc(ST[u.status].l) + '</span></td>' +
+        '<td>' + (cd.signed ? esc(dateVN(cd.signed)) : '<span class="note">Chưa ký</span>') + '</td>' +
+        '<td>' + (sc ?
+          '<span class="tag-verified">✓ Đã lưu file scan</span><div class="note" style="font-size:11px;margin-top:2px;">' + esc(sc.name) + ' (' + esc(sc.size) + ')</div>' :
+          '<span class="tag-pending">⚠ Thiếu bản scan mộc đỏ</span>') +
+        '</td>' +
+        '<td><div style="display:flex;gap:6px;">' +
+        '<button class="btn" style="padding:4px 8px;font-size:11.5px;" data-act="unit" data-uid="' + u.uid + '">Xem căn</button>' +
+        (sc ? '<button class="btn" style="padding:4px 8px;font-size:11.5px;" onclick="alert(\'Đang mở file scan ' + esc(sc.name) + '\')">Xem Scan</button>' :
+          '<button class="btn pri" style="padding:4px 8px;font-size:11.5px;" onclick="simulateScanUpload(\'' + u.uid + '\')">Nạp scan</button>') +
+        '</div></td>' +
+        '</tr>'
+      );
+    }).join("");
+
+    return (
+      '<div class="vault-page">' +
+      '<header class="vault-header"><div>' +
+      '<h1><svg class="ic"><use href="#i-file"/></svg> Kho Lưu Trữ File Scan HĐMB & Ký Quỹ (Document Vault)</h1>' +
+      '<p>Phân hệ số hóa, lưu trữ và đối soát pháp lý hồ sơ HĐMB đã có chữ ký sống & con dấu mộc đỏ Chủ đầu tư.</p></div>' +
+      '<button class="btn" data-act="nav" data-view="project">Về sơ đồ căn</button></header>' +
+
+      '<div class="vault-stats">' +
+      '<div class="v-stat"><span>Tổng căn đã giao dịch</span><b>' + bookedUnits.length + '</b></div>' +
+      '<div class="v-stat verified"><span>Đã lưu file scan mộc đỏ</span><b>' + verifiedScans.length + '</b></div>' +
+      '<div class="v-stat pending"><span>Chờ nộp file scan</span><b>' + pendingScans.length + '</b></div>' +
+      '<div class="v-stat"><span>Tỷ lệ số hóa pháp lý</span><b>' + ratio + '%</b></div></div>' +
+
+      '<div class="vault-dropzone" onclick="$(\'#batch-scan-input\').click()">' +
+      '<div class="dz-icon">📂</div>' +
+      '<div class="dz-title">Kéo thả hàng loạt file scan HĐMB (PDF / Ảnh) vào đây</div>' +
+      '<div class="dz-desc">AI Agent tự động OCR đọc mã căn trong tên file hoặc trang bìa để phân loại vào đúng hồ sơ căn hộ</div>' +
+      '<div class="dz-tags"><span class="dz-tag">✓ Tự động đối soát mộc đỏ</span><span class="dz-tag">✓ Gán tự động vào kho căn</span><span class="dz-tag">✓ Tải lên 50 file trong 1 giây</span></div>' +
+      '<div style="margin-top:12px;"><button class="btn pri" type="button" style="font-size:12px;" onclick="event.stopPropagation(); simulateBatchDrop()">Giả lập AI nạp 5 file scan cùng lúc</button></div>' +
+      '<input type="file" id="batch-scan-input" multiple accept=".pdf,.png,.jpg,.jpeg" hidden onchange="handleBatchScanUpload(this)" /></div>' +
+
+      '<div class="vault-filter-bar"><div class="vault-tabs">' +
+      '<button class="vault-tab ' + (filter === "all" ? "on" : "") + '" data-act="vault-filter" data-vf="all">Tất cả (' + bookedUnits.length + ')</button>' +
+      '<button class="vault-tab ' + (filter === "verified" ? "on" : "") + '" data-act="vault-filter" data-vf="verified">Đã có scan mộc đỏ (' + verifiedScans.length + ')</button>' +
+      '<button class="vault-tab ' + (filter === "pending" ? "on" : "") + '" data-act="vault-filter" data-vf="pending">Chờ nộp scan (' + pendingScans.length + ')</button>' +
+      '</div><div class="note">Đang xem: ' + esc(p.name) + ' · ' + esc(t.name) + '</div></div>' +
+
+      '<table class="vault-table"><thead><tr>' +
+      '<th>Mã căn</th><th>Khách hàng</th><th>Trạng thái căn</th><th>Ngày ký HĐMB</th><th>Tình trạng File Scan</th><th>Thao tác</th>' +
+      '</tr></thead><tbody>' + (rows || '<tr><td colspan="6" style="text-align:center;padding:24px;color:#536b72;">Chưa có căn hộ nào phù hợp với bộ lọc.</td></tr>') + '</tbody></table></div>'
     );
   }
 
@@ -2845,6 +3069,35 @@ body.detail-mode #viewbar{display:none}
       seniqueQuote(seniquePaymentPlans[sale.paymentPlan], u, sale.discountsByPlan?.[sale.paymentPlan]) : null;
     const checks = S.route.contractReview && d.stage === "dat-coc" && sale?.signedDate
       ? crmAgent.call("review_deal", { uid: u.uid }).review.slice(0, 3) : [];
+
+    const scan = scanVault.get(u.uid);
+    const hdmbBox =
+      '<div class="hdmb-export-box">' +
+      '<h4><svg class="ic sm"><use href="#i-file"/></svg> Hợp Đồng Mua Bán (HĐMB) · Bản Điện Tử Chuẩn In</h4>' +
+      '<p>Tự động điền thông tin khách hàng, số CCCD, mã căn, diện tích tim tường/thông thủy, cơ cấu giá VAT &amp; KPBT, dịch số tiền ra chữ tiếng Việt và bảng phụ lục lịch thanh toán.</p>' +
+      '<div class="hdmb-btns">' +
+      '<button class="btn pri" type="button" data-act="hdmb-pdf-view"><svg class="ic sm"><use href="#i-file"/></svg> Xem PDF HĐMB</button>' +
+      '<button class="btn" type="button" data-act="hdmb-pdf-download"><svg class="ic sm"><use href="#i-download"/></svg> Tải PDF HĐMB</button>' +
+      '</div></div>';
+
+    const vaultBox =
+      '<div class="unit-vault-section">' +
+      '<div class="sec-h"><b>Document Vault — File Scan HĐMB Mộc Đỏ</b>' +
+      (scan ? '<span class="tag-verified">✓ Đã lưu file scan mộc đỏ</span>' : '<span class="tag-pending">⚠ Chưa nộp bản scan</span>') +
+      '</div>' +
+      (scan ?
+        '<div class="unit-vault-card"><div class="unit-vault-meta"><span class="file-icon">📑</span><div>' +
+        '<div class="file-name">' + esc(scan.name) + '</div><div class="file-sub"><span>' + esc(scan.size) + '</span> · <span>Ngày lưu: ' + esc(scan.date) + '</span> · <span style="color:#137333;font-weight:600;">✓ AI: Đã đối soát con dấu CĐT</span></div></div></div>' +
+        '<div class="unit-vault-actions"><button class="btn" type="button" onclick="alert(\'Đang mở file scan ' + esc(scan.name) + '\')">Xem Scan</button>' +
+        '<button class="btn ghost icon" type="button" data-act="delete-scan" data-uid="' + u.uid + '" title="Xóa file scan"><svg class="ic sm"><use href="#i-x"/></svg></button></div></div>' :
+        '<div class="vault-dropzone" style="padding:16px;" onclick="$(\'#unit-scan-upload-input\').click()">' +
+        '<div class="dz-icon" style="font-size:24px;">📤</div>' +
+        '<div class="dz-title">Tải lên hoặc Kéo thả file scan HĐMB đã có mộc đỏ</div>' +
+        '<div class="dz-desc">Hỗ trợ PDF, PNG, JPG (Tự động AI OCR nhận diện con dấu &amp; mã căn)</div>' +
+        '<div style="margin-top:8px;"><button class="btn pri" type="button" style="font-size:11.5px;padding:4px 10px;" onclick="event.stopPropagation(); simulateScanUpload(\'' + u.uid + '\')">Nạp file scan mẫu (Demo)</button></div></div>' +
+        '<input type="file" id="unit-scan-upload-input" accept=".pdf,.png,.jpg,.jpeg" hidden onchange="handleUnitScanUpload(this, \'' + u.uid + '\')" />'
+      ) + '</div>';
+
     return (
       '<div class="contract-page">' +
       '<div class="contract-heading"><h2>Hồ sơ hợp đồng</h2><span class="tag t-lock">Mô phỏng</span></div>' +
@@ -2863,6 +3116,7 @@ body.detail-mode #viewbar{display:none}
       (quote ? '<div class="contract-quote-bridge"><div><b>Báo giá đã xác nhận trong luồng bán</b><p>' +
         esc(seniquePaymentPlans[sale.paymentPlan].label) + ' · ' + fmt(quote.total) + '</p></div>' +
         '<button class="btn" data-act="contract-open-quote">Đối chiếu lịch dự kiến</button></div>' : '') +
+      hdmbBox +
       '<div class="contract-columns">' +
       '<details class="sec contract-info"' + (d.stage === "hdmb" ? ' open' : '') +
       '><summary><b>Thông tin HĐMB</b></summary>' +
@@ -2877,6 +3131,7 @@ body.detail-mode #viewbar{display:none}
       '<section class="sec contract-docs" aria-labelledby="contract-docs-title"><h3 id="contract-docs-title">Biểu mẫu đã cấu hình</h3>' +
       '<div class="contract-primary-docs">' + docs.slice(0, 3).join("") + '</div>' +
       '<details class="contract-extra-docs"><summary>Biểu mẫu khác</summary>' + docs.slice(3).join("") + '</details></section></div>' +
+      vaultBox + +
       '<section class="sec" aria-labelledby="contract-schedule-title">' +
       '<div class="contract-heading"><h3 id="contract-schedule-title">' +
       (d.stage === "hdmb" ? 'Lịch thanh toán áp dụng' : 'Xem trước lịch HĐMB') + '</h3>' +
@@ -2984,8 +3239,10 @@ body.detail-mode #viewbar{display:none}
     $("#contract-template").value = d.templates[doc.id] || (doc.id === "ky-quy" ? readyEscrowDraft(u)?.template : "") || "project";
     $("#contract-preview-result").textContent = "";
     const escrow = doc.id === "ky-quy";
+    const hdmb = doc.id === "hdmb";
     $$('[data-act="escrow-pdf-view"], [data-act="escrow-pdf-download"]', dialog).forEach((button) => { button.hidden = !escrow; });
-    $('[data-act="contract-generate"]', dialog).hidden = escrow;
+    $$('[data-act="hdmb-pdf-view"], [data-act="hdmb-pdf-download"]', dialog).forEach((button) => { button.hidden = !hdmb; });
+    $('[data-act="contract-generate"]', dialog).hidden = escrow || hdmb;
     renderContractDocument(u, doc);
     dialog.showModal();
   }
@@ -3003,6 +3260,107 @@ body.detail-mode #viewbar{display:none}
     }
     if (escrowPdfUrl) URL.revokeObjectURL(escrowPdfUrl);
     escrowPdfUrl = "";
+  }
+
+  let hdmbPdfUrl = "";
+  let hdmbPdfRequest = 0;
+
+  function clearHdmbPdfView() {
+    $("#hdmb-pdf-frame").removeAttribute("src");
+    $("#hdmb-pdf-frame").hidden = true;
+    for (const id of ["#hdmb-pdf-save", "#hdmb-pdf-new-tab"]) {
+      const link = $(id);
+      link.removeAttribute("href");
+      link.hidden = true;
+    }
+    if (hdmbPdfUrl) URL.revokeObjectURL(hdmbPdfUrl);
+    hdmbPdfUrl = "";
+  }
+
+  async function useHdmbPdf(button, preview) {
+    const parent = button.closest("#contract-preview");
+    const u = byUid(parent?.dataset.uid || S.route?.uid);
+    if (!u) return;
+    const d = contractDraft(u);
+    const buyer = custOf(u.buyer, u) || {
+      name: u.buyer || "Nguyễn Văn An",
+      id: u.cccd || "079095001234",
+      idDate: "15/04/2021",
+      address: "124/8 Võ Thị Sáu, Phường Võ Thị Sáu, Quận 3, TP.HCM",
+      phone: u.phone || "0912 345 678",
+      email: "khachhang@example.com"
+    };
+    const p = pricing(u);
+    const sch = tracksPayments(u) ? schedule(u, d) : [
+      { k: "Đợt 1 (Ký HĐMB)", p: 0.20, amt: Math.round(p.total * 0.20), date: "30/11/2026", note: "Bao gồm khoản ký quỹ đã đóng" },
+      { k: "Đợt 2", p: 0.10, amt: Math.round(p.total * 0.10), date: "15/01/2027", note: "Hoàn thành sàn tầng 5" },
+      { k: "Đợt 3", p: 0.10, amt: Math.round(p.total * 0.10), date: "30/03/2027", note: "Hoàn thành sàn tầng 10" },
+      { k: "Đợt 4 (Cất nóc)", p: 0.15, amt: Math.round(p.total * 0.15), date: "30/06/2027", note: "Cất nóc toàn bộ tòa tháp" },
+      { k: "Đợt 5", p: 0.15, amt: Math.round(p.total * 0.15), date: "30/09/2027", note: "Hoàn thiện mặt ngoài" },
+      { k: "Đợt 6 (Nhận nhà)", p: 0.25, amt: Math.round(p.total * 0.25), date: "15/12/2027", note: "Bàn giao căn hộ + 2% PBT" },
+      { k: "Đợt 7 (Sổ hồng)", p: 0.05, amt: Math.round(p.total * 0.05), date: "30/03/2028", note: "Bàn giao Giấy chứng nhận quyền sở hữu" }
+    ];
+
+    const signedParts = (d.signed || "2026-11-20").split("-");
+    const contractData = {
+      contractNumber: d.number || ("HĐMB-" + u.code + "/MERAKI/2026"),
+      unit: u,
+      tower: curTower(u),
+      project: curProj(u),
+      buyer: buyer,
+      pricing: p,
+      schedule: sch,
+      signedDay: signedParts[2] || "20",
+      signedMonth: signedParts[1] || "11",
+      signedYear: signedParts[0] || "2026",
+      planTitle: d.appliedSchedule?.label || contractPlans[d.plan] || "Tiến độ chuẩn"
+    };
+
+    const name = "HDMB-" + u.tower + "-" + u.code + ".pdf";
+    const dialog = $("#hdmb-pdf-dialog");
+    const status = $("#hdmb-pdf-status");
+    const request = preview ? ++hdmbPdfRequest : 0;
+    if (preview) {
+      clearHdmbPdfView();
+      status.textContent = "Đang tạo bản PDF HĐMB chính thức…";
+      dialog.showModal();
+    }
+    button.disabled = true;
+    try {
+      const blob = await HdmbPDF.create(contractData);
+      d.generated = d.generated || {};
+      d.generated["hdmb"] = true;
+      if (preview) {
+        if (!dialog.open || request !== hdmbPdfRequest) return;
+        hdmbPdfUrl = URL.createObjectURL(blob);
+        const frame = $("#hdmb-pdf-frame");
+        const save = $("#hdmb-pdf-save");
+        const open = $("#hdmb-pdf-new-tab");
+        frame.src = hdmbPdfUrl;
+        save.href = open.href = hdmbPdfUrl;
+        save.download = name;
+        frame.hidden = save.hidden = open.hidden = false;
+        status.textContent = "";
+      } else {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = name;
+        document.body.append(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 30000);
+        toast("Đã tải PDF HĐMB căn " + u.code);
+      }
+    } catch (error) {
+      if (preview && dialog.open && request === hdmbPdfRequest) {
+        status.textContent = "Không mở được PDF HĐMB: " + error.message;
+      } else if (!preview) {
+        toast("Không tải được PDF HĐMB: " + error.message);
+      }
+    } finally {
+      button.disabled = false;
+    }
   }
 
   async function useEscrowPdf(button, preview) {
@@ -4568,7 +4926,7 @@ body.detail-mode #viewbar{display:none}
       if (c) { box.innerHTML = detailCust(c); box.scrollTop = y; return; }
       S.route = null;
     }
-    box.innerHTML = S.view === "work" ? viewWork() : S.view === "agent" ? viewAgent() : S.view === "project" ? viewProject() : viewCustomers();
+    box.innerHTML = S.view === "work" ? viewWork() : S.view === "agent" ? viewAgent() : S.view === "project" ? viewProject() : S.view === "vault" ? viewVault() : viewCustomers();
     const el = $("#vbcount");
     if (el) el.textContent = "· " + filteredCustomers().length + " người";
     box.scrollTop = y;
@@ -4783,6 +5141,19 @@ body.detail-mode #viewbar{display:none}
     if (a === "customer-message") { openCustomerMessage(el.dataset.channel); return; }
     if (a === "escrow-pdf-view" || a === "escrow-pdf-download") {
       useEscrowPdf(el, a === "escrow-pdf-view");
+      return;
+    }
+    if (a === "hdmb-pdf-view" || a === "hdmb-pdf-download") {
+      useHdmbPdf(el, a === "hdmb-pdf-view");
+      return;
+    }
+    if (a === "delete-scan") {
+      removeScanFile(el.dataset.uid);
+      return;
+    }
+    if (a === "vault-filter") {
+      S.vaultFilter = el.dataset.vf;
+      renderContent();
       return;
     }
     if (a === "open-sale" || a.startsWith("sale-")) {
@@ -5066,6 +5437,11 @@ body.detail-mode #viewbar{display:none}
     if (e.currentTarget.open) return;
     escrowPdfRequest++;
     clearEscrowPdfView();
+  });
+  $("#hdmb-pdf-dialog")?.addEventListener("close", (e) => {
+    if (e.currentTarget.open) return;
+    hdmbPdfRequest++;
+    clearHdmbPdfView();
   });
 
   $("#customer-message-form").addEventListener("submit", (e) => {

@@ -1010,3 +1010,64 @@ select.inp { padding-right: 22px; }
 .escrow-pdf-dialog iframe { display: block; width: 100%; height: min(67vh, 700px); margin-top: 6px; border: 1px solid var(--bd); border-radius: var(--r-sm); }
 .escrow-pdf-dialog .escrow-pdf-footer { justify-content: flex-end; flex-wrap: wrap; }
 #escrow-pdf-status:not(:empty) { padding-block: 10px; }
+
+/* ================= DOCUMENT VAULT & HĐMB ENHANCEMENTS ================= */
+.vault-page { padding: 18px 24px; max-width: 1300px; margin: 0 auto; }
+.vault-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
+.vault-header h1 { font-size: 20px; font-weight: 700; color: #172c33; margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+.vault-header p { font-size: 13px; color: #536b72; margin: 0; }
+.vault-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.v-stat { background: #fff; border: 1px solid var(--bd, #dce5e5); border-radius: 8px; padding: 12px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
+.v-stat span { display: block; font-size: 11.5px; color: #627b82; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.v-stat b { font-size: 22px; font-weight: 700; color: #172c33; font-family: monospace; }
+.v-stat.verified b { color: #156757; }
+.v-stat.pending b { color: #d97706; }
+
+.vault-dropzone {
+  border: 2px dashed #93c5bc;
+  background: #f7faf9;
+  border-radius: 10px;
+  padding: 24px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 24px;
+}
+.vault-dropzone:hover, .vault-dropzone.dragover {
+  border-color: #156757;
+  background: #eaf3f1;
+}
+.vault-dropzone .dz-icon { font-size: 32px; margin-bottom: 8px; }
+.vault-dropzone .dz-title { font-size: 14px; font-weight: 700; color: #172c33; margin-bottom: 4px; }
+.vault-dropzone .dz-desc { font-size: 12px; color: #536b72; }
+.vault-dropzone .dz-tags { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+.vault-dropzone .dz-tag { font-size: 11px; background: #fff; border: 1px solid #dce5e5; padding: 2px 8px; border-radius: 12px; color: #156757; font-weight: 600; }
+
+.vault-filter-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+.vault-tabs { display: flex; gap: 4px; background: #eef2f3; padding: 3px; border-radius: 7px; }
+.vault-tab { border: none; background: transparent; padding: 5px 12px; font-size: 12px; font-weight: 600; border-radius: 5px; cursor: pointer; color: #536b72; }
+.vault-tab.on { background: #fff; color: #156757; box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+
+.vault-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--bd, #dce5e5); border-radius: 8px; overflow: hidden; font-size: 12.5px; }
+.vault-table th { background: #f8faf9; color: #486167; font-weight: 600; text-align: left; padding: 10px 14px; border-bottom: 1px solid #dce5e5; }
+.vault-table td { padding: 11px 14px; border-bottom: 1px solid #edf2f2; color: #172c33; }
+.vault-table tr:hover td { background: #fbfdfc; }
+
+.tag-verified { background: #e6f4ea; color: #137333; font-weight: 600; padding: 3px 8px; border-radius: 4px; font-size: 11px; display: inline-flex; align-items: center; gap: 4px; }
+.tag-pending { background: #fef3c7; color: #92400e; font-weight: 600; padding: 3px 8px; border-radius: 4px; font-size: 11px; display: inline-flex; align-items: center; gap: 4px; }
+.tag-unbooked { background: #f1f3f4; color: #5f6368; padding: 3px 8px; border-radius: 4px; font-size: 11px; }
+
+/* Unit Tab4 Enhancements */
+.unit-vault-section { margin-top: 18px; border-top: 1px solid var(--bd, #dce5e5); padding-top: 16px; }
+.unit-vault-section .sec-h { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.unit-vault-card { background: #f8faf9; border: 1px solid #d3e2de; border-radius: 8px; padding: 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.unit-vault-meta { display: flex; align-items: center; gap: 12px; }
+.unit-vault-meta .file-icon { font-size: 26px; }
+.unit-vault-meta .file-name { font-weight: 700; font-size: 13px; color: #172c33; }
+.unit-vault-meta .file-sub { font-size: 11.5px; color: #536b72; display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.unit-vault-actions { display: flex; gap: 6px; }
+
+.hdmb-export-box { background: #fff; border: 1px solid #cce2dc; border-radius: 8px; padding: 14px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(21, 103, 87, 0.05); }
+.hdmb-export-box h4 { margin: 0 0 6px; font-size: 13.5px; color: #156757; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+.hdmb-export-box p { font-size: 12px; color: #536b72; margin: 0 0 10px; line-height: 1.4; }
+.hdmb-btns { display: flex; flex-wrap: wrap; gap: 8px; }
